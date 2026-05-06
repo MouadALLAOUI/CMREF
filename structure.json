@@ -1,0 +1,963 @@
+{
+  "controllers": {
+    "AdminController": {
+      "model": "Admin",
+      "resource": "AdminResource",
+      "endpoints": {
+        "index": "GET /api/admins",
+        "store": "POST /api/admins",
+        "show": "GET /api/admins/{id}",
+        "update": "PUT /api/admins/{id}",
+        "destroy": "DELETE /api/admins/{id}"
+      }
+    },
+    "BLivraisonController": {
+      "model": "BLivraison",
+      "resource": "BLivraisonResource",
+      "endpoints": {
+        "index": {
+          "route": "GET /api/b-livraisons",
+          "return format": [
+            {
+              "id": "",
+              "rep_id": "",
+              "bl_number": "",
+              "date_emission": "",
+              "mode_envoi": "-",
+              "type": "Livre",
+              "statut_recu": 1,
+              "statut_vu": 1,
+              "status": "Pending",
+              "annee": null,
+              "remarks": null,
+              "created_at": null,
+              "updated_at": null,
+              "representant": {
+                "id": "",
+                "destination_id": "",
+                "nom": "",
+                "cin": "",
+                "tel": "",
+                "email": "",
+                "adresse": null,
+                "code_postale": null,
+                "ville": null,
+                "lieu_de_travail": null,
+                "login": "",
+                "bl_count": 0,
+                "remb_count": 0,
+                "created_at": "",
+                "updated_at": ""
+              }
+            }
+          ]
+        },
+        "store": "POST /api/b-livraisons",
+        "show": "GET /api/b-livraisons/{id}",
+        "update": "PUT /api/b-livraisons/{id}",
+        "destroy": "DELETE /api/b-livraisons/{id}"
+      }
+    },
+    "BLivraisonImpController": {
+      "model": "BLivraisonImp",
+      "resource": "BLivraisonImpResource",
+      "endpoints": {
+        "index": "GET /api/b-livraison-imps",
+        "store": "POST /api/b-livraison-imps",
+        "show": "GET /api/b-livraison-imps/{id}",
+        "update": "PUT /api/b-livraison-imps/{id}",
+        "destroy": "DELETE /api/b-livraison-imps/{id}"
+      }
+    },
+    "BLivraisonItemController": {
+      "model": "BLivraisonItem",
+      "resource": "BLivraisonItemResource",
+      "endpoints": {
+        "index": "GET /api/b-livraison-items",
+        "store": "POST /api/b-livraison-items",
+        "show": "GET /api/b-livraison-items/{id}",
+        "update": "PUT /api/b-livraison-items/{id}",
+        "destroy": "DELETE /api/b-livraison-items/{id}"
+      }
+    },
+    "BVentesClientController": {
+      "model": "BVentesClient",
+      "resource": "BVentesClientResource",
+      "endpoints": {
+        "index": "GET /api/b-ventes-clients",
+        "store": "POST /api/b-ventes-clients",
+        "show": "GET /api/b-ventes-clients/{id}",
+        "update": "PUT /api/b-ventes-clients/{id}",
+        "destroy": "DELETE /api/b-ventes-clients/{id}"
+      }
+    },
+    "BanqueController": {
+      "model": "Banque",
+      "resource": "BanqueResource",
+      "endpoints": {
+        "index": "GET /api/banques",
+        "store": "POST /api/banques",
+        "show": "GET /api/banques/{id}",
+        "update": "PUT /api/banques/{id}",
+        "destroy": "DELETE /api/banques/{id}"
+      }
+    },
+    "CahierCommunicationController": {
+      "model": "CahierCommunication",
+      "resource": "CahierCommunicationResource",
+      "endpoints": {
+        "index": "GET /api/cahier-communications",
+        "store": "POST /api/cahier-communications",
+        "show": "GET /api/cahier-communications/{id}",
+        "update": "PUT /api/cahier-communications/{id}",
+        "destroy": "DELETE /api/cahier-communications/{id}"
+      }
+    },
+    "CarteVisiteController": {
+      "model": "CarteVisite",
+      "resource": "CarteVisiteResource",
+      "endpoints": {
+        "index": "GET /api/carte-visites",
+        "store": "POST /api/carte-visites",
+        "show": "GET /api/carte-visites/{id}",
+        "update": "PUT /api/carte-visites/{id}",
+        "destroy": "DELETE /api/carte-visites/{id}"
+      }
+    },
+    "CatalogueController": {
+      "model": "Catalogue",
+      "resource": "CatalogueResource",
+      "endpoints": {
+        "index": "GET /api/catalogues",
+        "store": "POST /api/catalogues",
+        "show": "GET /api/catalogues/{id}",
+        "update": "PUT /api/catalogues/{id}",
+        "destroy": "DELETE /api/catalogues/{id}"
+      }
+    },
+    "CategoryController": {
+      "model": "Category",
+      "resource": "CategoryResource",
+      "endpoints": {
+        "index": "GET /api/categories",
+        "store": "POST /api/categories",
+        "show": "GET /api/categories/{id}",
+        "update": "PUT /api/categories/{id}",
+        "destroy": "DELETE /api/categories/{id}"
+      }
+    },
+    "ClientController": {
+      "model": "Client",
+      "resource": "ClientResource",
+      "endpoints": {
+        "index": "GET /api/clients",
+        "store": "POST /api/clients",
+        "show": "GET /api/clients/{id}",
+        "update": "PUT /api/clients/{id}",
+        "destroy": "DELETE /api/clients/{id}"
+      }
+    },
+    "ClientRemboursementController": {
+      "model": "ClientRemboursement",
+      "resource": "ClientRemboursementResource",
+      "endpoints": {
+        "index": "GET /api/client-remboursements",
+        "store": "POST /api/client-remboursements",
+        "show": "GET /api/client-remboursements/{id}",
+        "update": "PUT /api/client-remboursements/{id}",
+        "destroy": "DELETE /api/client-remboursements/{id}"
+      }
+    },
+    "ContentController": {
+      "model": "Content",
+      "resource": "ContentResource",
+      "endpoints": {
+        "index": "GET /api/contents",
+        "store": "POST /api/contents",
+        "show": "GET /api/contents/{id}",
+        "update": "PUT /api/contents/{id}",
+        "destroy": "DELETE /api/contents/{id}"
+      }
+    },
+    "DemandeFController": {
+      "model": "DemandeF",
+      "resource": "DemandeFResource",
+      "endpoints": {
+        "index": "GET /api/demande-f",
+        "store": "POST /api/demande-f",
+        "show": "GET /api/demande-f/{id}",
+        "update": "PUT /api/demande-f/{id}",
+        "destroy": "DELETE /api/demande-f/{id}"
+      }
+    },
+    "DepotController": {
+      "model": "Depot",
+      "resource": "DepotResource",
+      "endpoints": {
+        "index": "GET /api/depots",
+        "store": "POST /api/depots",
+        "show": "GET /api/depots/{id}",
+        "update": "PUT /api/depots/{id}",
+        "destroy": "DELETE /api/depots/{id}"
+      }
+    },
+    "DestinationController": {
+      "model": "Destination",
+      "resource": "DestinationResource",
+      "endpoints": {
+        "index": "GET /api/destinations",
+        "store": "POST /api/destinations",
+        "show": "GET /api/destinations/{id}",
+        "update": "PUT /api/destinations/{id}",
+        "destroy": "DELETE /api/destinations/{id}"
+      }
+    },
+    "DetFactController": {
+      "model": "DetFact",
+      "resource": "DetFactResource",
+      "endpoints": {
+        "index": "GET /api/det-fact",
+        "store": "POST /api/det-fact",
+        "show": "GET /api/det-fact/{id}",
+        "update": "PUT /api/det-fact/{id}",
+        "destroy": "DELETE /api/det-fact/{id}"
+      }
+    },
+    "FactController": {
+      "model": "Fact",
+      "resource": "FactResource",
+      "endpoints": {
+        "index": "GET /api/fact",
+        "store": "POST /api/fact",
+        "show": "GET /api/fact/{id}",
+        "update": "PUT /api/fact/{id}",
+        "destroy": "DELETE /api/fact/{id}"
+      }
+    },
+    "FactSequenceController": {
+      "model": "FactSequence",
+      "resource": "FactSequenceResource",
+      "endpoints": {
+        "index": "GET /api/fact-sequences",
+        "store": "POST /api/fact-sequences",
+        "show": "GET /api/fact-sequences/{id}",
+        "update": "PUT /api/fact-sequences/{id}",
+        "destroy": "DELETE /api/fact-sequences/{id}"
+      }
+    },
+    "ImprimeurController": {
+      "model": "Imprimeur",
+      "resource": "ImprimeurResource",
+      "endpoints": {
+        "index": "GET /api/imprimeurs",
+        "store": "POST /api/imprimeurs",
+        "show": "GET /api/imprimeurs/{id}",
+        "update": "PUT /api/imprimeurs/{id}",
+        "destroy": "DELETE /api/imprimeurs/{id}"
+      }
+    },
+    "LivreController": {
+      "model": "Livre",
+      "resource": "LivreResource",
+      "endpoints": {
+        "index": "GET /api/livres",
+        "store": "POST /api/livres",
+        "show": "GET /api/livres/{id}",
+        "update": "PUT /api/livres/{id}",
+        "destroy": "DELETE /api/livres/{id}"
+      }
+    },
+    "LoginController": {
+      "model": "Login",
+      "resource": "LoginResource",
+      "endpoints": {
+        "login": "POST /api/login",
+        "logout": "POST /api/logout"
+      }
+    },
+    "RembImpController": {
+      "model": "RembImp",
+      "resource": "RembImpResource",
+      "endpoints": {
+        "index": "GET /api/remb-imp",
+        "store": "POST /api/remb-imp",
+        "show": "GET /api/remb-imp/{id}",
+        "update": "PUT /api/remb-imp/{id}",
+        "destroy": "DELETE /api/remb-imp/{id}"
+      }
+    },
+    "RepRemboursementController": {
+      "model": "RepRemboursement",
+      "resource": "RepRemboursementResource",
+      "endpoints": {
+        "index": "GET /api/rep-remboursements",
+        "store": "POST /api/rep-remboursements",
+        "show": "GET /api/rep-remboursements/{id}",
+        "update": "PUT /api/rep-remboursements/{id}",
+        "destroy": "DELETE /api/rep-remboursements/{id}"
+      }
+    },
+    "RepresentantController": {
+      "model": "Representant",
+      "resource": "RepresentantResource",
+      "endpoints": {
+        "index": "GET /api/representants",
+        "store": "POST /api/representants",
+        "show": "GET /api/representants/{id}",
+        "update": "PUT /api/representants/{id}",
+        "destroy": "DELETE /api/representants/{id}"
+      }
+    },
+    "RobotController": {
+      "model": "Robot",
+      "resource": "RobotResource",
+      "endpoints": {
+        "index": "GET /api/robots",
+        "store": "POST /api/robots",
+        "show": "GET /api/robots/{id}",
+        "update": "PUT /api/robots/{id}",
+        "destroy": "DELETE /api/robots/{id}"
+      }
+    },
+    "UserController": {
+      "model": "User",
+      "resource": "UserResource",
+      "endpoints": {
+        "index": "GET /api/users",
+        "store": "POST /api/users",
+        "show": "GET /api/users/{id}",
+        "update": "PUT /api/users/{id}",
+        "destroy": "DELETE /api/users/{id}"
+      }
+    }
+  },
+  "models": {
+    "Admin": {
+      "fillable": [
+        "login",
+        "password"
+      ],
+      "hidden": [
+        "password"
+      ],
+      "relationships": [
+        "login"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "BLivraison": {
+      "fillable": [
+        "rep_id",
+        "bl_number",
+        "date_emission",
+        "type",
+        "mode_envoi",
+        "statut_recu",
+        "statut_vu",
+        "status",
+        "annee",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant",
+        "items"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "BLivraisonImp": {
+      "fillable": [
+        "imprimeur_id",
+        "date_reception",
+        "b_livraison_number",
+        "livre_id",
+        "quantite",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "imprimeur",
+        "livre",
+        "items"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "BLivraisonItem": {
+      "fillable": [
+        "deliverable_id",
+        "deliverable_type",
+        "livre_id",
+        "quantite"
+      ],
+      "hidden": [],
+      "relationships": [
+        "deliverable",
+        "livre"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "BVentesClient": {
+      "fillable": [
+        "rep_id",
+        "client_id",
+        "b_vente_number",
+        "date_vente",
+        "type",
+        "livre_id",
+        "quantite",
+        "remise",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant",
+        "client",
+        "livre"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Banque": {
+      "fillable": [
+        "nom",
+        "code_abreviation",
+        "logo_path",
+        "is_active"
+      ],
+      "hidden": [],
+      "relationships": [
+        "rep_remboursements",
+        "client_remboursements",
+        "remb_imp"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "casts": {
+          "is_active": "boolean"
+        }
+      }
+    },
+    "CahierCommunication": {
+      "fillable": [
+        "rep_id",
+        "ecole",
+        "type",
+        "qte",
+        "nom_fichier",
+        "date_commande",
+        "bon_de_commande",
+        "indication",
+        "model_recto",
+        "model_verso",
+        "is_accepted",
+        "is_refused",
+        "etat_model",
+        "date_validate_model",
+        "is_bc_validated",
+        "is_printed",
+        "is_delivered",
+        "is_deleted",
+        "remarques",
+        "annee_scolaire"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "casts": {
+          "is_accepted": "boolean",
+          "is_refused": "boolean",
+          "is_bc_validated": "boolean",
+          "is_printed": "boolean",
+          "is_delivered": "boolean",
+          "is_deleted": "boolean",
+          "date_validate_model": "datetime",
+          "date_commande": "date",
+          "qte": "integer",
+          "etat_model": "integer"
+        }
+      }
+    },
+    "CarteVisite": {
+      "fillable": [
+        "rep_id",
+        "model",
+        "date_commande",
+        "nom_sur_carte",
+        "fonction",
+        "tel",
+        "email",
+        "adresse",
+        "autre_info",
+        "logo_path",
+        "chevalet_ligne_1",
+        "chevalet_ligne_2",
+        "chevalet_ligne_3",
+        "conception_carte",
+        "is_valide_carte",
+        "conception_chevalet",
+        "is_valide_chevalet",
+        "comment_cv",
+        "comment_chevalet",
+        "remarques",
+        "prod_carte",
+        "livraison_carte",
+        "recu_carte",
+        "prod_chevalet",
+        "livraison_chevalet",
+        "recu_chevalet",
+        "annee_scolaire",
+        "is_deleted"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "casts": {
+          "date_commande": "date",
+          "is_valide_carte": "boolean",
+          "is_valide_chevalet": "boolean",
+          "prod_carte": "boolean",
+          "livraison_carte": "boolean",
+          "recu_carte": "boolean",
+          "prod_chevalet": "boolean",
+          "livraison_chevalet": "boolean",
+          "recu_chevalet": "boolean",
+          "is_deleted": "boolean"
+        }
+      }
+    },
+    "Catalogue": {
+      "fillable": [
+        "titre",
+        "categorie_id",
+        "image_url",
+        "content"
+      ],
+      "hidden": [],
+      "relationships": [
+        "category"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Category": {
+      "fillable": [
+        "libelle",
+        "description"
+      ],
+      "hidden": [],
+      "relationships": [
+        "livres"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Client": {
+      "fillable": [
+        "representant_id",
+        "destination_id",
+        "raison_sociale",
+        "ville",
+        "adresse",
+        "tel",
+        "email"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "ClientRemboursement": {
+      "fillable": [
+        "rep_id",
+        "client_id",
+        "date_payment",
+        "banque_id",
+        "banque_nom",
+        "cheque_number",
+        "cheque_image_path",
+        "a_lordre_de",
+        "montant",
+        "observation",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant",
+        "client",
+        "banque"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "appends": [
+          "cheque_url"
+        ]
+      }
+    },
+    "Content": {
+      "fillable": [
+        "type",
+        "champ1",
+        "champ2",
+        "champ3"
+      ],
+      "hidden": [],
+      "relationships": [],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "DemandeF": {
+      "fillable": [
+        "rep_id",
+        "client_id",
+        "date_demande",
+        "objet",
+        "contenu",
+        "statut",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant",
+        "client"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Depot": {
+      "fillable": [
+        "rep_id",
+        "livre_id",
+        "quantite_balance",
+        "status",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant",
+        "livre"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Destination": {
+      "fillable": [
+        "destination",
+        "description"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representants",
+        "robots",
+        "clients",
+        "ventes",
+        "livraisons"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "DetFact": {
+      "fillable": [
+        "fact_id",
+        "livre_id",
+        "quantite",
+        "prix_unitaire_ht",
+        "remise",
+        "total_ligne_ht"
+      ],
+      "hidden": [],
+      "relationships": [
+        "fact",
+        "livre"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Fact": {
+      "fillable": [
+        "rep_id",
+        "sequence_id",
+        "year_session",
+        "number",
+        "fact_number",
+        "date_facture",
+        "total_ht",
+        "tva_rate",
+        "total_ttc",
+        "status",
+        "remarques"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant",
+        "details",
+        "sequence"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "FactSequence": {
+      "fillable": [
+        "nom",
+        "dernier_numero",
+        "est_active"
+      ],
+      "hidden": [],
+      "relationships": [
+        "facts"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Imprimeur": {
+      "fillable": [
+        "raison_sociale",
+        "adresse",
+        "directeur_nom",
+        "directeur_tel",
+        "directeur_email",
+        "adjoint_nom",
+        "adjoint_tel",
+        "adjoint_email"
+      ],
+      "hidden": [],
+      "relationships": [
+        "bls"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Livre": {
+      "fillable": [
+        "titre",
+        "code",
+        "categorie_id",
+        "prix_achat",
+        "prix_vente",
+        "prix_public",
+        "nb_pages",
+        "color_code",
+        "description",
+        "annee_publication"
+      ],
+      "hidden": [],
+      "relationships": [
+        "category"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Login": {
+      "fillable": [
+        "username",
+        "password",
+        "authenticatable_id",
+        "authenticatable_type",
+        "role",
+        "is_active",
+        "last_visit"
+      ],
+      "hidden": [
+        "password",
+        "remember_token"
+      ],
+      "relationships": [
+        "profile"
+      ],
+      "details": {
+        "casts": {
+          "is_active": "boolean"
+        }
+      }
+    },
+    "RembImp": {
+      "fillable": [
+        "imprimeur_id",
+        "date_payment",
+        "banque_id",
+        "banque_nom",
+        "cheque_number",
+        "cheque_image_path",
+        "montant",
+        "statut_recu",
+        "statut_rejete",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "imprimeur",
+        "banque"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "appends": [
+          "cheque_url"
+        ],
+        "casts": {
+          "statut_recu": "boolean",
+          "statut_rejete": "boolean",
+          "date_payment": "date",
+          "montant": "float"
+        }
+      }
+    },
+    "RepRemboursement": {
+      "fillable": [
+        "rep_id",
+        "date_payment",
+        "banque_id",
+        "banque_nom",
+        "cheque_number",
+        "cheque_image_path",
+        "type_versement",
+        "montant",
+        "date_prevue",
+        "statut_recu",
+        "statut_rejete",
+        "statut_accepte",
+        "remarks"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant",
+        "banque"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "appends": [
+          "cheque_url"
+        ]
+      }
+    },
+    "Representant": {
+      "fillable": [
+        "nom",
+        "cin",
+        "destination_id",
+        "tel",
+        "email",
+        "adresse",
+        "code_postale",
+        "ville",
+        "lieu_de_travail",
+        "login",
+        "password"
+      ],
+      "hidden": [
+        "password"
+      ],
+      "relationships": [
+        "login",
+        "clients",
+        "bls",
+        "remboursements"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string"
+      }
+    },
+    "Robot": {
+      "fillable": [
+        "rep_id",
+        "destination_id",
+        "date_operation",
+        "ville",
+        "etablissement",
+        "contact_nom",
+        "contact_tel",
+        "reference_robot",
+        "quantite_vue",
+        "quantite_recue",
+        "images",
+        "statut",
+        "remarques"
+      ],
+      "hidden": [],
+      "relationships": [
+        "representant"
+      ],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "appends": [
+          "image_urls"
+        ],
+        "casts": {
+          "images": "array"
+        }
+      }
+    },
+    "User": {
+      "fillable": [
+        "name",
+        "email",
+        "password"
+      ],
+      "hidden": [
+        "password",
+        "remember_token"
+      ],
+      "relationships": [],
+      "details": {
+        "incrementing": false,
+        "keyType": "string",
+        "casts": {
+          "email_verified_at": "datetime",
+          "password": "hashed"
+        }
+      }
+    }
+  }
+}

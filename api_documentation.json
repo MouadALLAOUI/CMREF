@@ -1,0 +1,2730 @@
+{
+  "api_documentation": {
+    "AdminController": {
+      "index": {
+        "route": "GET /api/admins",
+        "return format": [
+          {
+            "id": "uuid",
+            "login": "string",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/admins",
+        "params": {
+          "login": "required|string|max:100|unique:logins,username",
+          "password": "required|string|min:8"
+        }
+      },
+      "show": {
+        "route": "GET /api/admins/{id}",
+        "return format": {
+          "id": "uuid",
+          "login": "string",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/admins/{id}",
+        "params": {
+          "login": "sometimes|string|max:100|unique:admins,login,{id}",
+          "password": "sometimes|string|min:8"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/admins/{id}"
+      }
+    },
+    "AuthController": {
+      "login": {
+        "route": "POST /api/login",
+        "params": {
+          "email": "required|string|email",
+          "password": "required|string"
+        },
+        "return format": {
+          "user": {
+            "id": "uuid",
+            "name": "string",
+            "email": "string",
+            "email_verified_at": "datetime|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          },
+          "message": "string"
+        }
+      },
+      "logout": {
+        "route": "POST /api/logout",
+        "return format": {
+          "message": "string"
+        }
+      }
+    },
+    "BLivraisonController": {
+      "index": {
+        "route": "GET /api/b-livraisons",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "bl_number": "string",
+            "date_emission": "date",
+            "mode_envoi": "string|null",
+            "type": "enum(Livre,Specimen,Pedagogie,Retour)",
+            "statut_recu": "boolean",
+            "statut_vu": "boolean",
+            "status": "enum(Pending,Seen,Received)|null",
+            "annee": "string|null",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/b-livraisons",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "bl_number": "required|string|max:50",
+          "date_emission": "required|date",
+          "mode_envoi": "nullable|string",
+          "type": "required|in:Livre,Specimen,Pedagogie,Retour",
+          "annee": "nullable|string",
+          "details": "required|array|min:1",
+          "details.*.livre_id": "required|uuid|exists:livres,id",
+          "details.*.qte": "required|integer"
+        }
+      },
+      "show": {
+        "route": "GET /api/b-livraisons/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "bl_number": "string",
+          "date_emission": "date",
+          "mode_envoi": "string|null",
+          "type": "enum(Livre,Specimen,Pedagogie,Retour)",
+          "statut_recu": "boolean",
+          "statut_vu": "boolean",
+          "status": "enum(Pending,Seen,Received)|null",
+          "annee": "string|null",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/b-livraisons/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "bl_number": "sometimes|string|max:50",
+          "date_emission": "sometimes|date",
+          "mode_envoi": "nullable|string",
+          "type": "sometimes|in:Livre,Specimen,Pedagogie,Retour",
+          "annee": "nullable|string",
+          "statut_recu": "sometimes|boolean",
+          "statut_vu": "sometimes|boolean",
+          "status": "nullable|in:Pending,Seen,Received",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/b-livraisons/{id}"
+      }
+    },
+    "BLivraisonImpController": {
+      "index": {
+        "route": "GET /api/b-livraison-imps",
+        "return format": [
+          {
+            "id": "uuid",
+            "imprimeur_id": "uuid",
+            "date_reception": "date",
+            "b_livraison_number": "string",
+            "livre_id": "uuid",
+            "quantite": "integer",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "imprimeur": {
+              "id": "uuid",
+              "raison_sociale": "string",
+              "adresse": "string|null",
+              "directeur_nom": "string|null",
+              "directeur_tel": "string|null",
+              "directeur_email": "string|null",
+              "adjoint_nom": "string|null",
+              "adjoint_tel": "string|null",
+              "adjoint_email": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "livre": {
+              "id": "uuid",
+              "titre": "string",
+              "code": "string",
+              "categorie_id": "uuid",
+              "prix_achat": "decimal",
+              "prix_vente": "decimal",
+              "prix_public": "decimal",
+              "nb_pages": "integer",
+              "color_code": "string",
+              "description": "string|null",
+              "annee_publication": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/b-livraison-imps",
+        "params": {
+          "imprimeur_id": "required|uuid|exists:imprimeurs,id",
+          "date_reception": "required|date",
+          "b_livraison_number": "required|string|max:50",
+          "remarks": "nullable|string",
+          "details": "required|array|min:1",
+          "details.*.livre_id": "required|uuid|exists:livres,id",
+          "details.*.qte": "required|integer|min:1"
+        }
+      },
+      "show": {
+        "route": "GET /api/b-livraison-imps/{id}",
+        "return format": {
+          "id": "uuid",
+          "imprimeur_id": "uuid",
+          "date_reception": "date",
+          "b_livraison_number": "string",
+          "livre_id": "uuid",
+          "quantite": "integer",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/b-livraison-imps/{id}",
+        "params": {
+          "imprimeur_id": "sometimes|uuid|exists:imprimeurs,id",
+          "date_reception": "sometimes|date",
+          "b_livraison_number": "sometimes|string|max:50",
+          "livre_id": "sometimes|uuid|exists:livres,id",
+          "quantite": "sometimes|integer|min:0",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/b-livraison-imps/{id}"
+      }
+    },
+    "BLivraisonItemController": {
+      "index": {
+        "route": "GET /api/b-livraison-items",
+        "return format": [
+          {
+            "id": "uuid",
+            "livre": {
+              "id": "uuid",
+              "titre": "string",
+              "code": "string",
+              "categorie_id": "uuid",
+              "prix_achat": "decimal",
+              "prix_vente": "decimal",
+              "prix_public": "decimal",
+              "nb_pages": "integer",
+              "color_code": "string",
+              "description": "string|null",
+              "annee_publication": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "quantite": "integer",
+            "deliverable": {
+              "id": "uuid",
+              "rep_id": "uuid|null",
+              "imprimeur_id": "uuid|null",
+              "bl_number": "string|null",
+              "b_livraison_number": "string|null",
+              "date_emission": "date|null",
+              "date_reception": "date|null",
+              "type": "string|null",
+              "statut_recu": "boolean|null",
+              "statut_vu": "boolean|null",
+              "status": "string|null",
+              "annee": "string|null",
+              "remarks": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "created_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/b-livraison-items",
+        "params": {
+          "bl_id": "required|uuid",
+          "type": "required|in:rep,imp",
+          "livre_id": "required|uuid|exists:livres,id",
+          "quantite": "required|integer|min:1"
+        }
+      },
+      "show": {
+        "route": "GET /api/b-livraison-items/{id}",
+        "return format": [
+          {
+            "id": "uuid",
+            "livre": {
+              "id": "uuid",
+              "titre": "string",
+              "code": "string",
+              "categorie_id": "uuid",
+              "prix_achat": "decimal",
+              "prix_vente": "decimal",
+              "prix_public": "decimal",
+              "nb_pages": "integer",
+              "color_code": "string",
+              "description": "string|null",
+              "annee_publication": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "quantite": "integer",
+            "deliverable": {
+              "id": "uuid",
+              "rep_id": "uuid|null",
+              "imprimeur_id": "uuid|null",
+              "bl_number": "string|null",
+              "b_livraison_number": "string|null",
+              "date_emission": "date|null",
+              "date_reception": "date|null",
+              "type": "string|null",
+              "statut_recu": "boolean|null",
+              "statut_vu": "boolean|null",
+              "status": "string|null",
+              "annee": "string|null",
+              "remarks": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "created_at": "datetime|null"
+          }
+        ]
+      },
+      "update": {
+        "route": "PUT /api/b-livraison-items/{id}",
+        "params": {
+          "livre_id": "sometimes|uuid|exists:livres,id",
+          "quantite": "sometimes|integer"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/b-livraison-items/{id}"
+      }
+    },
+    "BVentesClientController": {
+      "index": {
+        "route": "GET /api/b-ventes-clients",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "client_id": "uuid",
+            "b_vente_number": "string",
+            "date_vente": "date",
+            "type": "string|null",
+            "livre_id": "uuid",
+            "quantite": "integer",
+            "remise": "decimal",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "client": {
+              "id": "uuid",
+              "representant_id": "uuid",
+              "destination_id": "uuid|null",
+              "raison_sociale": "string",
+              "ice": "string|null",
+              "ville": "string|null",
+              "adresse": "string|null",
+              "tel": "string|null",
+              "email": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "livre": {
+              "id": "uuid",
+              "titre": "string",
+              "code": "string",
+              "categorie_id": "uuid",
+              "prix_achat": "decimal",
+              "prix_vente": "decimal",
+              "prix_public": "decimal",
+              "nb_pages": "integer",
+              "color_code": "string",
+              "description": "string|null",
+              "annee_publication": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/b-ventes-clients",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "client_id": "required|uuid|exists:clients,id",
+          "b_vente_number": "required|string|max:50",
+          "date_vente": "required|date",
+          "type": "nullable|string|max:50",
+          "livre_id": "required|uuid|exists:livres,id",
+          "quantite": "required|integer|min:0",
+          "remise": "sometimes|numeric|min:0|max:100",
+          "remarks": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/b-ventes-clients/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "client_id": "uuid",
+          "b_vente_number": "string",
+          "date_vente": "date",
+          "type": "string|null",
+          "livre_id": "uuid",
+          "quantite": "integer",
+          "remise": "decimal",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/b-ventes-clients/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "client_id": "sometimes|uuid|exists:clients,id",
+          "b_vente_number": "sometimes|string|max:50",
+          "date_vente": "sometimes|date",
+          "type": "nullable|string|max:50",
+          "livre_id": "sometimes|uuid|exists:livres,id",
+          "quantite": "sometimes|integer|min:0",
+          "remise": "sometimes|numeric|min:0|max:100",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/b-ventes-clients/{id}"
+      }
+    },
+    "BanqueController": {
+      "index": {
+        "route": "GET /api/banques",
+        "return format": [
+          {
+            "id": "uuid",
+            "nom": "string",
+            "code_abreviation": "string|null",
+            "logo_path": "string|null",
+            "is_active": "boolean",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/banques",
+        "params": {
+          "nom": "required|string|max:100|unique:banques,nom",
+          "code_abreviation": "nullable|string|max:10",
+          "is_active": "boolean"
+        }
+      },
+      "show": {
+        "route": "GET /api/banques/{id}",
+        "return format": {
+          "id": "uuid",
+          "nom": "string",
+          "code_abreviation": "string|null",
+          "logo_path": "string|null",
+          "is_active": "boolean",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/banques/{id}",
+        "params": {
+          "nom": "sometimes|string|max:100|unique:banques,nom,{id}",
+          "code_abreviation": "nullable|string|max:10",
+          "is_active": "boolean"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/banques/{id}"
+      }
+    },
+    "CahierCommunicationController": {
+      "index": {
+        "route": "GET /api/cahier-communications",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "representant_nom": "string",
+            "ecole": "string",
+            "type": "string",
+            "qte": "integer",
+            "date_commande": "date",
+            "status": {
+              "accepted": "boolean",
+              "printed": "boolean",
+              "delivered": "boolean"
+            },
+            "files": {
+              "recto": "string|null",
+              "verso": "string|null",
+              "bc": "string|null"
+            },
+            "remarques": "string|null",
+            "annee_scolaire": "string|null",
+            "created_at": "string"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/cahier-communications",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "ecole": "required|string|max:255",
+          "type": "required|string",
+          "qte": "required|integer|min:1",
+          "date_commande": "required|date",
+          "nom_fichier": "nullable|string",
+          "indication": "nullable|string",
+          "annee_scolaire": "nullable|string",
+          "remarques": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/cahier-communications/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "representant_nom": "string",
+          "ecole": "string",
+          "type": "string",
+          "qte": "integer",
+          "date_commande": "date",
+          "status": {
+            "accepted": "boolean",
+            "printed": "boolean",
+            "delivered": "boolean"
+          },
+          "files": {
+            "recto": "string|null",
+            "verso": "string|null",
+            "bc": "string|null"
+          },
+          "remarques": "string|null",
+          "annee_scolaire": "string|null",
+          "created_at": "string"
+        }
+      },
+      "update": {
+        "route": "PUT /api/cahier-communications/{id}",
+        "params": {
+          "ecole": "sometimes|string",
+          "type": "sometimes|string",
+          "qte": "sometimes|integer",
+          "is_accepted": "sometimes|boolean",
+          "is_refused": "sometimes|boolean",
+          "is_printed": "sometimes|boolean",
+          "is_delivered": "sometimes|boolean",
+          "etat_model": "sometimes|integer",
+          "remarques": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/cahier-communications/{id}"
+      }
+    },
+    "CarteVisiteController": {
+      "index": {
+        "route": "GET /api/carte-visites",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "model": "string|null",
+            "date_commande": "date",
+            "nom_sur_carte": "string",
+            "fonction": "string|null",
+            "tel": "string|null",
+            "email": "string|null",
+            "adresse": "string|null",
+            "autre_info": "string|null",
+            "logo_path": "string|null",
+            "chevalet_ligne_1": "string|null",
+            "chevalet_ligne_2": "string|null",
+            "chevalet_ligne_3": "string|null",
+            "conception_carte": "string|null",
+            "is_valide_carte": "boolean",
+            "conception_chevalet": "string|null",
+            "is_valide_chevalet": "boolean",
+            "comment_cv": "string|null",
+            "comment_chevalet": "string|null",
+            "remarques": "string|null",
+            "prod_carte": "boolean",
+            "livraison_carte": "boolean",
+            "recu_carte": "boolean",
+            "prod_chevalet": "boolean",
+            "livraison_chevalet": "boolean",
+            "recu_chevalet": "boolean",
+            "annee_scolaire": "string|null",
+            "is_deleted": "boolean",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/carte-visites",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "date_commande": "required|date",
+          "annee_scolaire": "nullable|string|max:20",
+          "model": "nullable|string",
+          "nom_sur_carte": "required|string|max:255",
+          "fonction": "nullable|string|max:255",
+          "tel": "nullable|string|max:50",
+          "email": "nullable|email|max:255",
+          "adresse": "nullable|string",
+          "autre_info": "nullable|string",
+          "logo_path": "nullable|string",
+          "chevalet_ligne_1": "nullable|string|max:255",
+          "chevalet_ligne_2": "nullable|string|max:255",
+          "chevalet_ligne_3": "nullable|string|max:255",
+          "conception_carte": "nullable|string",
+          "conception_chevalet": "nullable|string",
+          "comment_cv": "nullable|string",
+          "comment_chevalet": "nullable|string",
+          "remarques": "nullable|string",
+          "is_valide_carte": "boolean",
+          "is_valide_chevalet": "boolean",
+          "prod_carte": "boolean",
+          "prod_chevalet": "boolean",
+          "livraison_carte": "boolean",
+          "livraison_chevalet": "boolean",
+          "recu_carte": "boolean",
+          "recu_chevalet": "boolean"
+        }
+      },
+      "show": {
+        "route": "GET /api/carte-visites/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "model": "string|null",
+          "date_commande": "date",
+          "nom_sur_carte": "string",
+          "fonction": "string|null",
+          "tel": "string|null",
+          "email": "string|null",
+          "adresse": "string|null",
+          "autre_info": "string|null",
+          "logo_path": "string|null",
+          "chevalet_ligne_1": "string|null",
+          "chevalet_ligne_2": "string|null",
+          "chevalet_ligne_3": "string|null",
+          "conception_carte": "string|null",
+          "is_valide_carte": "boolean",
+          "conception_chevalet": "string|null",
+          "is_valide_chevalet": "boolean",
+          "comment_cv": "string|null",
+          "comment_chevalet": "string|null",
+          "remarques": "string|null",
+          "prod_carte": "boolean",
+          "livraison_carte": "boolean",
+          "recu_carte": "boolean",
+          "prod_chevalet": "boolean",
+          "livraison_chevalet": "boolean",
+          "recu_chevalet": "boolean",
+          "annee_scolaire": "string|null",
+          "is_deleted": "boolean",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/carte-visites/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "date_commande": "sometimes|date",
+          "annee_scolaire": "nullable|string|max:20",
+          "model": "nullable|string",
+          "nom_sur_carte": "sometimes|string|max:255",
+          "fonction": "nullable|string|max:255",
+          "tel": "nullable|string|max:50",
+          "email": "nullable|email|max:255",
+          "adresse": "nullable|string",
+          "autre_info": "nullable|string",
+          "logo_path": "nullable|string",
+          "chevalet_ligne_1": "nullable|string|max:255",
+          "chevalet_ligne_2": "nullable|string|max:255",
+          "chevalet_ligne_3": "nullable|string|max:255",
+          "conception_carte": "nullable|string",
+          "conception_chevalet": "nullable|string",
+          "comment_cv": "nullable|string",
+          "comment_chevalet": "nullable|string",
+          "remarques": "nullable|string",
+          "is_valide_carte": "sometimes|boolean",
+          "is_valide_chevalet": "sometimes|boolean",
+          "prod_carte": "sometimes|boolean",
+          "prod_chevalet": "sometimes|boolean",
+          "livraison_carte": "sometimes|boolean",
+          "livraison_chevalet": "sometimes|boolean",
+          "recu_carte": "sometimes|boolean",
+          "recu_chevalet": "sometimes|boolean",
+          "is_deleted": "sometimes|boolean"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/carte-visites/{id}"
+      }
+    },
+    "CatalogueController": {
+      "index": {
+        "route": "GET /api/catalogues",
+        "return format": [
+          {
+            "id": "uuid",
+            "titre": "string",
+            "categorie_id": "uuid",
+            "image_url": "string|null",
+            "content": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "category": {
+              "id": "uuid",
+              "libelle": "string",
+              "description": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/catalogues",
+        "params": {
+          "titre": "required|string|max:255",
+          "categorie_id": "required|uuid|exists:categories,id",
+          "image_url": "nullable|string",
+          "content": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/catalogues/{id}",
+        "return format": {
+          "id": "uuid",
+          "titre": "string",
+          "categorie_id": "uuid",
+          "image_url": "string|null",
+          "content": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/catalogues/{id}",
+        "params": {
+          "titre": "sometimes|string|max:255",
+          "categorie_id": "sometimes|uuid|exists:categories,id",
+          "image_url": "nullable|string",
+          "content": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/catalogues/{id}"
+      }
+    },
+    "CategoryController": {
+      "index": {
+        "route": "GET /api/categories",
+        "return format": [
+          {
+            "id": "uuid",
+            "libelle": "string",
+            "description": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/categories",
+        "params": {
+          "libelle": "required|string|max:255",
+          "description": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/categories/{id}",
+        "return format": {
+          "id": "uuid",
+          "libelle": "string",
+          "description": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/categories/{id}",
+        "params": {
+          "libelle": "sometimes|string|max:255",
+          "description": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/categories/{id}"
+      }
+    },
+    "ClientController": {
+      "index": {
+        "route": "GET /api/clients",
+        "return format": [
+          {
+            "id": "uuid",
+            "representant_id": "uuid",
+            "destination_id": "uuid|null",
+            "raison_sociale": "string",
+            "ice": "string|null",
+            "ville": "string|null",
+            "adresse": "string|null",
+            "tel": "string|null",
+            "email": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/clients",
+        "params": {
+          "representant_id": "required|uuid|exists:representants,id",
+          "destination_id": "nullable|uuid|exists:destinations,id",
+          "raison_sociale": "required|string|max:255",
+          "ice": "nullable|string|max:20",
+          "ville": "nullable|string|max:100",
+          "adresse": "nullable|string",
+          "tel": "nullable|string|max:20",
+          "email": "nullable|string|email|max:255"
+        }
+      },
+      "show": {
+        "route": "GET /api/clients/{id}",
+        "return format": {
+          "id": "uuid",
+          "representant_id": "uuid",
+          "destination_id": "uuid|null",
+          "raison_sociale": "string",
+          "ice": "string|null",
+          "ville": "string|null",
+          "adresse": "string|null",
+          "tel": "string|null",
+          "email": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/clients/{id}",
+        "params": {
+          "representant_id": "sometimes|uuid|exists:representants,id",
+          "destination_id": "nullable|uuid|exists:destinations,id",
+          "raison_sociale": "sometimes|string|max:255",
+          "ice": "nullable|string|max:20",
+          "ville": "nullable|string|max:100",
+          "adresse": "nullable|string",
+          "tel": "nullable|string|max:20",
+          "email": "nullable|string|email|max:255"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/clients/{id}"
+      }
+    },
+    "ClientRemboursementController": {
+      "index": {
+        "route": "GET /api/client-remboursements",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "client_id": "uuid",
+            "date_payment": "date",
+            "banque_id": "uuid|null",
+            "banque_nom": "string|null",
+            "cheque_number": "string|null",
+            "cheque_image_path": "string|null",
+            "a_lordre_de": "string|null",
+            "montant": "decimal",
+            "observation": "string|null",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "client": {
+              "id": "uuid",
+              "representant_id": "uuid",
+              "destination_id": "uuid|null",
+              "raison_sociale": "string",
+              "ice": "string|null",
+              "ville": "string|null",
+              "adresse": "string|null",
+              "tel": "string|null",
+              "email": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/client-remboursements",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "client_id": "required|uuid|exists:clients,id",
+          "date_payment": "required|date",
+          "banque_id": "nullable|uuid|exists:banques,id",
+          "banque_nom": "nullable|string|max:100",
+          "cheque_number": "nullable|string|max:50",
+          "cheque_image_path": "nullable|string",
+          "a_lordre_de": "nullable|string|max:255",
+          "montant": "required|numeric|min:0",
+          "observation": "nullable|string",
+          "remarks": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/client-remboursements/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "client_id": "uuid",
+          "date_payment": "date",
+          "banque_id": "uuid|null",
+          "banque_nom": "string|null",
+          "cheque_number": "string|null",
+          "cheque_image_path": "string|null",
+          "a_lordre_de": "string|null",
+          "montant": "decimal",
+          "observation": "string|null",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/client-remboursements/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "client_id": "sometimes|uuid|exists:clients,id",
+          "date_payment": "sometimes|date",
+          "banque_id": "nullable|uuid|exists:banques,id",
+          "banque_nom": "nullable|string|max:100",
+          "cheque_number": "nullable|string|max:50",
+          "cheque_image_path": "nullable|string",
+          "a_lordre_de": "nullable|string|max:255",
+          "montant": "sometimes|numeric|min:0",
+          "observation": "nullable|string",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/client-remboursements/{id}"
+      }
+    },
+    "ContentController": {
+      "index": {
+        "route": "GET /api/contents",
+        "return format": [
+          {
+            "id": "uuid",
+            "type": "string",
+            "champ1": "string|null",
+            "champ2": "string|null",
+            "champ3": "string|null",
+            "created_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/contents",
+        "params": {
+          "type": "required|string",
+          "champ1": "nullable|string",
+          "champ2": "nullable|string",
+          "champ3": "nullable|string"
+        }
+      },
+      "update": {
+        "route": "PUT /api/contents/{id}",
+        "params": {
+          "type": "sometimes|string",
+          "champ1": "nullable|string",
+          "champ2": "nullable|string",
+          "champ3": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/contents/{id}"
+      }
+    },
+    "DemandeFController": {
+      "index": {
+        "route": "GET /api/demande-f",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "client_id": "uuid",
+            "date_demande": "date",
+            "objet": "string|null",
+            "contenu": "string|null",
+            "statut": "enum(En attente,Approuvée,Rejetée,Facturée)",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "client": {
+              "id": "uuid",
+              "representant_id": "uuid",
+              "destination_id": "uuid|null",
+              "raison_sociale": "string",
+              "ice": "string|null",
+              "ville": "string|null",
+              "adresse": "string|null",
+              "tel": "string|null",
+              "email": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/demande-f",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "client_id": "required|uuid|exists:clients,id",
+          "date_demande": "required|date",
+          "objet": "nullable|string|max:255",
+          "contenu": "nullable|string",
+          "statut": "sometimes|in:En attente,Approuvée,Rejetée,Facturée",
+          "remarks": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/demande-f/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "client_id": "uuid",
+          "date_demande": "date",
+          "objet": "string|null",
+          "contenu": "string|null",
+          "statut": "enum(En attente,Approuvée,Rejetée,Facturée)",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/demande-f/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "client_id": "sometimes|uuid|exists:clients,id",
+          "date_demande": "sometimes|date",
+          "objet": "nullable|string|max:255",
+          "contenu": "nullable|string",
+          "statut": "sometimes|in:En attente,Approuvée,Rejetée,Facturée",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/demande-f/{id}"
+      }
+    },
+    "DepotController": {
+      "index": {
+        "route": "GET /api/depots",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "livre_id": "uuid",
+            "quantite_balance": "integer",
+            "status": "enum(Actif,Cloturé)",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "livre": {
+              "id": "uuid",
+              "titre": "string",
+              "code": "string",
+              "categorie_id": "uuid",
+              "prix_achat": "decimal",
+              "prix_vente": "decimal",
+              "prix_public": "decimal",
+              "nb_pages": "integer",
+              "color_code": "string",
+              "description": "string|null",
+              "annee_publication": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/depots",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "livre_id": "required|uuid|exists:livres,id",
+          "quantite_balance": "required|integer",
+          "status": "required|in:Actif,Cloturé",
+          "remarks": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/depots/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "livre_id": "uuid",
+          "quantite_balance": "integer",
+          "status": "enum(Actif,Cloturé)",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/depots/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "livre_id": "sometimes|uuid|exists:livres,id",
+          "quantite_balance": "sometimes|integer",
+          "status": "sometimes|in:Actif,Cloturé",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/depots/{id}"
+      }
+    },
+    "DestinationController": {
+      "index": {
+        "route": "GET /api/destinations",
+        "return format": [
+          {
+            "id": "uuid",
+            "destination": "string",
+            "description": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representants": [
+              {
+                "id": "uuid",
+                "destination_id": "uuid|null",
+                "nom": "string",
+                "cin": "string",
+                "tel": "string|null",
+                "email": "string|null",
+                "adresse": "string|null",
+                "code_postale": "string|null",
+                "ville": "string|null",
+                "lieu_de_travail": "string|null",
+                "login": "string",
+                "bl_count": "integer",
+                "remb_count": "integer",
+                "created_at": "datetime|null",
+                "updated_at": "datetime|null"
+              }
+            ],
+            "ventes": [
+              {
+                "id": "uuid",
+                "rep_id": "uuid",
+                "client_id": "uuid",
+                "b_vente_number": "string",
+                "date_vente": "date",
+                "type": "string|null",
+                "livre_id": "uuid",
+                "quantite": "integer",
+                "remise": "decimal",
+                "remarks": "string|null",
+                "created_at": "datetime|null",
+                "updated_at": "datetime|null"
+              }
+            ],
+            "livraisons": [
+              {
+                "id": "uuid",
+                "rep_id": "uuid",
+                "bl_number": "string",
+                "date_emission": "date",
+                "mode_envoi": "string|null",
+                "type": "enum(Livre,Specimen,Pedagogie,Retour)",
+                "statut_recu": "boolean",
+                "statut_vu": "boolean",
+                "status": "enum(Pending,Seen,Received)|null",
+                "annee": "string|null",
+                "remarks": "string|null",
+                "created_at": "datetime|null",
+                "updated_at": "datetime|null"
+              }
+            ]
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/destinations",
+        "params": {
+          "destination": "required|string|max:255",
+          "description": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/destinations/{id}",
+        "return format": {
+          "id": "uuid",
+          "destination": "string",
+          "description": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/destinations/{id}",
+        "params": {
+          "destination": "sometimes|string|max:255",
+          "description": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/destinations/{id}"
+      }
+    },
+    "DetFactController": {
+      "index": {
+        "route": "GET /api/det-fact",
+        "return format": [
+          {
+            "id": "uuid",
+            "fact_id": "uuid",
+            "livre_id": "uuid",
+            "quantite": "integer",
+            "prix_unitaire_ht": "decimal",
+            "remise": "decimal",
+            "total_ligne_ht": "decimal",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "fact": {
+              "id": "uuid",
+              "rep_id": "uuid",
+              "sequence_id": "uuid",
+              "year_session": "string",
+              "number": "integer",
+              "fact_number": "string|null",
+              "date_facture": "date",
+              "total_ht": "decimal",
+              "tva_rate": "decimal",
+              "total_ttc": "decimal",
+              "reste_a_payer": "decimal",
+              "status": "enum(Brouillon,Validée,Payée,Annulée)",
+              "remarques": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "livre": {
+              "id": "uuid",
+              "titre": "string",
+              "code": "string",
+              "categorie_id": "uuid",
+              "prix_achat": "decimal",
+              "prix_vente": "decimal",
+              "prix_public": "decimal",
+              "nb_pages": "integer",
+              "color_code": "string",
+              "description": "string|null",
+              "annee_publication": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/det-fact",
+        "params": {
+          "fact_id": "required|uuid|exists:fact,id",
+          "livre_id": "required|uuid|exists:livres,id",
+          "quantite": "sometimes|integer|min:1",
+          "prix_unitaire_ht": "required|numeric|min:0",
+          "remise": "sometimes|numeric|min:0|max:100",
+          "total_ligne_ht": "required|numeric|min:0"
+        }
+      },
+      "show": {
+        "route": "GET /api/det-fact/{id}",
+        "return format": {
+          "id": "uuid",
+          "fact_id": "uuid",
+          "livre_id": "uuid",
+          "quantite": "integer",
+          "prix_unitaire_ht": "decimal",
+          "remise": "decimal",
+          "total_ligne_ht": "decimal",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/det-fact/{id}",
+        "params": {
+          "fact_id": "sometimes|uuid|exists:fact,id",
+          "livre_id": "sometimes|uuid|exists:livres,id",
+          "quantite": "sometimes|integer|min:1",
+          "prix_unitaire_ht": "sometimes|numeric|min:0",
+          "remise": "sometimes|numeric|min:0|max:100",
+          "total_ligne_ht": "sometimes|numeric|min:0"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/det-fact/{id}"
+      }
+    },
+    "FactController": {
+      "index": {
+        "route": "GET /api/factures",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "sequence_id": "uuid",
+            "year_session": "string",
+            "number": "integer",
+            "fact_number": "string|null",
+            "date_facture": "date",
+            "total_ht": "decimal",
+            "tva_rate": "decimal",
+            "total_ttc": "decimal",
+            "reste_a_payer": "decimal",
+            "status": "enum(Brouillon,Validée,Payée,Annulée)",
+            "remarques": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "sequence": {
+              "id": "uuid",
+              "nom": "string",
+              "dernier_numero": "integer",
+              "est_active": "boolean",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/fact",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "sequence_id": "required|integer|exists:fact_sequences,id",
+          "year_session": "required|string|max:9",
+          "number": "required|integer|unique:fact,number,NULL,id,year_session,{year_session}",
+          "fact_number": "nullable|string|max:50|unique:fact",
+          "date_facture": "required|date",
+          "total_ht": "sometimes|numeric|min:0",
+          "tva_rate": "sometimes|numeric|min:0",
+          "total_ttc": "sometimes|numeric|min:0",
+          "status": "sometimes|in:Brouillon,Validée,Payée,Annulée",
+          "remarques": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/fact/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "sequence_id": "uuid",
+          "year_session": "string",
+          "number": "integer",
+          "fact_number": "string|null",
+          "date_facture": "date",
+          "total_ht": "decimal",
+          "tva_rate": "decimal",
+          "total_ttc": "decimal",
+          "reste_a_payer": "decimal",
+          "status": "enum(Brouillon,Validée,Payée,Annulée)",
+          "remarques": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/fact/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "sequence_id": "sometimes|integer|exists:fact_sequences,id",
+          "year_session": "sometimes|string|max:9",
+          "number": "sometimes|integer|unique:fact,number,{id},id,year_session,{year_session}",
+          "fact_number": "sometimes|string|max:50|unique:fact,fact_number,{id}",
+          "date_facture": "sometimes|date",
+          "total_ht": "sometimes|numeric|min:0",
+          "tva_rate": "sometimes|numeric|min:0",
+          "total_ttc": "sometimes|numeric|min:0",
+          "status": "sometimes|in:Brouillon,Validée,Payée,Annulée",
+          "remarques": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/fact/{id}"
+      }
+    },
+    "FactSequenceController": {
+      "index": {
+        "route": "GET /api/fact-sequences",
+        "return format": [
+          {
+            "id": "uuid",
+            "nom": "string",
+            "dernier_numero": "integer",
+            "est_active": "boolean",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/fact-sequences",
+        "params": {
+          "nom": "required|string|max:9|unique:fact_sequences",
+          "dernier_numero": "sometimes|integer|min:0",
+          "est_active": "sometimes|boolean"
+        }
+      },
+      "show": {
+        "route": "GET /api/fact-sequences/{id}",
+        "return format": {
+          "id": "uuid",
+          "nom": "string",
+          "dernier_numero": "integer",
+          "est_active": "boolean",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/fact-sequences/{id}",
+        "params": {
+          "nom": "sometimes|string|max:9|unique:fact_sequences,nom,{id}",
+          "dernier_numero": "sometimes|integer|min:0",
+          "est_active": "sometimes|boolean"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/fact-sequences/{id}"
+      }
+    },
+    "ImprimeurController": {
+      "index": {
+        "route": "GET /api/imprimeurs",
+        "return format": [
+          {
+            "id": "uuid",
+            "raison_sociale": "string",
+            "adresse": "string|null",
+            "directeur_nom": "string|null",
+            "directeur_tel": "string|null",
+            "directeur_email": "string|null",
+            "adjoint_nom": "string|null",
+            "adjoint_tel": "string|null",
+            "adjoint_email": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/imprimeurs",
+        "params": {
+          "raison_sociale": "required|string|max:255",
+          "adresse": "nullable|string",
+          "directeur_nom": "nullable|string|max:255",
+          "directeur_tel": "nullable|string|max:20",
+          "directeur_email": "nullable|string|email|max:255",
+          "adjoint_nom": "nullable|string|max:255",
+          "adjoint_tel": "nullable|string|max:20",
+          "adjoint_email": "nullable|string|email|max:255"
+        }
+      },
+      "show": {
+        "route": "GET /api/imprimeurs/{id}",
+        "return format": {
+          "id": "uuid",
+          "raison_sociale": "string",
+          "adresse": "string|null",
+          "directeur_nom": "string|null",
+          "directeur_tel": "string|null",
+          "directeur_email": "string|null",
+          "adjoint_nom": "string|null",
+          "adjoint_tel": "string|null",
+          "adjoint_email": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/imprimeurs/{id}",
+        "params": {
+          "raison_sociale": "sometimes|string|max:255",
+          "adresse": "nullable|string",
+          "directeur_nom": "nullable|string|max:255",
+          "directeur_tel": "nullable|string|max:20",
+          "directeur_email": "nullable|string|email|max:255",
+          "adjoint_nom": "nullable|string|max:255",
+          "adjoint_tel": "nullable|string|max:20",
+          "adjoint_email": "nullable|string|email|max:255"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/imprimeurs/{id}"
+      }
+    },
+    "LivreController": {
+      "index": {
+        "route": "GET /api/livres",
+        "return format": [
+          {
+            "id": "uuid",
+            "titre": "string",
+            "code": "string",
+            "categorie_id": "uuid",
+            "prix_achat": "decimal",
+            "prix_vente": "decimal",
+            "prix_public": "decimal",
+            "nb_pages": "integer",
+            "color_code": "string",
+            "description": "string|null",
+            "annee_publication": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "category": {
+              "id": "uuid",
+              "libelle": "string",
+              "description": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/livres",
+        "params": {
+          "titre": "required|string|max:255",
+          "code": "required|string|max:50|unique:livres",
+          "categorie_id": "required|uuid|exists:categories,id",
+          "prix_achat": "required|numeric|min:0",
+          "prix_vente": "required|numeric|min:0",
+          "prix_public": "required|numeric|min:0",
+          "nb_pages": "required|integer|min:0",
+          "color_code": "sometimes|string|max:7",
+          "description": "nullable|string",
+          "annee_publication": "nullable|string|max:4"
+        }
+      },
+      "show": {
+        "route": "GET /api/livres/{id}",
+        "return format": {
+          "id": "uuid",
+          "titre": "string",
+          "code": "string",
+          "categorie_id": "uuid",
+          "prix_achat": "decimal",
+          "prix_vente": "decimal",
+          "prix_public": "decimal",
+          "nb_pages": "integer",
+          "color_code": "string",
+          "description": "string|null",
+          "annee_publication": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/livres/{id}",
+        "params": {
+          "titre": "sometimes|string|max:255",
+          "code": "sometimes|string|max:50|unique:livres,code,{id}",
+          "categorie_id": "sometimes|uuid|exists:categories,id",
+          "prix_achat": "sometimes|numeric|min:0",
+          "prix_vente": "sometimes|numeric|min:0",
+          "prix_public": "sometimes|numeric|min:0",
+          "nb_pages": "sometimes|integer|min:0",
+          "color_code": "sometimes|string|max:7",
+          "description": "nullable|string",
+          "annee_publication": "nullable|string|max:4"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/livres/{id}"
+      }
+    },
+    "LoginController": {
+      "login": {
+        "route": "POST /api/login",
+        "params": {
+          "username": "required|string",
+          "password": "required|string"
+        },
+        "return format": {
+          "status": "success",
+          "token": "string",
+          "user": {
+            "username": "string",
+            "role": "enum(admin,representant)"
+          },
+          "profile": {
+            "id": "uuid",
+            "nom": "string|null",
+            "login": "string|null",
+            "email": "string|null",
+            "cin": "string|null",
+            "destination_id": "uuid|null",
+            "tel": "string|null",
+            "adresse": "string|null",
+            "code_postale": "string|null",
+            "ville": "string|null",
+            "lieu_de_travail": "string|null",
+            "bl_count": "integer|null",
+            "remb_count": "integer|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        }
+      },
+      "logout": {
+        "route": "POST /api/logout",
+        "return format": {
+          "message": "string"
+        }
+      }
+    },
+    "RembImpController": {
+      "index": {
+        "route": "GET /api/remb-imp",
+        "return format": [
+          {
+            "id": "uuid",
+            "imprimeur_id": "uuid",
+            "date_payment": "date",
+            "banque_nom": "string|null",
+            "banque_id": "uuid|null",
+            "cheque_number": "string|null",
+            "cheque_image_path": "string|null",
+            "montant": "decimal",
+            "statut_recu": "boolean",
+            "statut_rejete": "boolean",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "imprimeur": {
+              "id": "uuid",
+              "raison_sociale": "string",
+              "adresse": "string|null",
+              "directeur_nom": "string|null",
+              "directeur_tel": "string|null",
+              "directeur_email": "string|null",
+              "adjoint_nom": "string|null",
+              "adjoint_tel": "string|null",
+              "adjoint_email": "string|null",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            },
+            "banque": {
+              "id": "uuid",
+              "nom": "string",
+              "code_abreviation": "string|null",
+              "logo_path": "string|null",
+              "is_active": "boolean",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/remb-imp",
+        "params": {
+          "imprimeur_id": "required|uuid|exists:imprimeurs,id",
+          "date_payment": "required|date",
+          "banque_id": "nullable|uuid|exists:banques,id",
+          "banque_nom": "nullable|string|max:100",
+          "cheque_number": "nullable|string|max:50",
+          "cheque_image_path": "nullable|string",
+          "montant": "required|numeric|min:0",
+          "statut_recu": "sometimes|boolean",
+          "statut_rejete": "sometimes|boolean",
+          "remarks": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/remb-imp/{id}",
+        "return format": {
+          "id": "uuid",
+          "imprimeur_id": "uuid",
+          "date_payment": "date",
+          "banque_nom": "string|null",
+          "banque_id": "uuid|null",
+          "cheque_number": "string|null",
+          "cheque_image_path": "string|null",
+          "montant": "decimal",
+          "statut_recu": "boolean",
+          "statut_rejete": "boolean",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/remb-imp/{id}",
+        "params": {
+          "imprimeur_id": "sometimes|uuid|exists:imprimeurs,id",
+          "date_payment": "sometimes|date",
+          "banque_id": "nullable|uuid|exists:banques,id",
+          "banque_nom": "nullable|string|max:100",
+          "cheque_number": "nullable|string|max:50",
+          "cheque_image_path": "nullable|string",
+          "montant": "sometimes|numeric|min:0",
+          "statut_recu": "sometimes|boolean",
+          "statut_rejete": "sometimes|boolean",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/remb-imp/{id}"
+      }
+    },
+    "RepRemboursementController": {
+      "index": {
+        "route": "GET /api/rep-remboursements",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "date_payment": "date",
+            "banque_nom": "string|null",
+            "banque_id": "uuid|null",
+            "cheque_number": "string|null",
+            "cheque_image_path": "string|null",
+            "type_versement": "enum(En main propre,Virement,Versement)",
+            "montant": "decimal",
+            "date_prevue": "date|null",
+            "statut_recu": "boolean",
+            "statut_rejete": "boolean",
+            "statut_accepte": "boolean",
+            "remarks": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/rep-remboursements",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "date_payment": "required|date",
+          "banque_id": "nullable|uuid|exists:banques,id",
+          "banque_nom": "nullable|string|max:100",
+          "cheque_number": "nullable|string|max:50",
+          "cheque_image_path": "nullable|string",
+          "type_versement": "required|in:En main propre,Virement,Versement",
+          "montant": "required|numeric|min:0",
+          "date_prevue": "nullable|date",
+          "statut_recu": "sometimes|boolean",
+          "statut_rejete": "sometimes|boolean",
+          "statut_accepte": "sometimes|boolean",
+          "remarks": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/rep-remboursements/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "date_payment": "date",
+          "banque_nom": "string|null",
+          "banque_id": "uuid|null",
+          "cheque_number": "string|null",
+          "cheque_image_path": "string|null",
+          "type_versement": "enum(En main propre,Virement,Versement)",
+          "montant": "decimal",
+          "date_prevue": "date|null",
+          "statut_recu": "boolean",
+          "statut_rejete": "boolean",
+          "statut_accepte": "boolean",
+          "remarks": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/rep-remboursements/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "date_payment": "sometimes|date",
+          "banque_id": "nullable|uuid|exists:banques,id",
+          "banque_nom": "nullable|string|max:100",
+          "cheque_number": "nullable|string|max:50",
+          "cheque_image_path": "nullable|string",
+          "type_versement": "sometimes|in:En main propre,Virement,Versement",
+          "montant": "sometimes|numeric|min:0",
+          "date_prevue": "nullable|date",
+          "statut_recu": "sometimes|boolean",
+          "statut_rejete": "sometimes|boolean",
+          "statut_accepte": "sometimes|boolean",
+          "remarks": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/rep-remboursements/{id}"
+      }
+    },
+    "RepresentantController": {
+      "index": {
+        "route": "GET /api/representants",
+        "return format": [
+          {
+            "id": "uuid",
+            "destination_id": "uuid|null",
+            "nom": "string",
+            "cin": "string",
+            "tel": "string|null",
+            "email": "string|null",
+            "adresse": "string|null",
+            "code_postale": "string|null",
+            "ville": "string|null",
+            "lieu_de_travail": "string|null",
+            "login": "string",
+            "bl_count": "integer",
+            "remb_count": "integer",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/representants",
+        "params": {
+          "nom": "required|string|max:255",
+          "cin": "required|string|max:20|unique:representants",
+          "destination_id": "nullable|uuid|exists:destinations,id",
+          "tel": "nullable|string|max:20",
+          "email": "nullable|string|email|max:255|unique:representants",
+          "adresse": "nullable|string",
+          "code_postale": "nullable|string|max:10",
+          "ville": "nullable|string|max:100",
+          "lieu_de_travail": "nullable|string|max:255",
+          "login": "required|string|max:100|unique:logins,username",
+          "password": "required|string|min:8",
+          "bl_count": "sometimes|integer|min:0",
+          "remb_count": "sometimes|integer|min:0"
+        }
+      },
+      "show": {
+        "route": "GET /api/representants/{id}",
+        "return format": {
+          "id": "uuid",
+          "destination_id": "uuid|null",
+          "nom": "string",
+          "cin": "string",
+          "tel": "string|null",
+          "email": "string|null",
+          "adresse": "string|null",
+          "code_postale": "string|null",
+          "ville": "string|null",
+          "lieu_de_travail": "string|null",
+          "login": "string",
+          "bl_count": "integer",
+          "remb_count": "integer",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/representants/{id}",
+        "params": {
+          "nom": "sometimes|string|max:255",
+          "cin": "sometimes|string|max:20|unique:representants,cin,{id}",
+          "destination_id": "nullable|uuid|exists:destinations,id",
+          "tel": "nullable|string|max:20",
+          "email": "nullable|string|email|max:255|unique:representants,email,{id}",
+          "adresse": "nullable|string",
+          "code_postale": "nullable|string|max:10",
+          "ville": "nullable|string|max:100",
+          "lieu_de_travail": "nullable|string|max:255",
+          "login": "sometimes|string|max:100|unique:representants,login,{id}",
+          "password": "sometimes|string|min:8",
+          "bl_count": "sometimes|integer|min:0",
+          "remb_count": "sometimes|integer|min:0"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/representants/{id}"
+      }
+    },
+    "RobotController": {
+      "index": {
+        "route": "GET /api/robots",
+        "return format": [
+          {
+            "id": "uuid",
+            "rep_id": "uuid",
+            "destination_id": "uuid|null",
+            "date_operation": "date",
+            "ville": "string",
+            "etablissement": "string",
+            "contact_nom": "string",
+            "contact_tel": "string",
+            "reference_robot": "string",
+            "quantite_vue": "integer",
+            "quantite_recue": "integer",
+            "images": "array",
+            "statut": "enum(Placé,En Démonstration,Retourné,Vendu)",
+            "remarques": "string|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null",
+            "representant": {
+              "id": "uuid",
+              "destination_id": "uuid|null",
+              "nom": "string",
+              "cin": "string",
+              "tel": "string|null",
+              "email": "string|null",
+              "adresse": "string|null",
+              "code_postale": "string|null",
+              "ville": "string|null",
+              "lieu_de_travail": "string|null",
+              "login": "string",
+              "bl_count": "integer",
+              "remb_count": "integer",
+              "created_at": "datetime|null",
+              "updated_at": "datetime|null"
+            }
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/robots",
+        "params": {
+          "rep_id": "required|uuid|exists:representants,id",
+          "destination_id": "nullable|uuid|exists:destinations,id",
+          "date_operation": "required|date",
+          "ville": "required|string|max:100",
+          "etablissement": "required|string",
+          "contact_nom": "required|string|max:150",
+          "contact_tel": "required|string|max:50",
+          "reference_robot": "required|string|max:100",
+          "quantite_vue": "sometimes|integer|min:0",
+          "quantite_recue": "sometimes|integer|min:0",
+          "images": "nullable|array",
+          "statut": "sometimes|in:Placé,En Démonstration,Retourné,Vendu",
+          "remarques": "nullable|string"
+        }
+      },
+      "show": {
+        "route": "GET /api/robots/{id}",
+        "return format": {
+          "id": "uuid",
+          "rep_id": "uuid",
+          "destination_id": "uuid|null",
+          "date_operation": "date",
+          "ville": "string",
+          "etablissement": "string",
+          "contact_nom": "string",
+          "contact_tel": "string",
+          "reference_robot": "string",
+          "quantite_vue": "integer",
+          "quantite_recue": "integer",
+          "images": "array",
+          "statut": "enum(Placé,En Démonstration,Retourné,Vendu)",
+          "remarques": "string|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/robots/{id}",
+        "params": {
+          "rep_id": "sometimes|uuid|exists:representants,id",
+          "destination_id": "nullable|uuid|exists:destinations,id",
+          "date_operation": "sometimes|date",
+          "ville": "sometimes|string|max:100",
+          "etablissement": "sometimes|string",
+          "contact_nom": "sometimes|string|max:150",
+          "contact_tel": "sometimes|string|max:50",
+          "reference_robot": "sometimes|string|max:100",
+          "quantite_vue": "sometimes|integer|min:0",
+          "quantite_recue": "sometimes|integer|min:0",
+          "images": "nullable|array",
+          "statut": "sometimes|in:Placé,En Démonstration,Retourné,Vendu",
+          "remarques": "nullable|string"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/robots/{id}"
+      }
+    },
+    "UserController": {
+      "index": {
+        "route": "GET /api/users",
+        "return format": [
+          {
+            "id": "uuid",
+            "name": "string",
+            "email": "string",
+            "email_verified_at": "datetime|null",
+            "created_at": "datetime|null",
+            "updated_at": "datetime|null"
+          }
+        ]
+      },
+      "store": {
+        "route": "POST /api/users",
+        "params": {
+          "name": "required|string|max:255",
+          "email": "required|string|email|max:255|unique:users",
+          "password": "required|string|min:8"
+        }
+      },
+      "show": {
+        "route": "GET /api/users/{id}",
+        "return format": {
+          "id": "uuid",
+          "name": "string",
+          "email": "string",
+          "email_verified_at": "datetime|null",
+          "created_at": "datetime|null",
+          "updated_at": "datetime|null"
+        }
+      },
+      "update": {
+        "route": "PUT /api/users/{id}",
+        "params": {
+          "name": "sometimes|string|max:255",
+          "email": "sometimes|string|email|max:255|unique:users,email,{id}",
+          "password": "sometimes|string|min:8"
+        }
+      },
+      "destroy": {
+        "route": "DELETE /api/users/{id}"
+      }
+    }
+  },
+  "models": {
+    "Admin": {
+      "fillable": [
+        "login",
+        "password"
+      ],
+      "hidden": [
+        "password"
+      ],
+      "casts": [],
+      "relationships": [
+        "login"
+      ]
+    },
+    "BLivraison": {
+      "fillable": [
+        "rep_id",
+        "bl_number",
+        "date_emission",
+        "type",
+        "mode_envoi",
+        "statut_recu",
+        "statut_vu",
+        "status",
+        "annee",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant",
+        "items"
+      ]
+    },
+    "BLivraisonImp": {
+      "fillable": [
+        "imprimeur_id",
+        "date_reception",
+        "b_livraison_number",
+        "livre_id",
+        "quantite",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "imprimeur",
+        "livre",
+        "items"
+      ]
+    },
+    "BLivraisonItem": {
+      "fillable": [
+        "deliverable_id",
+        "deliverable_type",
+        "livre_id",
+        "quantite"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "deliverable",
+        "livre"
+      ]
+    },
+    "BVentesClient": {
+      "fillable": [
+        "rep_id",
+        "client_id",
+        "b_vente_number",
+        "date_vente",
+        "type",
+        "livre_id",
+        "quantite",
+        "remise",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant",
+        "client",
+        "livre"
+      ]
+    },
+    "Banque": {
+      "fillable": [
+        "nom",
+        "code_abreviation",
+        "logo_path",
+        "is_active"
+      ],
+      "hidden": [],
+      "casts": {
+        "is_active": "boolean"
+      },
+      "relationships": [
+        "rep_remboursements",
+        "client_remboursements",
+        "remb_imp"
+      ]
+    },
+    "CahierCommunication": {
+      "fillable": [
+        "rep_id",
+        "ecole",
+        "type",
+        "qte",
+        "nom_fichier",
+        "date_commande",
+        "bon_de_commande",
+        "indication",
+        "model_recto",
+        "model_verso",
+        "is_accepted",
+        "is_refused",
+        "etat_model",
+        "date_validate_model",
+        "is_bc_validated",
+        "is_printed",
+        "is_delivered",
+        "is_deleted",
+        "remarques",
+        "annee_scolaire"
+      ],
+      "hidden": [],
+      "casts": {
+        "is_accepted": "boolean",
+        "is_refused": "boolean",
+        "is_bc_validated": "boolean",
+        "is_printed": "boolean",
+        "is_delivered": "boolean",
+        "is_deleted": "boolean",
+        "date_validate_model": "datetime",
+        "date_commande": "date",
+        "qte": "integer",
+        "etat_model": "integer"
+      },
+      "relationships": [
+        "representant"
+      ]
+    },
+    "CarteVisite": {
+      "fillable": [
+        "rep_id",
+        "model",
+        "date_commande",
+        "nom_sur_carte",
+        "fonction",
+        "tel",
+        "email",
+        "adresse",
+        "autre_info",
+        "logo_path",
+        "chevalet_ligne_1",
+        "chevalet_ligne_2",
+        "chevalet_ligne_3",
+        "conception_carte",
+        "is_valide_carte",
+        "conception_chevalet",
+        "is_valide_chevalet",
+        "comment_cv",
+        "comment_chevalet",
+        "remarques",
+        "prod_carte",
+        "livraison_carte",
+        "recu_carte",
+        "prod_chevalet",
+        "livraison_chevalet",
+        "recu_chevalet",
+        "annee_scolaire",
+        "is_deleted"
+      ],
+      "hidden": [],
+      "casts": {
+        "date_commande": "date",
+        "is_valide_carte": "boolean",
+        "is_valide_chevalet": "boolean",
+        "prod_carte": "boolean",
+        "livraison_carte": "boolean",
+        "recu_carte": "boolean",
+        "prod_chevalet": "boolean",
+        "livraison_chevalet": "boolean",
+        "recu_chevalet": "boolean",
+        "is_deleted": "boolean"
+      },
+      "relationships": [
+        "representant"
+      ]
+    },
+    "Catalogue": {
+      "fillable": [
+        "titre",
+        "categorie_id",
+        "image_url",
+        "content"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "category"
+      ]
+    },
+    "Category": {
+      "fillable": [
+        "libelle",
+        "description"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "livres"
+      ]
+    },
+    "Client": {
+      "fillable": [
+        "representant_id",
+        "destination_id",
+        "raison_sociale",
+        "ice",
+        "ville",
+        "adresse",
+        "tel",
+        "email"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant"
+      ]
+    },
+    "ClientRemboursement": {
+      "fillable": [
+        "rep_id",
+        "client_id",
+        "date_payment",
+        "banque_id",
+        "banque_nom",
+        "cheque_number",
+        "cheque_image_path",
+        "a_lordre_de",
+        "montant",
+        "observation",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant",
+        "client",
+        "banque"
+      ]
+    },
+    "Content": {
+      "fillable": [
+        "type",
+        "champ1",
+        "champ2",
+        "champ3"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": []
+    },
+    "DemandeF": {
+      "fillable": [
+        "rep_id",
+        "client_id",
+        "date_demande",
+        "objet",
+        "contenu",
+        "statut",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant",
+        "client"
+      ]
+    },
+    "Depot": {
+      "fillable": [
+        "rep_id",
+        "livre_id",
+        "quantite_balance",
+        "status",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant",
+        "livre"
+      ]
+    },
+    "Destination": {
+      "fillable": [
+        "destination",
+        "description"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representants",
+        "robots",
+        "clients",
+        "ventes",
+        "livraisons"
+      ]
+    },
+    "DetFact": {
+      "fillable": [
+        "fact_id",
+        "livre_id",
+        "quantite",
+        "prix_unitaire_ht",
+        "remise",
+        "total_ligne_ht"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "fact",
+        "livre"
+      ]
+    },
+    "Fact": {
+      "fillable": [
+        "rep_id",
+        "sequence_id",
+        "year_session",
+        "number",
+        "fact_number",
+        "date_facture",
+        "total_ht",
+        "tva_rate",
+        "total_ttc",
+        "reste_a_payer",
+        "status",
+        "remarques"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant",
+        "details",
+        "sequence"
+      ]
+    },
+    "FactSequence": {
+      "fillable": [
+        "nom",
+        "dernier_numero",
+        "est_active"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "facts"
+      ]
+    },
+    "Imprimeur": {
+      "fillable": [
+        "raison_sociale",
+        "adresse",
+        "directeur_nom",
+        "directeur_tel",
+        "directeur_email",
+        "adjoint_nom",
+        "adjoint_tel",
+        "adjoint_email"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "bls"
+      ]
+    },
+    "Livre": {
+      "fillable": [
+        "titre",
+        "code",
+        "categorie_id",
+        "prix_achat",
+        "prix_vente",
+        "prix_public",
+        "nb_pages",
+        "color_code",
+        "description",
+        "annee_publication"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "category"
+      ]
+    },
+    "Login": {
+      "fillable": [
+        "username",
+        "password",
+        "authenticatable_id",
+        "authenticatable_type",
+        "role",
+        "is_active",
+        "last_visit"
+      ],
+      "hidden": [
+        "password",
+        "remember_token"
+      ],
+      "casts": {
+        "is_active": "boolean"
+      },
+      "relationships": [
+        "profile"
+      ]
+    },
+    "RembImp": {
+      "fillable": [
+        "imprimeur_id",
+        "date_payment",
+        "banque_id",
+        "banque_nom",
+        "cheque_number",
+        "cheque_image_path",
+        "montant",
+        "statut_recu",
+        "statut_rejete",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": {
+        "statut_recu": "boolean",
+        "statut_rejete": "boolean",
+        "date_payment": "date",
+        "montant": "float"
+      },
+      "relationships": [
+        "imprimeur",
+        "banque"
+      ]
+    },
+    "RepRemboursement": {
+      "fillable": [
+        "rep_id",
+        "date_payment",
+        "banque_id",
+        "banque_nom",
+        "cheque_number",
+        "cheque_image_path",
+        "type_versement",
+        "montant",
+        "date_prevue",
+        "statut_recu",
+        "statut_rejete",
+        "statut_accepte",
+        "remarks"
+      ],
+      "hidden": [],
+      "casts": [],
+      "relationships": [
+        "representant",
+        "banque"
+      ]
+    },
+    "Representant": {
+      "fillable": [
+        "nom",
+        "cin",
+        "destination_id",
+        "tel",
+        "email",
+        "adresse",
+        "code_postale",
+        "ville",
+        "lieu_de_travail",
+        "login",
+        "password"
+      ],
+      "hidden": [
+        "password"
+      ],
+      "casts": [],
+      "relationships": [
+        "login",
+        "clients",
+        "bls",
+        "remboursements"
+      ]
+    },
+    "Robot": {
+      "fillable": [
+        "rep_id",
+        "destination_id",
+        "date_operation",
+        "ville",
+        "etablissement",
+        "contact_nom",
+        "contact_tel",
+        "reference_robot",
+        "quantite_vue",
+        "quantite_recue",
+        "images",
+        "statut",
+        "remarques"
+      ],
+      "hidden": [],
+      "casts": {
+        "images": "array"
+      },
+      "relationships": [
+        "representant"
+      ]
+    },
+    "User": {
+      "fillable": [
+        "name",
+        "email",
+        "password"
+      ],
+      "hidden": [
+        "password",
+        "remember_token"
+      ],
+      "casts": {
+        "email_verified_at": "datetime",
+        "password": "hashed"
+      },
+      "relationships": []
+    }
+  }
+}

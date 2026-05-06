@@ -1,0 +1,658 @@
+import { cn } from "../../lib/utils";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowUpDown, BadgeCheck, BadgeX, ChevronDown, ChevronUp, Eye, Filter, Printer, Search, SquareArrowLeft, SquareArrowRight, SquarePen, Trash } from "lucide-react";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "./table"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
+import { AlertBox, AlertBoxContainer, AlertBoxTrigger } from "./AlertBox";
+import { Button } from "./button"
+import { Input } from "./input";
+import { currencyFormat, dateFormat } from "../../lib/utilities";
+
+const getNestedValue = (obj, path) => {
+  if (!path) return "";
+
+  // Detects +, -, *, or /
+  const mathRegex = /([\+\-\*\/])/;
+  if (mathRegex.test(path)) {
+    const parts = path.split(mathRegex).map(p => p.trim());
+
+    // Resolve the first value recursively
+    let result = parseFloat(getNestedValue(obj, parts[0])) || 0;
+
+    // Iterate through the remaining parts (operator + next value)
+    for (let i = 1; i < parts.length; i += 2) {
+      const operator = parts[i];
+      const nextVal = parseFloat(getNestedValue(obj, parts[i + 1])) || 0;
+
+      switch (operator) {
+        case '+': result += nextVal; break;
+        case '-': result -= nextVal; break;
+        case '*': result *= nextVal; break;
+        case '/': result = nextVal !== 0 ? result / nextVal : 0; break;
+        default: break;
+      }
+    }
+    return result;
+  }
+  const paths = path.split('||').map(p => p.trim());
+  for (const singlePath of paths) {
+    if ((singlePath.startsWith("'") && singlePath.endsWith("'")) ||
+      (singlePath.startsWith('"') && singlePath.endsWith('"'))) {
+      return singlePath.slice(1, -1);
+    }
+
+    const value = singlePath.split('.').reduce((acc, part) => acc && acc[part], obj);
+
+    if (value !== undefined && value !== null && value !== "") {
+      return value;
+    }
+  }
+  return "";
+};
+
+/**
+ * 
+ * @param {*} param0 
+ * @returns 
+ * data
+ * columns
+ * actions e.g. ["edit", "delete", "view"]
+ * actionsDetaille e.g. delete: {
+      type: "delete",
+      icon: Trash,
+      title: "",
+      description: "Êtes-vous sûr de vouloir supprimer cette donnée ?",
+      cancelText: "Annuler",
+      actionText: "Supprimer",
+      onOk: () => { return true },
+      onCancel: () => { return false },
+    }
+  * onAction Callback function: (type, row) => void
+  * variant => blue, dark, green, slate, light, outline
+  * pageSize
+  * isLoading
+  * enableSearch = false,
+  * enableSorting = false,
+  * enableSelection = false,
+  * onSelectionChange = (selectedRows) => {}
+ */
+
+const MyTable = ({
+  data = [],
+  columns,
+  actions = [],
+  actionsDetaille = {},
+  onAction,
+  variant = "slate",
+  pageSize = 5,
+  isLoading = false,
+
+
+  defaultFilterColumn = "",
+  enableSearch = false,
+  enableSorting = false,
+  enableSelection = false,
+  enableCategoricalFilter = false,
+  onSelectionChange = (selectedRows) => { }
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Pagination Logic
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [selectedIds, setSelectedIds] = useState(new Set());
+
+  // Categorical Filter State
+  const [catFilterCol, setCatFilterCol] = useState(defaultFilterColumn.accessor || "");
+  const [catFilterVal, setCatFilterVal] = useState("all");
+
+  // Get unique values for the selected category column
+  const uniqueCategoryValues = useMemo(() => {
+    if (!catFilterCol) return [];
+    const values = data.map(row => String(getNestedValue(row, catFilterCol)));
+    return [...new Set(values)].filter(v => v !== "").sort();
+  }, [data, catFilterCol]);
+
+  const filteredData = useMemo(() => {
+    let result = data;
+
+    // 1. Apply Categorical Filter
+    if (enableCategoricalFilter && catFilterCol && catFilterVal !== "all") {
+      result = result.filter(row => String(getNestedValue(row, catFilterCol)) === catFilterVal);
+    }
+
+    // 2. Apply Text Search
+    if (searchQuery) {
+      result = result.filter((row) =>
+        columns.some((col) => {
+          const val = getNestedValue(row, col.accessor);
+          return String(val).toLowerCase().includes(searchQuery.toLowerCase());
+        })
+      );
+    }
+    return result;
+  }, [data, searchQuery, columns, catFilterCol, catFilterVal, enableCategoricalFilter]);
+
+
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return filteredData;
+    const sorted = [...filteredData].sort((a, b) => {
+      const aVal = getNestedValue(a, sortConfig.key);
+      const bVal = getNestedValue(b, sortConfig.key);
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return sorted;
+  }, [filteredData, sortConfig]);
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === sortedData.length) {
+      setSelectedIds(new Set());
+      onSelectionChange([]);
+    } else {
+      const allIds = new Set(sortedData.map(row => row.id));
+      setSelectedIds(allIds);
+      onSelectionChange(sortedData);
+    }
+  };
+
+  const toggleSelectRow = (id) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) newSelected.delete(id);
+    else newSelected.add(id);
+    setSelectedIds(newSelected);
+
+    const selectedRows = data.filter(r => newSelected.has(r.id));
+    onSelectionChange(selectedRows);
+  };
+
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const totalPages = Math.ceil((data?.length || 0) / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedData = sortedData.slice(startIndex, startIndex + pageSize);
+  useEffect(() => {
+    if (currentPage > 1 && paginatedData.length === 0 && !isLoading) {
+      setCurrentPage(totalPages || 1);
+    }
+  }, [paginatedData.length, currentPage, totalPages, isLoading]);
+
+  // Color Variant Mapping
+  const variants = {
+    blue: "bg-blue-600 text-white",
+    dark: "bg-slate-900 text-white",
+    green: "bg-emerald-600 text-white",
+    slate: "bg-slate-900 text-white",
+    light: "bg-slate-100 text-slate-900",
+    outline: "bg-white border-b border-slate-200 text-slate-900",
+  };
+
+  const visibleColumnsCount = columns.filter(col => col.type !== "hidden").length;
+  const totalColSpan = visibleColumnsCount + (actions.length > 0 ? 1 : 0) + (enableSelection ? 1 : 0);
+
+  return (
+    <div className={styles.container.rootdiv}>
+      <div className="flex flex-wrap items-center justify-between py-4 w-full px-5 gap-4">
+        {enableCategoricalFilter && (
+          <div className="flex items-center gap-2">
+            <Filter size={16} className="text-slate-500" />
+            {!defaultFilterColumn && <select
+              className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs focus:ring-1 focus:ring-slate-900"
+              value={catFilterCol}
+              onChange={(e) => { setCatFilterCol(e.target.value); setCatFilterVal("all"); }}
+            >
+              <option value="">Filtrer par...</option>
+              {columns.map(col => <option key={col.accessor} value={col.accessor}>{col.header}</option>)}
+            </select>}
+
+            {catFilterCol && (
+              <select
+                className="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs focus:ring-1 focus:ring-slate-900"
+                value={catFilterVal}
+                onChange={(e) => { setCatFilterVal(e.target.value); setCurrentPage(1); }}
+              >
+                <option value="all">Tous ({defaultFilterColumn.header || ""})</option>
+                {uniqueCategoryValues.map(val => <option key={val} value={val}>{val}</option>)}
+              </select>
+            )}
+          </div>
+        )}
+
+        {enableSearch && (
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Rechercher..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-10 rounded-xl border-slate-200 focus:ring-slate-900"
+            />
+          </div>
+        )}
+      </div>
+      <div className={styles.container.subrootdiv}>
+        <Table>
+          <MyTableHeader
+            columns={columns}
+            actions={actions.length > 0}
+            variant={variants[variant]}
+            enableSorting={enableSorting}
+            sortConfig={sortConfig}
+            requestSort={requestSort}
+            enableSelection={enableSelection}
+            onSelectAll={toggleSelectAll}
+            allSelected={sortedData.length > 0 && selectedIds.size === sortedData.length}
+          />
+
+          <MyTableBody
+            data={paginatedData}
+            columns={columns}
+            actions={actions}
+            actionsDetaille={actionsDetaille}
+            onAction={onAction}
+            isLoading={isLoading}
+            enableSelection={enableSelection}
+            selectedIds={selectedIds}
+            onToggleSelect={toggleSelectRow}
+          />
+
+          <MyTableFooter
+            totalDataCount={sortedData.length}
+            colSpan={totalColSpan}
+            startIndex={startIndex}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
+        </Table>
+      </div>
+    </div>
+  )
+}
+
+const MyTableHeader = ({ columns, variant, actions = false, enableSorting, sortConfig, requestSort, enableSelection, onSelectAll, allSelected }) => (
+  <TableHeader className={variant}>
+    <TableRow className={styles.header.tablehead}>
+      {enableSelection && (
+        <TableHead className="w-12 px-4">
+          <Input type="checkbox" checked={allSelected} onChange={onSelectAll} />
+        </TableHead>
+      )}
+      {columns.map((column) => {
+        if (column.type === "hidden") return null;
+        return (
+          <TableHead
+            key={column.header}
+            className={cn(styles.header.tablecell, variant, enableSorting && "cursor-pointer select-none")}
+            onClick={() => enableSorting && requestSort(column.accessor)}
+          >
+            <div className="flex items-center gap-2">
+              {column.header}
+              {enableSorting && (
+                sortConfig.key === column.accessor ? (
+                  sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                ) : <ArrowUpDown className="h-3 w-3 opacity-50" />
+              )}
+            </div>
+          </TableHead>
+        )
+      })}
+      {actions && (
+        <TableHead
+          key="actions"
+          className={cn(styles.header.tablecell, "text-right", variant)}
+        >
+          Actions
+        </TableHead>
+      )}
+    </TableRow>
+  </TableHeader>
+)
+
+const MyTableBody = ({ data, isLoading, columns, actions, onAction, actionsDetaille, enableSelection, selectedIds, onToggleSelect }) => {
+  if (isLoading) {
+    return (
+      <TableBody>
+        <TableRow>
+          <TableCell colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className={styles.body.tableloading.cell}>
+            <div className={styles.body.tableloading.container}>
+              <div className={styles.body.tableloading.spinner}></div>
+              <p className={styles.body.tableloading.text}>Chargement...</p>
+            </div>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    );
+  }
+  return (
+    <TableBody>
+      {data.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="h-32 text-center text-slate-400 italic">
+            Aucune donnée disponible
+          </TableCell>
+        </TableRow>
+      ) : (
+        data.map((row, index) => (
+          <MyTableRow
+            key={row.id || index}
+            row={row}
+            columns={columns}
+            actions={actions}
+            onAction={onAction}
+            actionsDetaille={actionsDetaille}
+            isItemSelected={selectedIds.has(row.id)}
+            enableSelection={enableSelection}
+            onToggleSelect={onToggleSelect}
+          />
+        ))
+      )}
+    </TableBody>
+  )
+}
+
+const MyTableRow = ({ row, columns, actions, onAction, actionsDetaille, isItemSelected, enableSelection, onToggleSelect }) => {
+  const ignoreColor = ["#FFFFFF", "#FFF", "#000000", "#000", "transparent"];
+  const rowColor = row.color || row["color_code"];
+  let iStyle = rowColor && !ignoreColor.includes(rowColor.toUpperCase());
+  const rowClasses = cn(
+    `odd:bg-white even:bg-slate-50/30`,
+    "transition-colors hover:bg-slate-100/50"
+  );
+  return (
+    <TableRow
+      key={row.id}
+      className={cn(rowClasses, "transition-colors hover:bg-slate-100/50")}
+    >
+      {enableSelection && (
+        <TableCell className="px-4">
+          <Input
+            type="checkbox"
+            checked={isItemSelected}
+            onChange={() => onToggleSelect(row.id, row)}
+          />
+        </TableCell>
+      )}
+      {columns.map((column, colIndex) => {
+        if (column.type === "hidden") return null;
+        const value = getNestedValue(row, column.accessor);
+        let content;
+
+        if (column.render) {
+          content = column.render(value, row);
+        } else if (column.type === "currency" || column.type === "money" || column.type === "curr") {
+          content = currencyFormat(value);
+        } else if (column.type === "rate" || column.type === "percentage" || column.type === "percent") {
+          // parseFloat gère les strings "20.00", les nombres 20.0 et assure que 20.00 devient 20
+          const numericValue = parseFloat(value);
+          content = isNaN(numericValue) ? "0%" : `${numericValue}%`;
+        } else if (column.type === "date") {
+          content = dateFormat(value);
+        } else if (typeof value === "boolean" || column.type === "bool") {
+          const badge = value ? (
+            <BadgeCheck className="text-emerald-600" />
+          ) : (
+            <BadgeX className="text-red-300" />
+          );
+
+          // If onClick is provided in the column definition, wrap it in a button
+          content = column.onClick ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent row click events
+                column.onClick(row);
+              }}
+              className="hover:scale-110 transition-transform active:opacity-70"
+            >
+              {badge}
+            </button>
+          ) : (
+            badge
+          );
+        } else if (column.type === "status-value" || column.type === "status-online") {
+          const statusValue = getNestedValue(row, column.statusAccessor);
+          const mainValue = column.render ? column.render(value, row) : value;
+          const formattedValue =
+            column.subType === "date"
+              ? (
+                column.type === "status-value"
+                  ? dateFormat(mainValue)
+                  : dateFormat(mainValue, true)
+              )
+              : mainValue;
+          {/* showTime */ }
+          // Determine if the entity is "Online" or "Active"
+          let isActive = false;
+
+          if (column.type === "status-online" && column.verifyOnline && statusValue && statusValue !== "null") {
+            const lastActivityDate = new Date(statusValue);
+            if (!isNaN(lastActivityDate.getTime())) {
+              const diffInMinutes = (new Date().getTime() - lastActivityDate.getTime()) / (1000 * 60);
+              isActive = diffInMinutes >= 0 && diffInMinutes < 15;
+            }
+          } else {
+            // Fallback for status-value or simple boolean online status
+            isActive = !!statusValue;
+          }
+
+          // Configuration based on type
+          const isOnlineType = column.type === "status-online";
+          const dotColorClass = isActive
+            ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"
+            : (isOnlineType ? "bg-slate-300" : "bg-red-500");
+
+          const indicator = (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className={cn("h-2.5 w-2.5 rounded-full shrink-0", dotColorClass)} />
+              </TooltipTrigger>
+              {/* Only show tooltip for status-online types */}
+              {isOnlineType && (
+                <TooltipContent className="text-[10px] bg-slate-900 text-white">
+                  {isActive ? "En ligne" : "Hors ligne"}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          );
+          {/* justify-between */ }
+          content = (
+            <div className={cn("flex items-center gap-2", isOnlineType ? "justify-between" : "justify-start")}>
+              {/* Reverse order based on type: Dot-Value vs Value-Dot */}
+              {isOnlineType ? (
+                <>
+                  <span className="text-xs text-muted-foreground italic">{formattedValue}</span>
+                  {indicator}
+                </>
+              ) : (
+                <>
+                  {indicator}
+                  <span className="text-xs text-muted-foreground italic">{formattedValue}</span>
+                </>
+              )}
+            </div>
+          );
+        } else {
+          content = value;
+        }
+
+        const cellStyle = (colIndex === 0 && iStyle)
+          ? { backgroundColor: rowColor }
+          : {};
+        return (
+          <TableCell
+            key={column.header}
+            style={cellStyle}
+            className={cn(colIndex === 0 && iStyle && "font-medium")}
+          >
+            {content}
+          </TableCell>
+        )
+      })}
+      {actions.length > 0 && (
+        <TableCell key="actions" className={styles.body.tablebody.cell}>
+          {actions.includes("view") && (
+            <ActionToolTip
+              row={row}
+              Icon={Eye}
+              tip="Détails"
+              onAction={() => onAction("view", row)}
+              triggerStyle="text-emerald-600"
+              alertInfo={actionsDetaille.edit || null}
+              hasAlert={actionsDetaille.edit || false}
+            />
+          )}
+          {actions.includes("edit") && (
+            <ActionToolTip
+              row={row}
+              Icon={SquarePen}
+              tip="Modifier"
+              onAction={() => onAction("edit", row)}
+              triggerStyle={"text-blue-600 hover:text-blue-900 transition-colors"}
+              alertInfo={actionsDetaille.edit || null}
+              hasAlert={actionsDetaille.edit || false}
+            />
+          )}
+          {actions.includes("imp") && (
+            <ActionToolTip
+              row={row}
+              Icon={Printer}
+              tip="Imprimer"
+              onAction={() => onAction("imp", row)}
+              triggerStyle={"text-slate-600 hover:text-slate-900 transition-colors"}
+              alertInfo={actionsDetaille.imp || null}
+              hasAlert={actionsDetaille.imp || false}
+            />
+          )}
+          {actions.includes("delete") && (
+            <ActionToolTip
+              row={row}
+              Icon={Trash}
+              tip="Supprimer"
+              onAction={() => onAction("delete", row)}
+              triggerStyle={"text-red-400 hover:text-red-600 transition-colors"}
+              alertInfo={actionsDetaille.delete || null}
+              hasAlert={actionsDetaille.delete || false}
+            />
+          )}
+        </TableCell>
+      )}
+    </TableRow>
+  )
+}
+
+const ActionToolTip = ({ Icon, tip, onAction, triggerStyle, hasAlert, alertInfo, row }) => {
+  const content = (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button onClick={!hasAlert ? onAction : undefined} className={cn("p-2 transition-transform active:scale-95", triggerStyle)}>
+          <Icon size={18} />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="bg-slate-900 text-white">{tip}</TooltipContent>
+    </Tooltip>
+  );
+
+  if (hasAlert) {
+    return (
+      <AlertBox>
+        <AlertBoxTrigger asChild>
+          <button
+            onClick={!hasAlert ? onAction : undefined}
+            className={cn("p-2 transition-transform active:scale-95", triggerStyle)}
+          >
+            <Icon size={18} />
+          </button>
+        </AlertBoxTrigger>
+        <AlertBoxContainer
+          type={alertInfo?.type || "default"}
+          title={alertInfo?.title || "title"}
+          description={alertInfo?.description || "description"}
+          cancelText={alertInfo?.cancelText || "cancelText"}
+          actionText={alertInfo?.actionText || "actionText"}
+          onOk={() => alertInfo?.onOk(row) || true}
+          onCancel={() => alertInfo?.onCancel() || false}
+        />
+      </AlertBox>
+    );
+  }
+  return content;
+};
+
+const MyTableFooter = ({ colSpan, startIndex, pageSize, totalDataCount, currentPage, setCurrentPage, totalPages }) => {
+  return (
+    <TableFooter>
+      <TableRow>
+        <TableCell colSpan={colSpan} className={styles.body.tablebody.cell}>
+          <div className="flex items-center justify-between px-2">
+            <p className="text-sm text-muted-foreground">
+              {startIndex + 1} de {Math.min(startIndex + pageSize, totalDataCount)} sur {totalDataCount}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <SquareArrowLeft />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                <SquareArrowRight />
+              </Button>
+            </div>
+          </div>
+        </TableCell>
+      </TableRow>
+    </TableFooter>
+  )
+}
+
+const styles = {
+  container: {
+    rootdiv: "space-y-4 max-w-90 overflow-auto m-3",
+    subrootdiv: "rounded-md border border-slate-200 overflow-hidden",
+  },
+  header: {
+    tablehead: "hover:bg-transparent border-none",
+    tablecell: "font-bold",
+  },
+  body: {
+    tablebody: {
+      cell: "text-right space-x-2",
+      actions: "text-center",
+      delete: "text-red-600",
+    },
+    tableloading: {
+      cell: "h-32 text-center",
+      container: "flex flex-col items-center justify-center space-y-2",
+      spinner: "w-8 h-8 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin",
+      text: "text-slate-500 font-medium italic",
+    }
+  }
+}
+
+export { MyTable }

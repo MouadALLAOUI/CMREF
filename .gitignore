@@ -1,20 +1,75 @@
-.git/*
-.git/
+```
+# Dependencies
+node_modules/
+
+# Build artifacts
 dist/
 build/
-node_modules/
-venv/
-vendor/
+coverage/
+htmlcov/
+*.out
+
+# Logs
+*.log
+
+# Environment
 .env
+.env.local
+*.env.*
 
-package-lock.json
-composer.lock
+# Editors
+.vscode/
+.idea/
 
-*.pdf
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.svg
-*.webp
-*.tree
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+.eggs/
+
+# Compression files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+
+# Temp files
+*.tmp
+*.swp
+*.swo
+
+# Coverage
+.coverage
+```

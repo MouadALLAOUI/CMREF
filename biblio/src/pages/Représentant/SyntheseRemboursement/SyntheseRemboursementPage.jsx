@@ -3,8 +3,10 @@ import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
-import { Printer, Download, TrendingDown } from "lucide-react";
+import { Printer, Download, TrendingDown, Users, Wallet, CreditCard } from "lucide-react";
 import repRemboursementService from "../../../api/services/repRemboursementService";
+import representantService from "../../../api/services/representantService";
+import { formatMoney, calculateFinancialSummary } from "../../../utils/helpers";
 
 const fetchAllPaginated = async (serviceGetAll, params = {}) => {
     const first = await serviceGetAll({ ...params, page: 1 });
@@ -28,13 +30,19 @@ const toNumber = (v) => {
 
 const SyntheseRemboursementPage = () => {
     const [rows, setRows] = useState([]);
-    const [kpis, setKpis] = useState({ total: 0, operations: 0 });
+    const [representants, setRepresentants] = useState([]);
+    const [kpis, setKpis] = useState({ total: 0, operations: 0, totalCredit: 0, totalAvance: 0, totalReste: 0 });
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const ops = await fetchAllPaginated(repRemboursementService.getAll);
+            const [ops, reps] = await Promise.all([
+                fetchAllPaginated(repRemboursementService.getAll),
+                representantService.getAll(),
+            ]);
+            setRepresentants(reps);
+            
             const grouped = new Map();
 
             for (const o of ops) {
@@ -57,9 +65,16 @@ const SyntheseRemboursementPage = () => {
 
             const computed = Array.from(grouped.values()).sort((a, b) => b.totalRemb - a.totalRemb);
             setRows(computed);
+            
+            // Calculate financial summary
+            const financialSummary = calculateFinancialSummary(ops);
+            
             setKpis({
                 total: computed.reduce((sum, r) => sum + toNumber(r.totalRemb), 0),
                 operations: ops.length,
+                totalCredit: financialSummary.totalCredit,
+                totalAvance: financialSummary.totalAvance,
+                totalReste: financialSummary.totalReste,
             });
         } catch (error) {
             logger("Error computing synthese remboursements:", error);
@@ -97,23 +112,41 @@ const SyntheseRemboursementPage = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-4">
                     <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
                         <TrendingDown size={24} />
                     </div>
                     <div>
                         <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest">Total Remboursé REP</p>
-                        <p className="text-3xl font-black text-emerald-900">{kpis.total.toLocaleString()} DH</p>
+                        <p className="text-2xl font-black text-emerald-900">{formatMoney(kpis.total)}</p>
+                    </div>
+                </div>
+                <div className="p-6 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-4">
+                    <div className="p-3 bg-blue-100 rounded-full text-blue-600">
+                        <CreditCard size={24} />
+                    </div>
+                    <div>
+                        <p className="text-xs text-blue-600 font-bold uppercase tracking-widest">Crédit Total</p>
+                        <p className="text-2xl font-black text-blue-900">{formatMoney(kpis.totalCredit)}</p>
+                    </div>
+                </div>
+                <div className="p-6 bg-purple-50 border border-purple-100 rounded-xl flex items-center gap-4">
+                    <div className="p-3 bg-purple-100 rounded-full text-purple-600">
+                        <Wallet size={24} />
+                    </div>
+                    <div>
+                        <p className="text-xs text-purple-600 font-bold uppercase tracking-widest">Avance Totale</p>
+                        <p className="text-2xl font-black text-purple-900">{formatMoney(kpis.totalAvance)}</p>
                     </div>
                 </div>
                 <div className="p-6 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-4">
                     <div className="p-3 bg-slate-100 rounded-full text-slate-600">
-                        <Printer size={24} />
+                        <Users size={24} />
                     </div>
                     <div>
                         <p className="text-xs text-slate-600 font-bold uppercase tracking-widest">Nb Total Opérations</p>
-                        <p className="text-3xl font-black text-slate-900">{kpis.operations}</p>
+                        <p className="text-2xl font-black text-slate-900">{kpis.operations}</p>
                     </div>
                 </div>
             </div>

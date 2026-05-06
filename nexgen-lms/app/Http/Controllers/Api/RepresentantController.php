@@ -86,17 +86,20 @@ class RepresentantController extends Controller
             'code_postale' => 'nullable|string|max:10',
             'ville' => 'nullable|string|max:100',
             'lieu_de_travail' => 'nullable|string|max:255',
-            'login' => 'sometimes|string|max:100|unique:representants,login,' . $representant->id,
-            'password' => 'sometimes|string|min:8',
+            'login' => 'sometimes|string|max:100|unique:logins,username,' . $representant->id,
+            'password' => 'sometimes|string|min:8', // Optional - only update if provided
             'bl_count' => 'sometimes|integer|min:0',
             'remb_count' => 'sometimes|integer|min:0',
+            'last_online_at' => 'sometimes|nullable|date',
         ]);
 
         try {
             DB::transaction(function () use ($representant, $validatedData) {
-                // Update Password if provided
-                if (isset($validatedData['password'])) {
+                // Update Password if provided (allow empty to skip)
+                if (isset($validatedData['password']) && !empty($validatedData['password'])) {
                     $validatedData['password'] = Hash::make($validatedData['password']);
+                } else {
+                    unset($validatedData['password']);
                 }
 
                 // 1. Update Representant Table
@@ -119,6 +122,20 @@ class RepresentantController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur de mise à jour', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $representant = Representant::findOrFail($id);
+        
+        $validated = $request->validate([
+            'last_online_at' => 'nullable|date',
+        ]);
+
+        $representant->update($validated);
+        event(new RepresentantUpdated($representant));
+
+        return new RepresentantResource($representant->load('login'));
     }
 
     public function destroy($id)

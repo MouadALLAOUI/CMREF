@@ -32,6 +32,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\DestinationController;
 use App\Http\Controllers\Api\FacturationController;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\SeasonController;
+use App\Http\Controllers\Api\SettingController;
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
@@ -83,6 +85,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('admins', AdminController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('banques', BanqueController::class);
+    Route::apiResource('seasons', SeasonController::class);
+
+    // Settings API
+    Route::get('/settings', [SettingController::class, 'index']);
+    Route::get('/settings/{key}', [SettingController::class, 'show']);
+    Route::post('/settings', [SettingController::class, 'store']);
+    Route::put('/settings', [SettingController::class, 'update']);
+
+    // Season management
+    Route::get('/seasons/active', [SeasonController::class, 'active']);
+    Route::post('/seasons/set-active', [SeasonController::class, 'setActive']);
+
+    // Representative specific routes
+    Route::get('/representants/{id}/depot', [DepotController::class, 'byRepresentant']);
+    Route::put('/representants/{id}/status', [RepresentantController::class, 'updateStatus']);
 
     // Facturation transformation
     Route::post('/demande-f/{id}/transform', [FacturationController::class, 'transform']);

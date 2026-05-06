@@ -23,11 +23,16 @@ class Representant extends Authenticatable
         'ville',
         'lieu_de_travail',
         'login',
-        'password'
+        'password',
+        'last_online_at',
     ];
 
 
     protected $hidden = ['password'];
+
+    protected $casts = [
+        'last_online_at' => 'datetime',
+    ];
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -50,5 +55,15 @@ class Representant extends Authenticatable
     public function remboursements()
     {
         return $this->hasMany(RepRemboursement::class, 'rep_id');
+    }
+
+    public function depot()
+    {
+        return $this->hasOne(Depot::class, 'rep_id');
+    }
+
+    public function depots()
+    {
+        return $this->hasMany(Depot::class, 'rep_id');
     }
 }

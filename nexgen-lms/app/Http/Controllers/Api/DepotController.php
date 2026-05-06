@@ -71,4 +71,15 @@ class DepotController extends Controller
 
         return response()->json(null, 204);
     }
+
+    public function byRepresentant($id)
+    {
+        $depot = Depot::where('rep_id', $id)->first();
+        
+        if (!$depot) {
+            return response()->json(['message' => 'No depot found for this representative'], 404);
+        }
+        
+        return new DepotResource($depot->load(['representant', 'items.livre']));
+    }
 }

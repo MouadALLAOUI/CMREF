@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Administration</title>
+  <link href="images/user-log-in.png" rel="shortcut icon" />
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800" rel="stylesheet" type="text/css" />
+  <link href="http://fonts.googleapis.com/css?family=Raleway:100,900,800,700,600,500,400,300,200" rel="stylesheet"
+    type="text/css" /><!-- Google Fonts -->
+  <!-- Styles -->
+  <link href="../../admin/css/bootstrap.css" rel="stylesheet" type="text/css" /><!-- Bootstrap -->
+  <link href="../../admin/css/jquery.mCustomScrollbar.css" rel="stylesheet" /><!-- Custom Scroll Bar -->
+  <link href="../../admin/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" /><!-- Font Awesome -->
+  <link href="../../admin/css/style.css" rel="stylesheet" type="text/css" /><!-- Style -->
+  <link href="../../admin/css/responsive.css" rel="stylesheet" type="text/css" /><!-- Responsive Style -->
+  <!-- Script -->
+  <script src="../../admin/js/ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- Jquery -->
+  <script src="../../admin/js/bootstrap.js" type="text/javascript"></script><!-- Bootstrap -->
+  <script src="../../admin/js/script.js" type="text/javascript"></script><!-- Script -->
+  <style type="text/css">
+    .notification {
+      margin: 0 auto;
+      background: #f00;
+      width: 29px;
+      height: 29px;
+      border-radius: 19px;
+      color: #fff;
+      padding: 5px 0;
+      font-weight: bold;
+    }
+
+    .content-articles {
+      clear: both;
+      float: none;
+    }
+
+    .content-articles .cat-accordian {
+      margin-bottom: 10px;
+    }
+
+    .content-articles .cat-accordian .titre-cat {
+      background: #31BEEB;
+      padding: 10px;
+      color: #fff;
+      font-family: arial;
+      font-weight: bold;
+      border-radius: 2px;
+      cursor: pointer;
+
+    }
+
+    .content-articles .cat-accordian .content-cat {
+      padding: 10px;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-top: 0;
+      display: table;
+      display: none;
+    }
+
+    .content-articles .cat-accordian .content-cat>div {
+      display: table;
+      width: 100%;
+    }
+
+    .content-articles .cat-accordian .content-cat .article {
+      display: table-row;
+      width: 100%;
+
+    }
+
+    .content-articles .cat-accordian .content-cat .article>div {
+      display: table-cell;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .content-articles .cat-accordian .content-cat .article .qte-article input {
+      display: none;
+      height: 37px !important;
+      margin-top: -4px !important;
+      text-align: right !important;
+      font-size: 18px !important;
+      padding-right: 11px !important;
+    }
+
+    .content-articles .cat-accordian .content-cat .article .titre-article input {
+      display: none;
+    }
+
+    .content-articles .cat-accordian .content-cat .article .titre-article {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      float: left;
+      width: 70%;
+      cursor: pointer;
+    }
+
+    .content-articles .cat-accordian .content-cat .article .titre-article.article-checked {
+      background: #0A8A0A;
+      color: #fff;
+      border: 1px solid #0A8A0A;
+    }
+
+    .content-articles .cat-accordian .content-cat .article .qte-article {
+      width: 30%;
+      float: left;
+      padding: 5px;
+    }
+
+    button.btn.green.btn-submit {
+      display: block;
+      margin: 0 auto;
+      padding: 11px;
+      width: 200px;
+      margin-top: 50px;
+      font-size: 17px;
+    }
+
+    table.table.table-striped.table-bordered.article-selected {
+      width: 400px;
+      margin: 0 auto;
+      float: none;
+      margin-top: 40px;
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+
+    function supp() {
+
+      if (confirm('voullez vous vraiment supprimez ce BL ?')) return true;
+
+      else return false;
+
+    }
+
+
+
+    function coche() {
+
+      if (confirm('voullez vous vraiment décocher ce BL ?')) return true;
+
+      else return false;
+
+    }
+
+
+
+    function valider(f) {
+      var test = 1;
+      for (var i = 1; i <= 10; i++) {
+        livre = document.getElementById('livre' + i);
+        value = livre.options[livre.selectedIndex].value;
+
+        if (value == '-') {
+          livre.style.backgroundColor = "#FFC8C8";
+          test *= 0;
+        }
+      };
+
+      if (test == 1) {
+        $('.btn-submit').attr("disabled", "disabled");
+        return true;
+      }
+      else {
+        alert('Il faut choisir un article pas une categorie !')
+        return false;
+      }
+
+
+
+    }
+
+
+
+  </script>
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="logo">
+        <img alt="" src="https://placehold.co/60x40?text=Image" />
+      </div><!-- Logo -->
+      <div class="welcome-user">
+        <!-- <img src="images/user.png" alt=""/> -->
+        <span></span>
+      </div>
+      <!-- Menu 1 -->
+      <div class="side-navigation">
+        <ul>
+          <li><a href="../Accueil.html"><i class="icon-home"></i>Accueil</a>
+          </li>
+          <li><a title=""><i class="icon-book"></i>Livres</a>
+            <ul>
+              <li><a href="../livres/categories.html" title=""><i class="icon-angle-right"></i>Catégories</a></li>
+              <li><a href="../livres/livres.html" title=""><i class="icon-angle-right"></i>livres</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-print"></i>Fournisseurs</a>
+            <ul>
+              <li><a href="../Fournisseurs/imprimeurs.html" title=""><i class="icon-angle-right"></i>Fournisseurs
+                  disponibles</a>
+              </li>
+              <li><a href="../Fournisseurs/imp-bl.html" title=""><i class="icon-angle-right"></i>Saisir un BL</a></li>
+              <li><a href="../Fournisseurs/imp-remb.html" title=""><i class="icon-angle-right"></i>Remboursement</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse
+                  Remboursemnet</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-user"></i>Représentant
+            </a>
+            <ul>
+              <li><a href="representant.html" title=""><i class="icon-angle-right"></i>Représentants disponibles </a>
+              </li>
+              <li><a href="BL-representant.html" title=""><i class="icon-angle-right"></i>Saisie un BL</a></li>
+              <li><a href="Remboursement.html" title=""><i class="icon-angle-right"></i>Remboursement
+
+
+                </a></li>
+              <li><a href="fact-rep.html" title=""><i class="icon-angle-right"></i>Demande de facturation </a></li>
+              <li><a href="factures.html" title=""><i class="icon-angle-right"></i>Factures </a></li>
+              <li><a href="remb-fact.html" title=""><i class="icon-angle-right"></i>Remboursement Factures </a></li>
+              <!-- <li><a href="./?page=Trassabilite" title=""><i class="icon-angle-right"></i></a></li> -->
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Déclaratoin Dépôt
+                </a></li>
+              <li style="background: #7CD5FF;"><a href="cahier_texte.html" title=""><i
+                    class="icon-angle-right"></i>Cahier de texte
+                </a></li>
+              <li style="background: #ffab26;;"><a href="carte_visite.html" title=""><i
+                    class="icon-angle-right"></i>Cartes de Visite &amp; Chevalet
+                </a></li>
+              <li><a href="rep-synthese.html" title=""><i class="icon-angle-right"></i>synthèse BL </a></li>
+              <li><a href="rep-synthese-remb.html" title=""><i class="icon-angle-right"></i>synthèse Remboursement
+                </a></li>
+            </ul>
+          </li>
+          <li><a href="../Robot.html"><i class="icon-gear"></i>Robots</a></li>
+          <li><a title=""><i class="icon-file-text-alt"></i>Traçabilité</a>
+            <ul>
+              <li><a href="../Traçabilité/Clients.html" title=""><i class="icon-angle-right"></i>clients</a></li>
+              <li><a href="../Traçabilité/bl-client.html" title=""><i class="icon-angle-right"></i>BL Clients</a></li>
+              <li><a href="../Traçabilité/remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Client</a></li>
+              <li><a href="../Traçabilité/synthese-client.html" title=""><i class="icon-angle-right"></i>Synthèse</a>
+              </li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-file-text-alt"></i>Synthèses Globales</a>
+            <ul>
+              <li><a href="../Synthèse Global/Livraison Fournisseurs.html" title=""><i
+                    class="icon-angle-right"></i>Livraison Fournisseurs --&gt;
+                  MSM-MEDIAS</a></li>
+              <li><a href="../Synthèse Global/Livraison Rep.html" title=""><i class="icon-angle-right"></i>Livraison
+                  MSM-MEDIAS --&gt;
+                  REP</a></li>
+              <li><a href="../Synthèse Global/vente.html" title=""><i class="icon-angle-right"></i>Ventes</a></li>
+              <li><a href="../Synthèse Global/depot_global.html" title=""><i class="icon-angle-right"></i>Dépôt</a></li>
+              <li><a href="../Synthèse Global/remb_globale.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Fournisseurs</a></li>
+              <li><a href="../Synthèse Global/remb_globale_imp.html" title=""><i
+                    class="icon-angle-right"></i>Remboursement REP</a></li>
+              <li><a href="../Synthèse Global/Balance.html" title=""><i class="icon-angle-right"></i>Balance</a></li>
+            </ul>
+          </li>
+          <li><a style="color:#fff"><i class="icon-envelope"></i>Emailing</a>
+            <ul>
+              <li><a href="../Emailing/emailing.html"><i class="icon-angle-right"></i>Simple Email</a></li>
+              <li><a href="../Emailing/invitation.html"><i class="icon-angle-right"></i>Invitation</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-cogs"></i>Réglages</a>
+            <ul>
+              <li><a href="../Réglage/semestre.html" title=""><i class="icon-angle-right"></i>Season de travail</a></li>
+              <li><a href="../Réglage/Peid-facture.html" title=""><i class="icon-angle-right"></i>Pied de facture</a>
+              </li>
+              <li><a href="../Réglage/modeles.html" title=""><i class="icon-angle-right"></i>Modèles Cahier de
+                  texte</a></li>
+            </ul>
+          </li>
+          <li><a><i class="icon-cogs"></i>SAISON : 2026 / 2027 </a></li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+      </div>
+      <!-- end  menu 2-->
+      <a class="slide-up-btn"><i class="icon-align-justify"></i></a>
+    </header><!-- Header End -->
+    <section class="main-section">
+      <div class="responsive-logo">
+        <img alt="" src="https://placehold.co/60x40?text=Image" />
+      </div>
+      <!-- menu 2 -->
+      <div class="responsive-menu">
+        <div class="responsive-menu-dropdown">
+          <a class="red" title="">MENU <i class="icon-align-justify"></i></a>
+        </div>
+        <ul>
+          <li><a href="../Accueil.html"><i class="icon-home"></i>Accueil</a>
+          </li>
+          <li><a title=""><i class="icon-book"></i>Livres</a>
+            <ul>
+              <li><a href="../livres/categories.html" title=""><i class="icon-angle-right"></i>Catégories</a></li>
+              <li><a href="../livres/livres.html" title=""><i class="icon-angle-right"></i>livres</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-print"></i>Fournisseurs</a>
+            <ul>
+              <li><a href="../Fournisseurs/imprimeurs.html" title=""><i class="icon-angle-right"></i>Fournisseurs
+                  disponibles</a>
+              </li>
+              <li><a href="../Fournisseurs/imp-bl.html" title=""><i class="icon-angle-right"></i>Saisir un BL</a></li>
+              <li><a href="../Fournisseurs/imp-remb.html" title=""><i class="icon-angle-right"></i>Remboursement</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse
+                  Remboursemnet</a></li>
+            </ul>
+          </li>
+          <li>
+            <a title=""><i class="icon-user"></i>Représentant
+            </a>
+            <ul>
+              <li><a href="representant.html" title=""><i class="icon-angle-right"></i>Représentants disponibles </a>
+              </li>
+              <li><a href="BL-representant.html" title=""><i class="icon-angle-right"></i>Saisie un BL</a></li>
+              <li><a href="Remboursement.html" title=""><i class="icon-angle-right"></i>Remboursement
+                </a></li>
+              <li><a href="fact-rep.html" title=""><i class="icon-angle-right"></i>Demande de facturation
+                </a></li>
+              <li><a href="factures.html" title=""><i class="icon-angle-right"></i>Factures </a></li>
+              <li><a href="remb-fact.html" title=""><i class="icon-angle-right"></i>Remboursement Factures </a></li>
+              <!-- <li><a href="./?page=Trassabilite" title=""><i class="icon-angle-right"></i></a></li> -->
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Déclaratoin Dépôt
+                </a></li>
+              <li style="background: #7CD5FF;"><a href="cahier_texte.html" title=""><i
+                    class="icon-angle-right"></i>Cahier de texte
+                </a></li>
+              <li style="background: #ffab26;;"><a href="carte_visite.html" title=""><i
+                    class="icon-angle-right"></i>Cartes de visite &amp; Chevalet
+                </a></li>
+              <li><a href="rep-synthese.html" title=""><i class="icon-angle-right"></i>synthèse BL </a></li>
+              <li><a href="rep-synthese-remb.html" title=""><i class="icon-angle-right"></i>synthèse Remboursement
+                </a></li>
+            </ul>
+          </li>
+          <li><a style="background: #303030; cursor: default; color: #fff;" title=""><i class="icon-cogs"></i>SAISON :
+              2026 / 2027 </a></li>
+        </ul>
+        <ul>
+          <li><a title=""><i class="icon-file-text-alt"></i>Traçabilité</a>
+            <ul>
+              <li><a href="../Traçabilité/Clients.html" title=""><i class="icon-angle-right"></i>clients</a></li>
+              <li><a href="../Traçabilité/bl-client.html" title=""><i class="icon-angle-right"></i>BL Clients</a></li>
+              <li><a href="../Traçabilité/remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Client</a></li>
+              <li><a href="../Traçabilité/synthese-client.html" title=""><i class="icon-angle-right"></i>Synthèse</a>
+              </li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-file-text-alt"></i>Synthèses Globales</a>
+            <ul>
+              <li><a href="../Synthèse Global/Livraison Fournisseurs.html" title=""><i
+                    class="icon-angle-right"></i>Livraison <br />
+                  Fournisseurs --&gt; MSM-MEDIAS</a></li>
+              <li><a href="../Synthèse Global/Livraison Rep.html" title=""><i class="icon-angle-right"></i>Livraison
+                  MSM-MEDIAS --&gt;
+                  REP</a></li>
+              <li><a href="../Synthèse Global/vente.html" title=""><i class="icon-angle-right"></i>Ventes</a></li>
+              <li><a href="../Synthèse Global/depot_global.html" title=""><i class="icon-angle-right"></i>Dépôt</a></li>
+              <li><a href="../Synthèse Global/remb_globale.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Fournisseurs</a></li>
+              <li><a href="../Synthèse Global/remb_globale_imp.html" title=""><i
+                    class="icon-angle-right"></i>Remboursement REP</a></li>
+              <li><a href="../Synthèse Global/Balance.html" title=""><i class="icon-angle-right"></i>Balance</a></li>
+            </ul>
+          </li>
+          <li style="background: #258AF3;"><a style="color:#fff"><i class="glyphicon glyphicon-envelope"
+                style="color:#fff;margin-top: -2px;font-size: 20px;"></i>Emailing</a>
+            <ul>
+              <li><a href="../Emailing/emailing.html"><i class="icon-angle-right"></i>Simple Email</a></li>
+              <li><a href="../Emailing/invitation.html"><i class="icon-angle-right"></i>Invitation</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-cogs"></i>Réglages</a>
+            <ul>
+              <li><a href="../Réglage/semestre.html" title=""><i class="icon-angle-right"></i>Season de travail</a></li>
+              <li><a href="../Réglage/Peid-facture.html" title=""><i class="icon-angle-right"></i>Pied de facture</a>
+              </li>
+              <li><a href="../Réglage/modeles.html" title=""><i class="icon-angle-right"></i>Modèles Cahier de
+                  texte</a></li>
+            </ul>
+          </li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+      </div>
+      <!-- end menu 2 -->
+      <!-- ****************************************fin de menu **************************************** -->
+      <div class="container">
+        <div class="row">
+          <div class="main-bg">
+            <div class="top-stats">
+              <div class="top-stats-icons">
+                <a href="#" style="pointer-events:none;" title="Déconnecter"> <i class="icon-off"></i></a>
+              </div>
+            </div>
+            <div class="breadcrumbs-notify">
+              <a href="#" style="pointer-events:none;">Accueil /</a><a>BL (MSM-MEDIAS --&gt; Représentant)</a>
+            </div>
+            <div class="heading-buttons-sec">
+            </div>
+            <!-- *********************************content**************************************			 -->
+            <div class="body-sec">
+              <div class="col-md-12">
+                <div class="widget-body">
+                  <div class="widget-heading blue">
+                    <i class="icon-book"></i>
+                    <h3 class="pull-left">Liste des BLs</h3>
+                    <ul>
+                      <li class="dropdown panel-function">
+                        <a data-toggle="dropdown" href="#" id="drop3" role="button"> <b class="caret"></b></a>
+                        <ul aria-labelledby="drop3" class="dropdown-menu" id="menu3" role="menu">
+                          <li role="presentation"><a class="hide-btn" title="">-</a></li>
+                          <li class="color-box-hover" role="presentation"><a class="color-box" title=""><i
+                                class="icon-magic"></i></a>
+                            <div class="color-box-sec">
+                              <a class="clr-red" title=""><i class="red"></i></a>
+                              <a class="clr-blue" title=""><i class="blue"></i></a>
+                              <a class="clr-green" title=""><i class="green"></i></a>
+                              <a class="clr-orange" title=""><i class="orange"></i></a>
+                              <a class="clr-purple" title=""><i class="purple"></i></a>
+                              <a class="clr-gray" title=""><i class="gray"></i></a>
+                            </div>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="widget-sec">
+                    <div id="contact">
+                      <form action="" method="post">
+                        <select name="rep" onchange="this.form.submit()"
+                          style="width: 200px;float:left;margin-left:10px;margin-right:10px;">
+                          <option value="all"> Afficher tous</option>
+                          <option value="1"> Adnane</option>
+                          <option value="2"> abjalil</option>
+                        </select>
+                      </form>
+                      <table class="table table-striped table-bordered" id="stream_table">
+                        <thead>
+                          <tr>
+                            <th> Représentant</th>
+                            <th> Date</th>
+                            <th> Type</th>
+                            <th style="min-width: 170px;"> BL N°</th>
+                            <th> Mode d'envoi</th>
+                            <th> Détails</th>
+                            <th> Imprimer</th>
+                            <th>
+                              <div class="notification" title="Nombre des BL non-vu">7</div> Vu
+                            </th>
+                            <th>
+                              <div class="notification" title="Nombre des BL non-reçu">7</div> Reçu
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><span title="Tél : 066666567 "> abjalil </span></td>
+                            <td style="text-align:center;">15/01/2026</td>
+                            <td style="text-align:center;">Pedagogie</td>
+                            <td style="text-align:center;">Péd001-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 066666567 "> abjalil </span></td>
+                            <td style="text-align:center;">07/01/2026</td>
+                            <td style="text-align:center;">Specimen</td>
+                            <td style="text-align:center;">Spé 02-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 066666567 "> abjalil </span></td>
+                            <td style="text-align:center;">07/01/2026</td>
+                            <td style="text-align:center;">Retour</td>
+                            <td style="text-align:center;">Ret 02-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 066666567 "> abjalil </span></td>
+                            <td style="text-align:center;">06/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">008-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 066666567 "> abjalil </span></td>
+                            <td style="text-align:center;">06/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">009-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 066666567 "> abjalil </span></td>
+                            <td style="text-align:center;">05/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">007-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 066666567 "> abjalil </span></td>
+                            <td style="text-align:center;">02/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">006-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 0662828750 "> Adnane </span></td>
+                            <td style="text-align:center;">12/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">0001-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><a href="#" onclick="return coche();"
+                                style="pointer-events:none;"><img src="https://placehold.co/60x40?text=Image" /></a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 0662828750 "> Adnane </span></td>
+                            <td style="text-align:center;">12/01/2026</td>
+                            <td style="text-align:center;">Specimen</td>
+                            <td style="text-align:center;">Spé 01-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><a href="#" onclick="return coche();"
+                                style="pointer-events:none;"><img src="https://placehold.co/60x40?text=Image" /></a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 0662828750 "> Adnane </span></td>
+                            <td style="text-align:center;">12/01/2026</td>
+                            <td style="text-align:center;">Retour</td>
+                            <td style="text-align:center;">Ret 01-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><a href="#" onclick="return coche();"
+                                style="pointer-events:none;"><img src="https://placehold.co/60x40?text=Image" /></a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 0662828750 "> Adnane </span></td>
+                            <td style="text-align:center;">12/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">002-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><a href="#" onclick="return coche();"
+                                style="pointer-events:none;"><img src="https://placehold.co/60x40?text=Image" /></a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 0662828750 "> Adnane </span></td>
+                            <td style="text-align:center;">09/01/2026</td>
+                            <td style="text-align:center;">Pedagogie</td>
+                            <td style="text-align:center;">003-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><a href="#" onclick="return coche();"
+                                style="pointer-events:none;"><img src="https://placehold.co/60x40?text=Image" /></a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 0662828750 "> Adnane </span></td>
+                            <td style="text-align:center;">08/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">005-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><a href="#" onclick="return coche();"
+                                style="pointer-events:none;"><img src="https://placehold.co/60x40?text=Image" /></a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><span title="Tél : 0662828750 "> Adnane </span></td>
+                            <td style="text-align:center;">06/01/2026</td>
+                            <td style="text-align:center;">Livre</td>
+                            <td style="text-align:center;">004-2026</td>
+                            <td style="text-align:center;">---</td>
+                            <td style="text-align:center;"> <a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="30" /></a></td>
+                            <td style="text-align:center;"><a href="#" style="pointer-events:none;"><img
+                                  src="https://placehold.co/60x40?text=Image" width="33" /></a></td>
+                            <td style="text-align:center;"><img src="https://placehold.co/60x40?text=Image" /></td>
+                            <td style="text-align:center;"><a href="#" onclick="return coche();"
+                                style="pointer-events:none;"><img src="https://placehold.co/60x40?text=Image" /></a>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="widget-body">
+                  <div class="widget-heading green">
+                    <i class="icon-plus"></i>
+                    <h3 class="pull-left">Ajouter un BL (MSM-MEDIAS --&gt; Représentant)</h3>
+                  </div>
+                  <div class="widget-sec">
+                    <div id="contact">
+                      <form action="add-bl-rep.php" class="form-add-bl" id="form" method="post"
+                        onsubmit="return valider(this);">
+                        <table class="table table-striped table-bordered" id="stream_table">
+                          <thead>
+                            <tr style="background: #31BEEB;">
+                              <th> Représentant</th>
+                              <th> Date</th>
+                              <th> Type</th>
+                              <th> BL N°</th>
+                              <th> Mode d'envoi</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <select name="rep" required="" style="width: 165px;">
+                                  <option value=""></option>
+                                  <option value="1"> Adnane</option>
+                                  <option value="2"> abjalil</option>
+                                </select>
+                              </td>
+                              <td><input name="date" required="" style="text-align:center;width: 165px;" type="date" />
+                              </td>
+                              <td><select name="type" style="width: 165px;">
+                                  <option value="BL">Livre</option>
+                                  <option value="Specimen">Spécimen</option>
+                                  <option value="Retour">Retour</option>
+                                  <option value="Rejete">Rejeté</option>
+                                  <option value="Pedagogie">Pédagogie</option>
+                                </select>
+                              </td>
+                              <td><input name="bl" required="" style="text-align:center;width: 165px;" type="text" />
+                              </td>
+                              <td><input name="mode" style="text-align:center;width: 165px;" type="text" />
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <div class="content-articles">
+                          <div class="cat-accordian">
+                            <div class="titre-cat">PRIMAIRE </div>
+                            <div class="content-cat" style="display: block;">
+                              <div>
+                                <div class="article" data-nb="1">
+                                  <div class="titre-article">
+                                    <span>Informatique et Robotique au primaire N 1</span>
+                                    <input name="title[]" type="checkbox" value="1" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_1" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                                <div class="article" data-nb="2">
+                                  <div class="titre-article">
+                                    <span>Informatique et Robotique au primaire N 2</span>
+                                    <input name="title[]" type="checkbox" value="2" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_2" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                                <div class="article" data-nb="3">
+                                  <div class="titre-article">
+                                    <span>Informatique et Robotique au primaire N 3</span>
+                                    <input name="title[]" type="checkbox" value="3" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_3" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                                <div class="article" data-nb="4">
+                                  <div class="titre-article">
+                                    <span>Informatique et Robotique au primaire N 4</span>
+                                    <input name="title[]" type="checkbox" value="4" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_4" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                                <div class="article" data-nb="5">
+                                  <div class="titre-article">
+                                    <span>Informatique et Robotique au primaire N 5</span>
+                                    <input name="title[]" type="checkbox" value="5" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_5" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                                <div class="article" data-nb="6">
+                                  <div class="titre-article">
+                                    <span>Informatique et Robotique au primaire N 6</span>
+                                    <input name="title[]" type="checkbox" value="6" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_6" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                              </div>
+                            </div>
+                          </div> <!-- Fin categorie   -->
+                          <div class="cat-accordian">
+                            <div class="titre-cat">COLLèGE</div>
+                            <div class="content-cat" style="display: none;">
+                              <div>
+                                <div class="article" data-nb="7">
+                                  <div class="titre-article">
+                                    <span>Informatique, Robotique et Intelligence Artificielle au collège N1</span>
+                                    <input name="title[]" type="checkbox" value="7" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_7" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                                <div class="article" data-nb="8">
+                                  <div class="titre-article">
+                                    <span>Informatique, Robotique et Intelligence Artificielle au collège N2</span>
+                                    <input name="title[]" type="checkbox" value="8" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_8" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                              </div>
+                            </div>
+                          </div> <!-- Fin categorie   -->
+                          <div class="cat-accordian">
+                            <div class="titre-cat">LYCéE</div>
+                            <div class="content-cat" style="">
+                              <div>
+                              </div>
+                            </div>
+                          </div> <!-- Fin categorie   -->
+                          <div class="cat-accordian">
+                            <div class="titre-cat">PRèS-SCOLAIRE</div>
+                            <div class="content-cat" style="">
+                              <div>
+                              </div>
+                            </div>
+                          </div> <!-- Fin categorie   -->
+                          <div class="cat-accordian">
+                            <div class="titre-cat">ROBOTOS</div>
+                            <div class="content-cat" style="">
+                              <div>
+                                <div class="article" data-nb="9">
+                                  <div class="titre-article">
+                                    <span>Thymio</span>
+                                    <input name="title[]" type="checkbox" value="9" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_9" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                                <div class="article" data-nb="10">
+                                  <div class="titre-article">
+                                    <span>mBot</span>
+                                    <input name="title[]" type="checkbox" value="10" />
+                                  </div>
+                                  <div class="qte-article">
+                                    <input name="qte_10" placeholder="Qté" type="text" />
+                                  </div>
+                                </div><!--  Fin article	 -->
+                              </div>
+                            </div>
+                          </div> <!-- Fin categorie   -->
+                        </div>
+                        <div>
+                          <table class="table table-striped table-bordered article-selected" id="stream_table">
+                            <thead>
+                              <tr style="background: #EBD631;">
+                                <td>Titre</td>
+                                <td>Qté</td>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div>
+                          <button class="btn green btn-submit" type="submit">Valider</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div><!-- Body Sec -->
+          </div><!-- main-bg-->
+        </div><!-- Row -->
+      </div><!-- Container -->
+    </section><!-- Main Section -->
+    <!-- Side Panel -->
+  </div><!-- Wrapper -->
+  <script type="text/javascript">
+
+    function updateArticleSelected(action, element) {
+      $('.article-selected').fadeIn();
+      var titleArticle = element.find('span').html();
+      var dataNb = element.parent().attr('data-nb');
+      if (action == "add") {
+        var article = "<tr class='tr_" + dataNb + "'><td>" + titleArticle + "</td><td class='qte'></td></tr>";
+        $('.article-selected tbody').append(article);
+      }
+      else if (action == "supp") {
+        $('.article-selected tbody').find('tr.tr_' + dataNb).remove();
+      }
+    }
+
+
+    $('.cat-accordian .titre-cat').click(function () {
+      $('.cat-accordian .content-cat').not($(this).next('.content-cat')).slideUp();
+      $(this).next('.content-cat').slideToggle();
+    });
+
+    $('.cat-accordian .titre-article').click(function () {
+      var checkbox = $(this).find('input[type=checkbox]');
+      if (checkbox.is(':checked')) {
+        checkbox[0].checked = false;
+        $(this).removeClass('article-checked').next('.qte-article').find('input').fadeOut().val('');
+        updateArticleSelected("supp", $(this));
+      }
+      else {
+        checkbox[0].checked = true;
+        $(this).addClass('article-checked').next('.qte-article').find('input').fadeIn();
+        updateArticleSelected("add", $(this));
+      }
+    });
+
+    $('.qte-article input').keyup(function () {
+      var qte = $(this).val();
+      var dataNb = $(this).parents('.article').attr('data-nb');
+
+      $('.article-selected').find('tr.tr_' + dataNb + ' td.qte').html(qte);
+
+    });
+
+
+  </script>
+</body><!-- Body -->
+
+</html>

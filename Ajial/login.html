@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ajial – Connexion</title>
+  <link rel="shortcut icon" href="logo.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="admin/css/style.css" type="text/css" />
+  <link rel="stylesheet" href="admin/css/boot.css" type="text/css" />
+  <link rel="stylesheet" href="admin/css/bootstrap.min.css" type="text/css" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="admin/font-awesome/css/font-awesome.css" type="text/css" />
+
+  <!-- Google Fonts -->
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+  <style>
+    .msg {
+      border: 1px solid #EC7E7E;
+      color: rgb(219, 39, 39);
+      background: #F0B1B1;
+      padding: 2px;
+      width: 95%;
+      margin-left: 4px;
+      margin-bottom: 9px;
+      clear: both;
+    }
+
+    html {
+      background: #006fb5;
+    }
+
+    .log-in-bg {
+      background: none;
+    }
+
+    .form input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .log-in {
+      background: none repeat scroll 0 0 #FFFFFF;
+      display: table;
+      margin: 85px auto 0;
+      width: 285px;
+      padding: 30px 70px;
+      box-shadow: none;
+    }
+
+    .role {
+      width: 100%;
+      margin-left: 0;
+      height: 31px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      padding-left: 81px;
+      border-radius: 0;
+    }
+
+    .login {
+      background: #006fb5;
+      width: 100%;
+      margin-left: 0;
+      border: 0;
+    }
+
+    .form {
+      border: 1px solid #E6E6E6;
+    }
+
+    .user-log-in img {
+      border: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body class="log-in-bg">
+
+
+  <!-- Log in -->
+
+  <form action="/representant/Accueil.html">
+    <div class="log-in">
+      <div class="top-sec-log">
+
+        <span class="user-log-in">
+          <img src="https://placehold.co/60x40?text=Image" alt="" />
+        </span><!-- User Image -->
+
+        <h1>AJIAL <span>MEDIAS</span></h1>
+      </div>
+
+
+      <select name='sem' class="role">
+
+        <OPTION value=''>Choisir une année </OPTION>
+        <OPTION value='26/27'>2026 / 2027</OPTION>
+      </select>
+
+
+
+      <div class="form">
+        <input type="text" name="login" placeholder="PSEUDO" />
+      </div><!-- Login User Name -->
+
+      <div class="form">
+        <input type="password" name="pass" placeholder="MOT DE PASSE" />
+      </div><!-- Login Password -->
+
+
+      <button type="submit" name="submit" class="login">AUTHENTIFICATION</button>
+
+    </div><!-- Log in Page -->
+  </form>
+  <form action="safe/Accueil.html">
+    <div class="log-in">
+      <div class="top-sec-log">
+
+        <span class="user-log-in">
+          <img src="https://placehold.co/60x40?text=Image" alt="" />
+        </span><!-- User Image -->
+        SAFE
+
+        <h1>AJIAL <span>MEDIAS</span></h1>
+      </div>
+
+
+      <select name='sem' class="role">
+        <OPTION value=''>Choisir une année </OPTION>
+        <OPTION value='26/27'>2026 / 2027</OPTION>
+      </select>
+
+
+
+      <div class="form">
+        <input type="text" name="login" placeholder="PSEUDO" />
+      </div><!-- Login User Name -->
+
+      <div class="form">
+        <input type="password" name="pass" placeholder="MOT DE PASSE" />
+      </div><!-- Login Password -->
+
+
+      <button type="submit" name="submit" class="login">AUTHENTIFICATION</button>
+
+    </div><!-- Log in Page -->
+  </form>
+
+</body>
+
+</html>

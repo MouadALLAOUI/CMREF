@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Représentant</title>
+  <link href="images/user-log-in.png" rel="shortcut icon" />
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800" rel="stylesheet" type="text/css" />
+  <link href="http://fonts.googleapis.com/css?family=Raleway:100,900,800,700,600,500,400,300,200" rel="stylesheet"
+    type="text/css" />
+  <!-- Google Fonts -->
+  <!-- Styles -->
+  <link href="../../admin/css/bootstrap.css" rel="stylesheet" type="text/css" />
+  <!-- Bootstrap -->
+  <link href="../../admin/css/jquery.mCustomScrollbar.css" rel="stylesheet" />
+  <!-- Custom Scroll Bar -->
+  <link href="../../admin/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+  <!-- Font Awesome -->
+  <link href="../../admin/css/style.css" rel="stylesheet" type="text/css" />
+  <!-- Style -->
+  <link href="../../admin/css/responsive.css" rel="stylesheet" type="text/css" />
+  <!-- Responsive Style -->
+  <!-- Script -->
+  <script src="../../admin/js/ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!-- Jquery -->
+  <script src="../../admin/js/bootstrap.js" type="text/javascript"></script>
+  <!-- Bootstrap -->
+  <script src="../../admin/js/script.js" type="text/javascript"></script>
+  <!-- Script -->
+  <style type="text/css">
+    .d_b {
+      display: inline !important;
+    }
+  </style>
+  <script type="text/javascript">
+
+
+
+
+
+    function supp() {
+
+      if (confirm('voullez vous vraiment supprimez ce Chéque ?')) return true;
+
+      else return false;
+
+    }
+    function isFloat(n) {
+      return parseFloat(n.match(/^-?\d*(\.\d+)?$/)) > 0;
+    }
+
+    function verif_montant() {
+      var montant = document.getElementById('montant');
+
+      if (!isFloat(montant.value) && montant.value != '') {
+        alert("Le Montant '" + montant.value + "' n'est pas une Valeur valide");
+        montant.value = '';
+        montant.placeholder = "Exemple : 24252.50";
+        montant.style.backgroundColor = "#FFC8C8";
+        return false;
+
+      }
+      else {
+        montant.style.backgroundColor = "#CDFFCD";
+        $('.btn-submit').attr("disabled", "disabled");
+        return true;
+      }
+    }
+
+    function printdiv(divID1) {
+
+      var headstr = "<body>";
+
+      var footstr = "</body>";
+
+      var newstr = document.all.item(divID1).innerHTML;
+
+      var oldstr = document.body.innerHTML;
+
+      document.body.innerHTML = headstr + newstr + footstr;
+
+      window.print();
+
+      document.body.innerHTML = oldstr;
+
+
+
+    }
+
+
+  </script>
+</head>
+
+<body style="width:100%;">
+  <div class="wrapper">
+    <header>
+      <div class="logo"> <img alt="" src="https://placehold.co/60x40?text=Image" /> </div>
+      <!-- Logo -->
+      <div class="welcome-user">
+        <!-- <img src="images/user.png" alt=""/> -->
+        <span></span>
+      </div>
+      <div class="side-navigation">
+        <div class="clear"></div>
+        <ul>
+          <li><a href="../Accueil.html"><i class="icon-home"></i>Accueil</a></li>
+          <li><a><i class="icon-money"></i> Bon de livraison <br />
+            </a>
+            <ul>
+              <li><a href="../bon de livraison/BL.html"><i class="icon-file-text-alt"></i>BL <br />
+                </a></li>
+              <li><a href="../bon de livraison/Renboursement.html"><i class="icon-money"></i>Remboursement</a></li>
+              <li><a href="../bon de livraison/synthese-bl-rep.html"><i class="icon-money"></i>Synthèse BL
+                </a></li>
+            </ul>
+          </li>
+          <li><a><i class="icon-file-text-alt"></i>Factures</a>
+            <ul>
+              <li><a href="../facture/facturation-msm.html" title=""><i class="icon-angle-right"></i>Facture
+                  MSM-MEDIAS</a></li>
+              <li><a href="../facture/facturation-wataniya.html" title=""><i class="icon-angle-right"></i>Facture
+                  Wataniya</a>
+              </li>
+              <!-- <li><a href="./?page=remb-fact"><i class="icon-money"></i>Rembourser une facture</a></li> -->
+            </ul>
+          </li>
+          <li><a href="client.html" title=""><i class="icon-user"></i>Clients</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Ajouter client</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Saisir un BL</a>
+              </li>
+              <li><a href="remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement</a></li>
+              <li><a href="synthese-bl.html" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="synthese-remb.html" title=""><i class="icon-angle-right"></i>Synthèse Remboursemnet</a>
+              </li>
+              <li><a href="Historique.html" title=""><i class="icon-angle-right"></i>Historique</a></li>
+              <li><a><i class="icon-angle-right"></i>Synthèse Global</a>
+                <ul>
+                  <li><a href="Synthèse Global/Livraison-global.html" title=""><i
+                        class="icon-angle-right"></i>Livraisons clients</a>
+                  </li>
+                  <li><a href="Synthèse Global/remb-global.html" title=""><i class="icon-angle-right"></i>Remboursements
+                      clients</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="../depot.html" title=""><i class="icon-print"></i>Dépôt</a></li>
+          <li><a title=""><i class="icon-book"></i>Cahier de texte</a>
+            <ul>
+              <li><a href="../cahier de texte/demande_cahier.html" title=""><i class="icon-angle-right"></i>Commander un
+                  cahier</a></li>
+              <li><a href="../cahier de texte/suivi_cahier.html" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-money"></i>Cartes de visite &amp; Chevalet</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Faire une
+                  commande</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a href="../Robot.html"><i class="icon-gear"></i>Robots</a></li>
+          <!-- <li><a href="./?page=TawassolApp"><i class="icon-gear"></i>TawassolApp</a></li>  -->
+          <li><a href="../profil.html"><i class="icon-user"></i>Profil</a></li>
+          <li><a title=""><i class="icon-cogs"></i>SAISON : 2026 / 2027 </a></li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+        <div class="clear"></div>
+      </div>
+      <a class="slide-up-btn"><i class="icon-align-justify"></i></a>
+    </header>
+    <!-- Header End -->
+    <section class="main-section">
+      <div class="responsive-logo"> <img alt="" src="https://placehold.co/60x40?text=Image" /> </div>
+      <div class="responsive-menu">
+        <div class="responsive-menu-dropdown">
+          <a class="red" title="">MENU <i class="icon-align-justify"></i></a>
+        </div>
+        <ul>
+          <li><a href="../Accueil.html"><i class="icon-home"></i>Accueil</a></li>
+          <li><a href="../bon de livraison/BL.html"><i class="icon-file-text-alt"></i>BL
+            </a>
+          </li>
+          <li><a href="../bon de livraison/Renboursement.html"><i class="icon-money"></i>Remboursement</a></li>
+          <li><a href="../bon de livraison/synthese-bl-rep.html"><i class="icon-money"></i>Synthèse BL
+            </a></li>
+          <li><a><i class="icon-file-text-alt"></i>Demander une facture</a>
+            <ul>
+              <li><a href="../facture/facturation-msm.html" title=""><i class="icon-angle-right"></i>Facture
+                  MSM-MEDIAS</a></li>
+              <li><a href="../facture/facturation-wataniya.html" title=""><i class="icon-angle-right"></i>Facture
+                  Wataniya</a>
+              </li>
+            </ul>
+          </li>
+          <!-- <li><a href="./?page=remb-fact"><i class="icon-money"></i>Rembourser une facture</a></li> -->
+          <li><a href="client.html" title=""><i class="icon-print"></i>Clients</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Ajouter client</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Saisir un BL</a>
+              </li>
+              <li><a href="remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement</a></li>
+              <li><a href="synthese-bl.html" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="synthese-remb.html" title=""><i class="icon-angle-right"></i>Synthèse Remboursemnet</a>
+              </li>
+              <li><a href="Historique.html" title=""><i class="icon-angle-right"></i>Historique</a></li>
+            </ul>
+          </li>
+        </ul>
+        <ul>
+          <li><a><i class="icon-angle-right"></i>Synthèse Global <em style="font-size:11px;">(Clients)</em></a>
+            <ul>
+              <li><a href="Synthèse Global/Livraison-global.html" title=""><i class="icon-angle-right"></i>Livraisons
+                  clients</a>
+              </li>
+              <li><a href="Synthèse Global/remb-global.html" title=""><i class="icon-angle-right"></i>Remboursements
+                  clients</a></li>
+            </ul>
+          </li>
+          <li><a href="../depot.html" title=""><i class="icon-print"></i>Dépôt</a></li>
+          <li><a title=""><i class="icon-book"></i>Cahier de texte</a>
+            <ul>
+              <li><a href="../cahier de texte/demande_cahier.html" title=""><i class="icon-angle-right"></i>Commander un
+                  cahier</a></li>
+              <li><a href="../cahier de texte/suivi_cahier.html" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-money"></i>Carte de visite &amp; Chevalet</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Faire une
+                  commande</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a href="../profil.html"><i class="icon-user"></i>Profil</a></li>
+          <li><a style="background: #0d6554; cursor: default; color: #fff;" title=""><i class="icon-cogs"></i>SAISON :
+              2026 / 2027 </a></li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+      </div> <!-- ****************************************fin de menu **************************************** -->
+      <div class="container">
+        <div class="row">
+          <div class="main-bg">
+            <div class="top-stats">
+              <div class="top-stats-icons"> <a href="#" style="pointer-events:none;" title="Déconnexion"><i
+                    class="icon-off"></i></a>
+              </div>
+            </div>
+            <div class="breadcrumbs-notify"> <a href="#" style="pointer-events:none;" title="">accueil /</a> <a
+                title="">Renboursement
+              </a> </div>
+            <div class="heading-buttons-sec"> </div>
+            <!-- *********************************content**************************************			 -->
+            <div class="body-sec">
+              <div class="col-md-12">
+                <div class="widget-body">
+                  <div class="widget-heading blue"> <i class="icon-book"></i>
+                    <h3 class="pull-left">
+                      Remboursements clients
+                    </h3>
+                  </div>
+                  <div class="widget-sec">
+                    <div id="contact">
+                      <form action="" method="post">
+                        <select name="client" onchange="this.form.submit()"
+                          style="width: 200px;float:left;margin-left:10px;margin-right:10px;">
+                          <option value="">Afficher tous</option>
+                          <option value="1"> Mouad the Coder | Medieval Portfolio</option>
+                        </select>
+                      </form>
+                      <div id="divID">
+                        <table class="table table-striped table-bordered" id="stream_table">
+                          <thead>
+                            <tr>
+                              <th> Client</th>
+                              <th>Date</th>
+                              <th>Banque</th>
+                              <th>N° de chèque</th>
+                              <th>A l'ordre de</th>
+                              <th>Montant</th>
+                              <th>Observation</th>
+                              <th> Modifier</th>
+                              <th> Supprimer</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="widget-body">
+                  <div class="widget-heading green"> <i class="icon-plus"></i>
+                    <h3 class="pull-left">Ajouter un remboursement</h3>
+                  </div>
+                  <div class="widget-sec">
+                    <div id="contact">
+                      <form action="add_remb_client_db.php" method="post" onsubmit="return verif_montant();">
+                        <table class="table table-striped table-bordered" id="stream_table">
+                          <thead>
+                            <tr>
+                              <th> Client</th>
+                              <th>Date</th>
+                              <th>Banque</th>
+                              <th>N° de chèque</th>
+                              <th>A l'ordre de</th>
+                              <th>Montant</th>
+                              <th>Observation</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td><select name="client" required="">
+                                  <option value=""></option>
+                                  <option value="1"> Mouad the Coder | Medieval Portfolio <span
+                                      style="font-size: 14px;color:#555;"> (Fes)</span> </option>
+                                </select>
+                              </td>
+                              <input name="rep" type="hidden" value="1" />
+                              <td><input name="date" required="" style="text-align:center" type="date" /></td>
+                              <td>
+                                <select name="banque" required="">
+                                  <option value=""></option>
+                                  <option value="Attijariwafa bank"> Attijariwafa bank</option>
+                                  <option value="Banque populaire">Banque populaire</option>
+                                  <option value="BMCE Bank">BMCE Bank</option>
+                                  <option value="BMCI">BMCI</option>
+                                  <option value="Crédit agricole">Crédit agricole</option>
+                                  <option value="Crédit du Maroc">Crédit du Maroc</option>
+                                  <option value="CIH">CIH</option>
+                                  <option value="La Poste">La POSTE</option>
+                                  <option value="Poste-Bank">Poste-Bank</option>
+                                  <option value="Société générale">Société générale</option>
+                                  <option value="Espèces">Espèces</option>
+                                  <option value="Traite">Traite</option>
+                                  <option value="Autre">Autre</option>
+                                </select>
+                              </td>
+                              <td><input name="cheque" style="text-align:center" type="text" /></td>
+                              <td>
+                                <select name="a_lordre_de" required="">
+                                  <option value=""></option>
+                                  <option value="Wataniya">Wataniya</option>
+                                  <option value="MSM-MEDIAS">MSM-MEDIAS</option>
+                                  <option value="Personnel">Personnel</option>
+                                  <option value="Autre">Autre</option>
+                                </select>
+                              </td>
+                              <td><input id="montant" name="montant" style="text-align:center" type="text" /></td>
+                              <td><textarea name="observation" style="font-size:13px;"></textarea></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <button class="btn green btn-submit" name="submit" type="submit">Valider</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Body Sec -->
+          </div>
+          <!-- main-bg-->
+        </div>
+        <!-- Row -->
+      </div>
+      <!-- Container -->
+    </section>
+    <!-- Main Section -->
+    <!-- Side Panel -->
+  </div>
+  <!-- Wrapper -->
+</body>
+<!-- Body -->
+
+</html><!-- Html -->

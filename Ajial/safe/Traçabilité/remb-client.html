@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Administration</title>
+  <link href="images/user-log-in.png" rel="shortcut icon" />
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800" rel="stylesheet" type="text/css" />
+  <link href="http://fonts.googleapis.com/css?family=Raleway:100,900,800,700,600,500,400,300,200" rel="stylesheet"
+    type="text/css" />
+  <!-- Google Fonts -->
+  <!-- Styles -->
+  <link href="../../admin/css/bootstrap.css" rel="stylesheet" type="text/css" />
+  <!-- Bootstrap -->
+  <link href="../../admin/css/jquery.mCustomScrollbar.css" rel="stylesheet" />
+  <!-- Custom Scroll Bar -->
+  <link href="../../admin/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
+  <!-- Font Awesome -->
+  <link href="../../admin/css/style.css" rel="stylesheet" type="text/css" />
+  <!-- Style -->
+  <link href="../../admin/css/responsive.css" rel="stylesheet" type="text/css" />
+  <!-- Responsive Style -->
+  <!-- Script -->
+  <script src="../../admin/js/ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <!-- Jquery -->
+  <script src="../../admin/js/bootstrap.js" type="text/javascript"></script>
+  <!-- Bootstrap -->
+  <script src="../../admin/js/script.js" type="text/javascript"></script>
+  <!-- Script -->
+  <script type="text/javascript">
+
+    function printdiv2(divID) {
+
+      var headstr = "<body>";
+
+      var footstr = "</body>";
+
+      var newstr = document.all.item(divID1).innerHTML;
+
+      var oldstr = document.body.innerHTML;
+
+      document.body.innerHTML = headstr + newstr + footstr;
+
+      window.print();
+
+      document.body.innerHTML = oldstr;
+
+
+
+    }
+
+
+
+    function supp() {
+
+      if (confirm('voullez vous vraiment supprimez ce livre ?')) return true;
+
+      else return false;
+
+    }
+
+
+
+  </script>
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="logo"> <img alt="" src="https://placehold.co/60x40?text=Image" /> </div>
+      <!-- Logo -->
+      <div class="welcome-user">
+        <!-- <img src="images/user.png" alt=""/> -->
+        <span></span>
+      </div>
+      <!-- Menu 1 -->
+      <div class="side-navigation">
+        <ul>
+          <li><a href="../Accueil.html"><i class="icon-home"></i>Accueil</a>
+          </li>
+          <li><a title=""><i class="icon-book"></i>Livres</a>
+            <ul>
+              <li><a href="../livres/categories.html" title=""><i class="icon-angle-right"></i>Catégories</a></li>
+              <li><a href="../livres/livres.html" title=""><i class="icon-angle-right"></i>livres</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-print"></i>Fournisseurs</a>
+            <ul>
+              <li><a href="../Fournisseurs/imprimeurs.html" title=""><i class="icon-angle-right"></i>Fournisseurs
+                  disponibles</a>
+              </li>
+              <li><a href="../Fournisseurs/imp-bl.html" title=""><i class="icon-angle-right"></i>Saisir un BL</a></li>
+              <li><a href="../Fournisseurs/imp-remb.html" title=""><i class="icon-angle-right"></i>Remboursement</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse
+                  Remboursemnet</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-user"></i>Représentant
+            </a>
+            <ul>
+              <li><a href="../representant/representant.html" title=""><i class="icon-angle-right"></i>Représentants
+                  disponibles </a>
+              </li>
+              <li><a href="../representant/BL-representant.html" title=""><i class="icon-angle-right"></i>Saisie un
+                  BL</a></li>
+              <li><a href="../representant/Remboursement.html" title=""><i class="icon-angle-right"></i>Remboursement
+
+
+                </a></li>
+              <li><a href="../representant/fact-rep.html" title=""><i class="icon-angle-right"></i>Demande de
+                  facturation </a></li>
+              <li><a href="../representant/factures.html" title=""><i class="icon-angle-right"></i>Factures </a></li>
+              <li><a href="../representant/remb-fact.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Factures </a></li>
+              <!-- <li><a href="./?page=Trassabilite" title=""><i class="icon-angle-right"></i></a></li> -->
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Déclaratoin Dépôt
+                </a></li>
+              <li style="background: #7CD5FF;"><a href="../representant/cahier_texte.html" title=""><i
+                    class="icon-angle-right"></i>Cahier de texte
+                </a></li>
+              <li style="background: #ffab26;;"><a href="../representant/carte_visite.html" title=""><i
+                    class="icon-angle-right"></i>Cartes de Visite &amp; Chevalet
+                </a></li>
+              <li><a href="../representant/rep-synthese.html" title=""><i class="icon-angle-right"></i>synthèse BL </a>
+              </li>
+              <li><a href="../representant/rep-synthese-remb.html" title=""><i class="icon-angle-right"></i>synthèse
+                  Remboursement
+                </a></li>
+            </ul>
+          </li>
+          <li><a href="../Robot.html"><i class="icon-gear"></i>Robots</a></li>
+          <li><a title=""><i class="icon-file-text-alt"></i>Traçabilité</a>
+            <ul>
+              <li><a href="Clients.html" title=""><i class="icon-angle-right"></i>clients</a></li>
+              <li><a href="bl-client.html" title=""><i class="icon-angle-right"></i>BL Clients</a></li>
+              <li><a href="remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement Client</a></li>
+              <li><a href="synthese-client.html" title=""><i class="icon-angle-right"></i>Synthèse</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-file-text-alt"></i>Synthèses Globales</a>
+            <ul>
+              <li><a href="../Synthèse Global/Livraison Fournisseurs.html" title=""><i
+                    class="icon-angle-right"></i>Livraison Fournisseurs --&gt;
+                  MSM-MEDIAS</a></li>
+              <li><a href="../Synthèse Global/Livraison Rep.html" title=""><i class="icon-angle-right"></i>Livraison
+                  MSM-MEDIAS --&gt;
+                  REP</a></li>
+              <li><a href="../Synthèse Global/vente.html" title=""><i class="icon-angle-right"></i>Ventes</a></li>
+              <li><a href="../Synthèse Global/depot_global.html" title=""><i class="icon-angle-right"></i>Dépôt</a></li>
+              <li><a href="../Synthèse Global/remb_globale.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Fournisseurs</a></li>
+              <li><a href="../Synthèse Global/remb_globale_imp.html" title=""><i
+                    class="icon-angle-right"></i>Remboursement REP</a></li>
+              <li><a href="../Synthèse Global/Balance.html" title=""><i class="icon-angle-right"></i>Balance</a></li>
+            </ul>
+          </li>
+          <li><a style="color:#fff"><i class="icon-envelope"></i>Emailing</a>
+            <ul>
+              <li><a href="../Emailing/emailing.html"><i class="icon-angle-right"></i>Simple Email</a></li>
+              <li><a href="../Emailing/invitation.html"><i class="icon-angle-right"></i>Invitation</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-cogs"></i>Réglages</a>
+            <ul>
+              <li><a href="../Réglage/semestre.html" title=""><i class="icon-angle-right"></i>Season de travail</a></li>
+              <li><a href="../Réglage/Peid-facture.html" title=""><i class="icon-angle-right"></i>Pied de facture</a>
+              </li>
+              <li><a href="../Réglage/modeles.html" title=""><i class="icon-angle-right"></i>Modèles Cahier de
+                  texte</a></li>
+            </ul>
+          </li>
+          <li><a><i class="icon-cogs"></i>SAISON : 2026 / 2027 </a></li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+      </div> <!-- end  menu 2-->
+      <a class="slide-up-btn"><i class="icon-align-justify"></i></a>
+    </header>
+    <!-- Header End -->
+    <section class="main-section">
+      <div class="responsive-logo"> <img alt="" src="https://placehold.co/60x40?text=Image" /> </div>
+      <!-- menu 2 -->
+      <div class="responsive-menu">
+        <div class="responsive-menu-dropdown">
+          <a class="red" title="">MENU <i class="icon-align-justify"></i></a>
+        </div>
+        <ul>
+          <li><a href="../Accueil.html"><i class="icon-home"></i>Accueil</a>
+          </li>
+          <li><a title=""><i class="icon-book"></i>Livres</a>
+            <ul>
+              <li><a href="../livres/categories.html" title=""><i class="icon-angle-right"></i>Catégories</a></li>
+              <li><a href="../livres/livres.html" title=""><i class="icon-angle-right"></i>livres</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-print"></i>Fournisseurs</a>
+            <ul>
+              <li><a href="../Fournisseurs/imprimeurs.html" title=""><i class="icon-angle-right"></i>Fournisseurs
+                  disponibles</a>
+              </li>
+              <li><a href="../Fournisseurs/imp-bl.html" title=""><i class="icon-angle-right"></i>Saisir un BL</a></li>
+              <li><a href="../Fournisseurs/imp-remb.html" title=""><i class="icon-angle-right"></i>Remboursement</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Synthèse
+                  Remboursemnet</a></li>
+            </ul>
+          </li>
+          <li>
+            <a title=""><i class="icon-user"></i>Représentant
+            </a>
+            <ul>
+              <li><a href="../representant/representant.html" title=""><i class="icon-angle-right"></i>Représentants
+                  disponibles </a>
+              </li>
+              <li><a href="../representant/BL-representant.html" title=""><i class="icon-angle-right"></i>Saisie un
+                  BL</a></li>
+              <li><a href="../representant/Remboursement.html" title=""><i class="icon-angle-right"></i>Remboursement
+                </a></li>
+              <li><a href="../representant/fact-rep.html" title=""><i class="icon-angle-right"></i>Demande de
+                  facturation
+                </a></li>
+              <li><a href="../representant/factures.html" title=""><i class="icon-angle-right"></i>Factures </a></li>
+              <li><a href="../representant/remb-fact.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Factures </a></li>
+              <!-- <li><a href="./?page=Trassabilite" title=""><i class="icon-angle-right"></i></a></li> -->
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Déclaratoin Dépôt
+                </a></li>
+              <li style="background: #7CD5FF;"><a href="../representant/cahier_texte.html" title=""><i
+                    class="icon-angle-right"></i>Cahier de texte
+                </a></li>
+              <li style="background: #ffab26;;"><a href="../representant/carte_visite.html" title=""><i
+                    class="icon-angle-right"></i>Cartes de visite &amp; Chevalet
+                </a></li>
+              <li><a href="../representant/rep-synthese.html" title=""><i class="icon-angle-right"></i>synthèse BL </a>
+              </li>
+              <li><a href="../representant/rep-synthese-remb.html" title=""><i class="icon-angle-right"></i>synthèse
+                  Remboursement
+                </a></li>
+            </ul>
+          </li>
+          <li><a style="background: #303030; cursor: default; color: #fff;" title=""><i class="icon-cogs"></i>SAISON :
+              2026 / 2027 </a></li>
+        </ul>
+        <ul>
+          <li><a title=""><i class="icon-file-text-alt"></i>Traçabilité</a>
+            <ul>
+              <li><a href="Clients.html" title=""><i class="icon-angle-right"></i>clients</a></li>
+              <li><a href="bl-client.html" title=""><i class="icon-angle-right"></i>BL Clients</a></li>
+              <li><a href="remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement Client</a></li>
+              <li><a href="synthese-client.html" title=""><i class="icon-angle-right"></i>Synthèse</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-file-text-alt"></i>Synthèses Globales</a>
+            <ul>
+              <li><a href="../Synthèse Global/Livraison Fournisseurs.html" title=""><i
+                    class="icon-angle-right"></i>Livraison <br />
+                  Fournisseurs --&gt; MSM-MEDIAS</a></li>
+              <li><a href="../Synthèse Global/Livraison Rep.html" title=""><i class="icon-angle-right"></i>Livraison
+                  MSM-MEDIAS --&gt;
+                  REP</a></li>
+              <li><a href="../Synthèse Global/vente.html" title=""><i class="icon-angle-right"></i>Ventes</a></li>
+              <li><a href="../Synthèse Global/depot_global.html" title=""><i class="icon-angle-right"></i>Dépôt</a></li>
+              <li><a href="../Synthèse Global/remb_globale.html" title=""><i class="icon-angle-right"></i>Remboursement
+                  Fournisseurs</a></li>
+              <li><a href="../Synthèse Global/remb_globale_imp.html" title=""><i
+                    class="icon-angle-right"></i>Remboursement REP</a></li>
+              <li><a href="../Synthèse Global/Balance.html" title=""><i class="icon-angle-right"></i>Balance</a></li>
+            </ul>
+          </li>
+          <li style="background: #258AF3;"><a style="color:#fff"><i class="glyphicon glyphicon-envelope"
+                style="color:#fff;margin-top: -2px;font-size: 20px;"></i>Emailing</a>
+            <ul>
+              <li><a href="../Emailing/emailing.html"><i class="icon-angle-right"></i>Simple Email</a></li>
+              <li><a href="../Emailing/invitation.html"><i class="icon-angle-right"></i>Invitation</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-cogs"></i>Réglages</a>
+            <ul>
+              <li><a href="../Réglage/semestre.html" title=""><i class="icon-angle-right"></i>Season de travail</a></li>
+              <li><a href="../Réglage/Peid-facture.html" title=""><i class="icon-angle-right"></i>Pied de facture</a>
+              </li>
+              <li><a href="../Réglage/modeles.html" title=""><i class="icon-angle-right"></i>Modèles Cahier de
+                  texte</a></li>
+            </ul>
+          </li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+      </div> <!-- end menu 2 -->
+      <!-- ****************************************fin de menu **************************************** -->
+      <div class="container">
+        <div class="row">
+          <div class="main-bg">
+            <div class="top-stats">
+              <div class="top-stats-icons"> <a href="#" style="pointer-events:none;" title="Déconnecter"> <i
+                    class="icon-off"></i></a>
+              </div>
+            </div>
+            <div class="breadcrumbs-notify"> <a href="#" style="pointer-events:none;" title="">Accueil /</a><a href="#"
+                title="">Traçabilité /</a><a href="#" title="">Remboursement clients </a> </div>
+            <div class="heading-buttons-sec"> </div>
+            <!-- *********************************content**************************************			 -->
+            <div class="body-sec">
+              <div class="col-md-12">
+                <div class="widget-body">
+                  <div class="widget-heading blue"> <i class="icon-book"></i>
+                    <h3 class="pull-left"> Remboursement clients</h3>
+                  </div>
+                  <div class="widget-sec">
+                    <div id="contact">
+                      <!-- //////////////////////////////////////******from********//////////////////////// -->
+                      <form action="" method="post">
+                        <label>Choisir un représentant</label>
+                        <select name="rep" required="" style="width:140px; margin-left:10px;">
+                          <option value=""></option>
+                          <option selected="" value="1"> Adnane </option>
+                          <option value="2"> abjalil </option>
+                        </select>
+                        <button class="btn green" style="margin-left:10px; width:100px;" type="submit">Valider</button>
+                      </form>
+                      <div id="divID">
+                        <h2 style="text-align:center">ETAT REMBOURSSEMENT CLIENT <br /> (Adnane)
+
+                        </h2>
+                        <table class="table table-striped table-bordered" id="stream_table">
+                          <thead>
+                            <tr>
+                              <th> Client</th>
+                              <th>Date</th>
+                              <th>Banque</th>
+                              <th>N° de chèque</th>
+                              <th>A l'ordre de</th>
+                              <th>Montant (DH)</th>
+                              <th style="width:300px">Observation</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                      <a href="#" style="pointer-events:none;"> <button class="btn green" onclick="printdiv1('divID');"
+                          style="width: 100px;background: #2FCF19; color: #fff" value="  ">Imprimer</button></a>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Body Sec -->
+          </div>
+          <!-- main-bg-->
+        </div>
+        <!-- Row -->
+      </div>
+      <!-- Container -->
+    </section>
+    <!-- Main Section -->
+    <!-- Side Panel -->
+  </div>
+  <!-- Wrapper -->
+</body><!-- Body -->
+
+</html>

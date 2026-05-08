@@ -114,11 +114,11 @@ class DatabaseSeeder extends Seeder
 
         // 6. Final Transactions
         BVentesClient::factory(20)->create();
-        RepRemboursement::factory(20)->create();
         ClientRemboursement::factory(20)->create();
         RembImp::factory(20)->create();
         DemandeF::factory(20)->create();
         Fact::factory(20)->create();
+        RepRemboursement::factory(20)->create();
         DetFact::factory(20)->create();
         CarteVisite::factory(20)->create();
         CahierCommunication::factory(20)->create();

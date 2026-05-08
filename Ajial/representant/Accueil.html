@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Représentant</title>
+  <link href="images/user-log-in.png" rel="shortcut icon" />
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800" rel="stylesheet" type="text/css" />
+  <link href="http://fonts.googleapis.com/css?family=Raleway:100,900,800,700,600,500,400,300,200" rel="stylesheet"
+    type="text/css" /><!-- Google Fonts -->
+  <!-- Styles -->
+  <link href="../admin/css/bootstrap.css" rel="stylesheet" type="text/css" /><!-- Bootstrap -->
+  <link href="../admin/css/jquery.mCustomScrollbar.css" rel="stylesheet" /><!-- Custom Scroll Bar -->
+  <link href="../admin/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" /><!-- Font Awesome -->
+  <link href="../admin/css/style.css" rel="stylesheet" type="text/css" /><!-- Style -->
+  <link href="../admin/css/responsive.css" rel="stylesheet" type="text/css" /><!-- Responsive Style -->
+  <!-- Script -->
+  <script src="../admin/js/ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script><!-- Jquery -->
+  <script src="../admin/js/bootstrap.js" type="text/javascript"></script><!-- Bootstrap -->
+  <script src="../admin/js/script.js" type="text/javascript"></script><!-- Script -->
+  <style type="text/css">
+    .widget-sec {
+      display: none;
+    }
+
+    .widget-heading {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body style="width:100%;">
+  <div class="wrapper">
+    <header>
+      <div class="logo">
+        <img alt="" src="images/logo.png" />
+      </div><!-- Logo -->
+      <div class="welcome-user">
+        <!-- <img src="images/user.png" alt=""/> -->
+        <span></span>
+      </div>
+      <div class="side-navigation">
+        <div class="clear"></div>
+        <ul>
+          <li><a href="Accueil.html"><i class="icon-home"></i>Accueil</a></li>
+          <li><a><i class="icon-money"></i> Bon de livraison <br />
+            </a>
+            <ul>
+              <li><a href="bon de livraison/BL.html"><i class="icon-file-text-alt"></i>BL <br />
+                </a></li>
+              <li><a href="bon de livraison/Renboursement.html"><i class="icon-money"></i>Remboursement</a></li>
+              <li><a href="bon de livraison/synthese-bl-rep.html"><i class="icon-money"></i>Synthèse BL
+                </a></li>
+            </ul>
+          </li>
+          <li><a><i class="icon-file-text-alt"></i>Factures</a>
+            <ul>
+              <li><a href="facture/facturation-msm.html" title=""><i class="icon-angle-right"></i>Facture MSM-MEDIAS</a>
+              </li>
+              <li><a href="facture/facturation-wataniya.html" title=""><i class="icon-angle-right"></i>Facture
+                  Wataniya</a>
+              </li>
+              <!-- <li><a href="./?page=remb-fact"><i class="icon-money"></i>Rembourser une facture</a></li> -->
+            </ul>
+          </li>
+          <li><a href="client/client.html" title=""><i class="icon-user"></i>Clients</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Ajouter client</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Saisir un BL</a>
+              </li>
+              <li><a href="client/remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement</a></li>
+              <li><a href="client/synthese-bl.html" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="client/synthese-remb.html" title=""><i class="icon-angle-right"></i>Synthèse
+                  Remboursemnet</a>
+              </li>
+              <li><a href="client/Historique.html" title=""><i class="icon-angle-right"></i>Historique</a></li>
+              <li><a><i class="icon-angle-right"></i>Synthèse Global</a>
+                <ul>
+                  <li><a href="client/Synthèse Global/Livraison-global.html" title=""><i
+                        class="icon-angle-right"></i>Livraisons clients</a>
+                  </li>
+                  <li><a href="client/Synthèse Global/remb-global.html" title=""><i
+                        class="icon-angle-right"></i>Remboursements clients</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li><a href="depot.html" title=""><i class="icon-print"></i>Dépôt</a></li>
+          <li><a title=""><i class="icon-book"></i>Cahier de texte</a>
+            <ul>
+              <li><a href="cahier de texte/demande_cahier.html" title=""><i class="icon-angle-right"></i>Commander un
+                  cahier</a></li>
+              <li><a href="cahier de texte/suivi_cahier.html" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-money"></i>Cartes de visite &amp; Chevalet</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Faire une
+                  commande</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a href="Robot.html"><i class="icon-gear"></i>Robots</a></li>
+          <!-- <li><a href="./?page=TawassolApp"><i class="icon-gear"></i>TawassolApp</a></li>  -->
+          <li><a href="profil.html"><i class="icon-user"></i>Profil</a></li>
+          <li><a title=""><i class="icon-cogs"></i>SAISON : 2026 / 2027 </a></li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+        <div class="clear"></div>
+      </div>
+      <a class="slide-up-btn"><i class="icon-align-justify"></i></a>
+    </header><!-- Header End -->
+    <section class="main-section">
+      <div class="responsive-logo">
+        <img alt="" src="images/logo.png" />
+      </div>
+      <div class="responsive-menu">
+        <div class="responsive-menu-dropdown">
+          <a class="red" title="">MENU <i class="icon-align-justify"></i></a>
+        </div>
+        <ul>
+          <li><a href="Accueil.html"><i class="icon-home"></i>Accueil</a></li>
+          <li><a href="bon de livraison/BL.html"><i class="icon-file-text-alt"></i>BL
+            </a>
+          </li>
+          <li><a href="bon de livraison/Renboursement.html"><i class="icon-money"></i>Remboursement</a></li>
+          <li><a href="bon de livraison/synthese-bl-rep.html"><i class="icon-money"></i>Synthèse BL
+            </a></li>
+          <li><a><i class="icon-file-text-alt"></i>Demander une facture</a>
+            <ul>
+              <li><a href="facture/facturation-msm.html" title=""><i class="icon-angle-right"></i>Facture MSM-MEDIAS</a>
+              </li>
+              <li><a href="facture/facturation-wataniya.html" title=""><i class="icon-angle-right"></i>Facture
+                  Wataniya</a>
+              </li>
+            </ul>
+          </li>
+          <!-- <li><a href="./?page=remb-fact"><i class="icon-money"></i>Rembourser une facture</a></li> -->
+          <li><a href="client/client.html" title=""><i class="icon-print"></i>Clients</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Ajouter client</a>
+              </li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Saisir un BL</a>
+              </li>
+              <li><a href="client/remb-client.html" title=""><i class="icon-angle-right"></i>Remboursement</a></li>
+              <li><a href="client/synthese-bl.html" title=""><i class="icon-angle-right"></i>Synthèse BL</a></li>
+              <li><a href="client/synthese-remb.html" title=""><i class="icon-angle-right"></i>Synthèse
+                  Remboursemnet</a>
+              </li>
+              <li><a href="client/Historique.html" title=""><i class="icon-angle-right"></i>Historique</a></li>
+            </ul>
+          </li>
+        </ul>
+        <ul>
+          <li><a><i class="icon-angle-right"></i>Synthèse Global <em style="font-size:11px;">(Clients)</em></a>
+            <ul>
+              <li><a href="client/Synthèse Global/Livraison-global.html" title=""><i
+                    class="icon-angle-right"></i>Livraisons clients</a>
+              </li>
+              <li><a href="client/Synthèse Global/remb-global.html" title=""><i
+                    class="icon-angle-right"></i>Remboursements clients</a></li>
+            </ul>
+          </li>
+          <li><a href="depot.html" title=""><i class="icon-print"></i>Dépôt</a></li>
+          <li><a title=""><i class="icon-book"></i>Cahier de texte</a>
+            <ul>
+              <li><a href="cahier de texte/demande_cahier.html" title=""><i class="icon-angle-right"></i>Commander un
+                  cahier</a></li>
+              <li><a href="cahier de texte/suivi_cahier.html" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a title=""><i class="icon-money"></i>Carte de visite &amp; Chevalet</a>
+            <ul>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Faire une
+                  commande</a></li>
+              <li><a href="#" style="pointer-events:none;" title=""><i class="icon-angle-right"></i>Suivi des
+                  commandes</a></li>
+            </ul>
+          </li>
+          <li><a href="profil.html"><i class="icon-user"></i>Profil</a></li>
+          <li><a style="background: #0d6554; cursor: default; color: #fff;" title=""><i class="icon-cogs"></i>SAISON :
+              2026 / 2027 </a></li>
+          <li><a href="/login.html" title=""><i class="icon-off"></i>Déconnexion</a></li>
+        </ul>
+      </div>
+      <!-- ****************************************fin de menu **************************************** -->
+      <div class="container">
+        <div class="row">
+          <div class="main-bg">
+            <div class="top-stats">
+              <div class="top-stats-icons">
+                <a href="#" style="pointer-events:none;" title="Déconnexion"><i class="icon-off"></i></a>
+              </div>
+            </div>
+            <div class="breadcrumbs-notify">
+              <a href="#" title="">accueil</a>
+            </div>
+            <div class="heading-buttons-sec">
+              <h1>Bienvenue Mr. Adnane </h1>
+              <p>Good Morning Lara Smith!!</p>
+            </div>
+            <div class="body-sec">
+              <!-- *********************************content**************************************			 -->
+              <div class="col-md-12">
+                <div class="widget-body">
+                  <div class="widget-heading blue">
+                    <i class="icon-plus"></i>
+                    <h3 class="pull-left">Livraison - Vente - Stock --|-- Categorie : Primaire </h3>
+                    <ul>
+                      <li class="dropdown panel-function">
+                        <a data-toggle="dropdown" href="#" id="drop3" role="button"> <b class="caret"></b></a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="widget-sec">
+                    <div id="contact">
+                      <a href="#" style="text-decoration:none;pointer-events:none;" target="_blank">
+                        <div class="version-table">
+                          <img src="https://placehold.co/60x40?text=Image" />
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+
+</html>

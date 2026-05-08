@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('rep_remboursements', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
-            $table->foreignUuid('fact_id')->nullable()->after('rep_id')->constrained('fact')->onDelete('set null');
+            $table->foreignUuid('fact_id')->nullable()->constrained('fact')->onDelete('set null');
             $table->date('date_payment');
             $table->foreignUuid('banque_id')->nullable()->constrained('banques')->onDelete('set null');
             $table->string('cheque_number', 50)->nullable();

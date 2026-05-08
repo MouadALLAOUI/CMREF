@@ -41,8 +41,10 @@ function LoginPage() {
     };
 
     return (
-        <div className="LoginPage bg-slate-900 min-h-screen flex flex-col items-center justify-center">
-            <LoginForm onLogIn={handleSubmit} error={error} />
+        <div className="LoginPage min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex flex-col items-center justify-center px-4">
+            <div className="w-full max-w-5xl rounded-3xl border border-slate-700/40 bg-slate-900/70 p-4 shadow-2xl backdrop-blur-sm md:p-8">
+                <LoginForm onLogIn={handleSubmit} error={error} />
+            </div>
         </div>
     );
 }

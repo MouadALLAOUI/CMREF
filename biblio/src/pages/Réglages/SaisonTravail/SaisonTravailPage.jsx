@@ -57,7 +57,7 @@ const SaisonTravailPage = () => {
 
     if (isLoading) {
         return (
-            <div className="max-w-md mx-auto space-y-6 pt-10">
+            <div className="space-y-6 pt-10">
                 <div className="text-center space-y-2">
                     <div className="inline-flex p-4 bg-blue-50 text-blue-600 rounded-full mb-2">
                         <CalendarDays size={32} />
@@ -69,7 +69,7 @@ const SaisonTravailPage = () => {
     }
 
     return (
-        <div className="max-w-md mx-auto space-y-6 pt-10">
+        <div className="space-y-6 pt-10">
             <div className="text-center space-y-2">
                 <div className="inline-flex p-4 bg-blue-50 text-blue-600 rounded-full mb-2">
                     <CalendarDays size={32} />
@@ -78,7 +78,7 @@ const SaisonTravailPage = () => {
                 <p className="text-slate-500 text-sm">Définissez la saison active pour l'ensemble du système.</p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 space-y-6">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
                 <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-blue-800 text-sm">
                     <div className="font-bold flex items-center gap-2">
                         <CalendarDays size={16} />

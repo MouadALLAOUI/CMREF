@@ -11,7 +11,7 @@ const InvitationPage = () => {
     });
 
     return (
-        <div className="max-w-3xl mx-auto space-y-6 pt-6">
+        <div className="space-y-6">
             <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
                 <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
                     <UserPlus size={24} />
@@ -24,8 +24,8 @@ const InvitationPage = () => {
 
             <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
                 <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-sm">
-                    <div className="font-bold">Backend missing</div>
-                    <div>Endpoint requis (exemple): POST /api/invitations</div>
+                    <div className="font-bold">Intégration API à finaliser</div>
+                    <div>Endpoint requis (exemple) : POST /api/invitations</div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormInputRow 
@@ -52,7 +52,7 @@ const InvitationPage = () => {
                 />
 
                 <div className="pt-4 border-t border-slate-50">
-                    <Button disabled className="w-full bg-blue-600 text-white flex items-center justify-center gap-2 py-6 text-lg font-bold hover:bg-blue-700 transition-colors">
+                    <Button disabled className="w-full bg-slate-900 text-white flex items-center justify-center gap-2 py-6 text-lg font-bold hover:bg-black transition-colors">
                         <Send size={20} /> Envoyer l'invitation
                     </Button>
                 </div>

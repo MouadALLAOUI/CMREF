@@ -113,7 +113,7 @@ const BalancePage = () => {
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline"><Download size={16} /></Button>
-                    <Button className="bg-blue-600 text-white flex items-center gap-2"><Printer size={16} /> Imprimer</Button>
+                    <Button className="bg-slate-900 text-white flex items-center gap-2 hover:bg-black"><Printer size={16} /> Imprimer</Button>
                 </div>
             </div>
 

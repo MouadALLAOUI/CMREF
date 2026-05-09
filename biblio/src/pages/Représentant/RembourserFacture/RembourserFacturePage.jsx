@@ -306,7 +306,7 @@ function RembourserFacturePage() {
         }
         footerActions={<SaveButton />}
       >
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="flex justify-end">
             <SaveButton />
           </div>

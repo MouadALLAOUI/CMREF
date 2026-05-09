@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Button } from "../../../components/ui/button";
-import FormInputRow from "../../../components/ui/FormInputRaw";
+import { Button } from "../../components/ui/button";
+import FormInputRow from "../../components/ui/FormInputRaw";
 import { Send, Mail, Paperclip, Users, UserX } from "lucide-react";
 import toast from "react-hot-toast";
-import logger from "../../../lib/logger";
+import logger from "../../lib/logger";
 
 const EmailingPage = () => {
   const [formData, setFormData] = useState({
@@ -60,7 +60,7 @@ const EmailingPage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pt-6 px-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between border-b border-slate-200 pb-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
@@ -110,7 +110,7 @@ const EmailingPage = () => {
             <Button 
               onClick={handleSend}
               disabled={isSending}
-              className="bg-blue-600 text-white flex items-center gap-2 px-8 h-12 font-bold hover:bg-blue-700 transition-all shadow-md disabled:opacity-50"
+              className="bg-slate-900 text-white flex items-center gap-2 px-8 h-12 font-bold hover:bg-black transition-all shadow-md disabled:opacity-50"
             >
               {isSending ? "Envoi en cours..." : (
                 <>
@@ -155,7 +155,7 @@ const EmailingPage = () => {
             <div className="flex items-start gap-2">
               <UserX size={18} className="text-amber-600 mt-0.5" />
               <div>
-                <h4 className="font-bold text-amber-800 text-sm">Backend requis</h4>
+                <h4 className="font-bold text-amber-800 text-sm">Intégration API à finaliser</h4>
                 <p className="text-xs text-amber-700 mt-1">
                   Endpoints nécessaires:<br/>
                   • GET /api/representants<br/>

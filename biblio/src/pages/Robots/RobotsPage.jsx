@@ -213,7 +213,10 @@ function RobotsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Robots</h1>
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Robots</h1>
+          <p className="text-sm text-slate-500">Suivi des opérations et du statut du parc.</p>
+        </div>
         <UniversalDialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}

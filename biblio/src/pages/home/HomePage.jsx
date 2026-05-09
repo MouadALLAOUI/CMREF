@@ -76,8 +76,16 @@ function HomePage() {
     ];
 
     return (
-        <div className="HomePage px-5">
-            <AccordionComponent AccordionItems={accordionItems} id="home" allowMultiple={true} />
+        <div className="HomePage space-y-6">
+            <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">Tableau de bord</h1>
+                        <p className="text-sm text-slate-500">Suivi des stocks et impression des états.</p>
+                    </div>
+                </div>
+                <AccordionComponent AccordionItems={accordionItems} id="home" allowMultiple={true} />
+            </div>
         </div>
     );
 }
@@ -92,12 +100,12 @@ const AVSPdfs = ({
     destinationName,
     isLoading
 }) => (
-    <div className="px-5 py-[15px]">
+    <div className="rounded-xl border border-slate-100 bg-slate-50/50 px-5 py-4">
         {/* 1. The Setting Dropdown is ALWAYS visible */}
-        <div className="mb-4 flex items-center gap-2 text-sm text-gray-600 border-b pb-2">
-            <label className="font-semibold">Mode d'affichage :</label>
+        <div className="mb-4 flex items-center gap-2 border-b border-slate-200 pb-3 text-sm text-slate-600">
+            <label className="font-semibold uppercase tracking-wide">Mode d'affichage :</label>
             <select
-                className="border rounded p-1 outline-none"
+                className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:ring-1 focus:ring-slate-900"
                 value={pdfDisplayMode}
                 onChange={(e) => {
                     setPdfDisplayMode(e.target.value);
@@ -154,7 +162,7 @@ const AVSPdfs = ({
                     {/* Fermer Button correctly resets state to default value */}
                     <Button
                         variant="destructive"
-                        className="mt-4 self-start"
+                        className="mt-4 self-start rounded-xl"
                         onClick={() => setShowViewer(false)}
                     >
                         Fermer l'aperçu PDF

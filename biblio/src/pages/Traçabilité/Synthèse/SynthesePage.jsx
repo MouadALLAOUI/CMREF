@@ -138,7 +138,7 @@ const SyntheseTracabilitePage = () => {
                     <BarChart3 className="text-slate-900" />
                     <h1 className="text-2xl font-bold text-slate-800">Synthèse Traçabilité</h1>
                 </div>
-                <Button variant="outline" className="flex items-center gap-2"><Download size={16} /> Rapport</Button>
+                <Button className="bg-slate-900 text-white flex items-center gap-2 hover:bg-black"><Download size={16} /> Rapport</Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

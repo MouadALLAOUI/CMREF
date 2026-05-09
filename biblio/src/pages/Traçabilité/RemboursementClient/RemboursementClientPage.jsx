@@ -220,7 +220,10 @@ function RemboursementClientPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Remboursements clients</h1>
+                <div>
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Remboursements clients</h1>
+                    <p className="text-sm text-slate-500">Suivi des règlements et des remboursements par client.</p>
+                </div>
                 <UniversalDialog
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}

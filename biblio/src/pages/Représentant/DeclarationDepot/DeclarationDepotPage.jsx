@@ -135,7 +135,7 @@ function DeclarationDepotPage() {
                 icon={CheckCircle2}
                 headerColor="bg-[#10b981]"
             >
-                <div className="space-y-4">
+                <div className="space-y-6">
                     <div className="flex items-center gap-4">
                         <label className="text-sm font-semibold text-slate-700">Sélectionner un représentant:</label>
                         <select

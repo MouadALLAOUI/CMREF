@@ -12,7 +12,7 @@ const PiedDeFacturePage = () => {
     });
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6 pt-6">
+        <div className="space-y-6">
             <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
                 <div className="p-2 bg-slate-100 text-slate-700 rounded-lg">
                     <FileText size={24} />
@@ -23,10 +23,10 @@ const PiedDeFacturePage = () => {
                 </div>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 space-y-8">
+            <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm space-y-8">
                 <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl text-amber-800 text-sm">
-                    <div className="font-bold">Backend missing</div>
-                    <div>Endpoints requis (exemple): GET/PUT /api/settings/pied-de-facture</div>
+                    <div className="font-bold">Intégration API à finaliser</div>
+                    <div>Endpoints requis (exemple) : GET/PUT /api/settings/pied-de-facture</div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <FormInputRow 

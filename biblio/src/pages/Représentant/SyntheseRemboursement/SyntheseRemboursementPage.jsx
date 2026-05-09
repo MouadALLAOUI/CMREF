@@ -99,14 +99,14 @@ const SyntheseRemboursementPage = () => {
     );
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-slate-800">Synthèse des Remboursements</h1>
                 <div className="flex gap-2">
                     <Button variant="outline" className="flex items-center gap-2">
                         <Download size={16} /> Exporter
                     </Button>
-                    <Button className="bg-emerald-600 text-white flex items-center gap-2">
+                    <Button className="bg-slate-900 text-white flex items-center gap-2 hover:bg-black">
                         <Printer size={16} /> Imprimer
                     </Button>
                 </div>

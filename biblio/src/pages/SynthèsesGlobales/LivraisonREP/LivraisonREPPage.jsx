@@ -110,7 +110,7 @@ const LivraisonREPPage = () => {
                     <Users className="text-blue-600" />
                     <h1 className="text-2xl font-bold text-slate-800">Livraisons aux Représentants</h1>
                 </div>
-                <Button className="bg-blue-600 text-white"><Download size={16} /></Button>
+                <Button className="bg-slate-900 text-white hover:bg-black"><Download size={16} /></Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

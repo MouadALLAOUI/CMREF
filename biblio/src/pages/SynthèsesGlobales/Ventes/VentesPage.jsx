@@ -99,7 +99,7 @@ const VentesPage = () => {
                     <TrendingUp className="text-emerald-600" />
                     <h1 className="text-2xl font-bold text-slate-800">Synthèse des Ventes</h1>
                 </div>
-                <Button className="bg-emerald-600 text-white flex items-center gap-2"><Download size={16} /> Exporter</Button>
+                <Button className="bg-slate-900 text-white flex items-center gap-2 hover:bg-black"><Download size={16} /> Exporter</Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

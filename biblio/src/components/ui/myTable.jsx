@@ -193,14 +193,15 @@ const MyTable = ({
     setSortConfig({ key, direction });
   };
 
-  const totalPages = Math.ceil((data?.length || 0) / pageSize);
+  const totalPages = Math.ceil((sortedData?.length || 0) / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const paginatedData = sortedData.slice(startIndex, startIndex + pageSize);
   useEffect(() => {
-    if (currentPage > 1 && paginatedData.length === 0 && !isLoading) {
-      setCurrentPage(totalPages || 1);
+    const validPage = totalPages || 1;
+    if (!isLoading && currentPage > validPage) {
+      setCurrentPage(validPage);
     }
-  }, [paginatedData.length, currentPage, totalPages, isLoading]);
+  }, [currentPage, totalPages, isLoading]);
 
   // Color Variant Mapping
   const variants = {

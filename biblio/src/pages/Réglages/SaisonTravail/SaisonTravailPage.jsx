@@ -93,9 +93,15 @@ const SaisonTravailPage = () => {
             toast.error("Veuillez sélectionner une saison");
             return;
         }
+        // Resolve the full season object from the list to get its id
+        const targetSeason = seasons.find(s => s.name === activeSeason);
+        if (!targetSeason) {
+            toast.error("Saison introuvable");
+            return;
+        }
         setIsSaving(true);
         try {
-            await seasonsService.setActive({ annee: activeSeason });
+            await seasonsService.setActive({ season_id: targetSeason.id, is_active: true });
             toast.success(`La saison ${activeSeason} est maintenant active.`);
             await fetchData();
         } catch (error) {

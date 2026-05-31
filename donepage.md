@@ -1,14 +1,14 @@
-livres -> done
-fournisseurs -> done
-http://localhost:3000/dash/representant/Saisir_un_BL // need code optimaized - need logic improvemnt
+# CMREF Task List
 
-representant/Remboursement // still need code and logic revise
-# todo
+## 🔐 PHASE 0 — Foundation & Auth
+- [x] Add `ProtectedRoute` guard to `/REP/dash/*` routes (currently unprotected)
+- [x] Add season context/global store so active season is available app-wide
+- [x] Create `utils/helpers.js` DRY organizer file (shared fetch, format, toast patterns)
+- [x] Remove all `console.log` debug statements from auth and logout flows
+- [x] Fix `MyTable` pagination bug — reset to page 1 when current page becomes empty after delete
+- [x] Add `// MOCK — replace with API` comments to all pages still using hardcoded data
 
 ## admin
-
-- [ ] create a file to orgnize function (for func that are repeated through other component)
-- [ ] table should return to page 1 if the current page is empty
 - [ ] Representants_disponibles -> add last online status red if offline green online
 - [ ] Representants_disponibles -> show password in modify (not the best for security), in modify pass can be null
 - [ ] for Bl detail modify ask if keep only qte change or the full elements
@@ -27,15 +27,3 @@ representant/Remboursement // still need code and logic revise
 - [ ] syntheses_globales/*
 - [ ] reglages/Season_travail
 - [ ] reglages/Modeles_Cahier_texte
-
-
----
-
-## representant
-
-
-
-
-// backend
-
-`demande_f` L327 database.sql file

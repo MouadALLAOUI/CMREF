@@ -15,7 +15,7 @@ const EmailingPage = () => {
   });
   const [isSending, setIsSending] = useState(false);
 
-  // Mock data - replace with actual API calls
+  // MOCK — replace with API
   const representants = [
     { id: "1", nom: "Jean Dupont", email: "jean.dupont@example.com" },
     { id: "2", nom: "Marie Martin", email: "marie.martin@example.com" },

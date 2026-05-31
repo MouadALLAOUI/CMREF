@@ -2,7 +2,7 @@ import { Loader2 } from "lucide-react";
 import useAppStore from "../store/useAppStore";
 import { Navigate, Outlet } from "react-router-dom";
 
-export const ProtectedRoute = ({ children }) => {
+export const ProtectedRoute = ({ children, role = "admin" }) => {
     const { user, loading, isAdminMode } = useAppStore();
     // console.log("ProtectedRoute - Auth State:", { user, profile, loading });
     if (loading) {
@@ -17,7 +17,7 @@ export const ProtectedRoute = ({ children }) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (isAdminMode === false) {
+    if (role === "admin" && isAdminMode === false) {
         return <Navigate to="/unauthorized" replace />;
     }
     return children ? children : <Outlet />;

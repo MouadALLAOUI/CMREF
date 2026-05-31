@@ -4,6 +4,32 @@
  */
 
 import { currencyFormat, dateFormat } from '../lib/utilities';
+import { toast } from "react-hot-toast";
+
+export const getApiBaseUrl = () => process.env.REACT_APP_API_URL || "";
+
+export const getCsrfCookieUrl = () =>
+  process.env.REACT_APP_CSRF_URL ||
+  `${getApiBaseUrl()}/sanctum/csrf-cookie`;
+
+export const normalizeSeason = (season) => {
+  if (!season) return null;
+  if (typeof season === "string" || typeof season === "number") {
+    return { id: season, label: String(season) };
+  }
+  if (season.season_id !== undefined) {
+    return { id: season.season_id, ...season };
+  }
+  if (season.id !== undefined) {
+    return season;
+  }
+  return null;
+};
+
+export const seasonActivationPayload = (season) => {
+  const normalized = normalizeSeason(season);
+  return normalized ? { season_id: normalized.id } : null;
+};
 
 /**
  * Format money value with DH suffix
@@ -83,24 +109,24 @@ export const groupBy = (array, key) => {
 export const calculateFinancialSummary = (items) => {
   let totalCredit = 0;
   let totalAvance = 0;
-  
+
   items.forEach(item => {
     const montant = toNumber(item.montant);
     const type = item.type_versement || '';
-    
+
     // Credit: payments received (statut_recu or statut_accepte)
     if (item.statut_recu || item.statut_accepte) {
       totalCredit += montant;
     }
-    
+
     // Avance: advance payments (type_versement === 'Versement' or 'Virement')
     if (type === 'Versement' || type === 'Virement') {
       totalAvance += montant;
     }
   });
-  
+
   const totalReste = totalCredit - totalAvance;
-  
+
   return { totalCredit, totalAvance, totalReste };
 };
 
@@ -149,13 +175,13 @@ export const debounce = (func, wait = 300) => {
  */
 export const exportToCSV = (data, columns, filename = 'export.csv') => {
   const headers = columns.filter(col => col.type !== 'hidden').map(col => col.header);
-  const rows = data.map(row => 
+  const rows = data.map(row =>
     columns.filter(col => col.type !== 'hidden').map(col => {
       const value = row[col.accessor] || '';
       return `"${String(value).replace(/"/g, '""')}"`;
     })
   );
-  
+
   const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
@@ -184,17 +210,17 @@ export const getEntityTypeLabel = (entityType) => {
  */
 export const calculateBLSynthesis = (blItems) => {
   const grouped = new Map();
-  
+
   for (const item of blItems) {
     const livraison = item.livraison;
     const repId = livraison?.rep_id || livraison?.representant?.id;
     if (!repId) continue;
-    
+
     const repNom = livraison?.representant?.nom || repId;
     const qty = toNumber(item.quantite);
     const unit = toNumber(item.livre?.prix_vente ?? item.livre?.prix_public ?? 0);
     const total = qty * unit;
-    
+
     const prev = grouped.get(repId) || {
       id: repId,
       rep: repNom,
@@ -203,7 +229,7 @@ export const calculateBLSynthesis = (blItems) => {
       lastUpdate: '',
       blNumbers: new Set(),
     };
-    
+
     prev.totalMontant += total;
     if (livraison?.bl_number) prev.blNumbers.add(String(livraison.bl_number));
     prev.totalBL = prev.blNumbers.size;
@@ -212,6 +238,37 @@ export const calculateBLSynthesis = (blItems) => {
     }
     grouped.set(repId, prev);
   }
-  
+
   return Array.from(grouped.values()).sort((a, b) => b.totalMontant - a.totalMontant);
+};
+
+/**
+ * Shared API error handler that displays a toast error and returns the message
+ * @param {Error} error - The error object
+ * @param {string} fallbackMessage - Fallback message
+ * @returns {string} Error message
+ */
+export const handleApiError = (error, fallbackMessage = "Une erreur est survenue.") => {
+  const message =
+    error?.response?.data?.message ||
+    error?.response?.data?.error ||
+    error?.message ||
+    fallbackMessage;
+  toast.error(message);
+  return message;
+};
+
+export const formatCurrency = (value, locale = "fr-FR", currency = "EUR") => {
+  const number = Number(value);
+  if (Number.isNaN(number)) return "0,00 €";
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+  }).format(number);
+};
+
+export const formatDate = (value, options = { year: "numeric", month: "2-digit", day: "2-digit" }) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("fr-FR", options);
 };

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('imprimeur_id')->constrained('imprimeurs')->onDelete('cascade'); // Link to Printer/Supplier
             $table->date('date_payment'); // Actual payment date
             $table->string('banque_nom', 100)->nullable();
-            $table->foreignUuid('banque_id')->nullable()->constrained('banques')->onDelete('set null'); //
+            $table->foreignUuid('banque_id')->nullable()->constrained('banques')->nullOnDelete(); //
             $table->string('cheque_number', 50)->nullable(); // Renamed from n_cheque
             $table->string('cheque_image_path')->nullable(); // Digital proof of payment
             $table->decimal('montant', 15, 2); // Precise financial type

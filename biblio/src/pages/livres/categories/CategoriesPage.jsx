@@ -38,7 +38,7 @@ function CategoriesPage() {
                     toast.success("Catégorie supprimée");
                     fetchData();
                 } catch (error) {
-                    logger("Error deleting category:", error);
+                    logger("Error deleting category:", error)();
                     toast.error("Erreur lors de la suppression");
                 }
             },
@@ -52,7 +52,7 @@ function CategoriesPage() {
             const response = await categoryService.getAll();
             setCategories(response);
         } catch (error) {
-            logger("Error fetching categories:", error);
+            logger("Error fetching categories:", error)();
             toast.error("Erreur lors du chargement des catégories");
         } finally {
             setIsLoading(false);
@@ -72,7 +72,7 @@ function CategoriesPage() {
             setDescription("");
             fetchData();
         } catch (error) {
-            logger("Error creating category:", error);
+            logger("Error creating category:", error)();
             toast.error("Erreur lors de l'ajout de la catégorie");
         }
     };
@@ -87,7 +87,7 @@ function CategoriesPage() {
             setCategoryId("");
             fetchData();
         } catch (error) {
-            logger("Error updating category:", error);
+            logger("Error updating category:", error)();
             toast.error("Erreur lors de la mise à jour de la catégorie");
         }
     };

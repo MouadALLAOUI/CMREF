@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('fact', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
-            $table->foreignUuid('sequence_id')->constrained('fact_sequences')->onDelete('restrict');
+            $table->foreignUuid('sequence_id')->nullable()->constrained('fact_sequences')->nullOnDelete();
             $table->foreignUuid('demande_id')->nullable()->constrained('demande_f')->onDelete('set null');
             $table->string('year_session', 9)->default('2026-2027'); // e.g., "2025-2026"
             $table->integer('number'); // The raw increment (1, 2, 3...)

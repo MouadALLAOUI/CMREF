@@ -43,6 +43,10 @@ use App\Http\Controllers\Api\SettingController;
 // --- Public Routes ---
 Route::post('/login', [LoginController::class, 'login']);
 
+// 1. Allow public access ONLY to view all seasons (and optionally a single season)
+Route::get('/seasons', [SeasonController::class, 'index']);
+Route::get('/seasons/{season}', [SeasonController::class, 'show']);
+
 // --- Protected Routes (Requires Sanctum Token) ---
 // Route::middleware('admin')->group(function () {
 
@@ -85,7 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('admins', AdminController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('banques', BanqueController::class);
-    Route::apiResource('seasons', SeasonController::class);
+    Route::apiResource('seasons', SeasonController::class)->except(['index', 'show']);
 
     // Settings API
     Route::get('/settings', [SettingController::class, 'index']);

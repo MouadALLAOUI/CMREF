@@ -13,7 +13,9 @@ class Season extends Model
     protected $fillable = [
         'name',
         'start_date',
+        'start_year',
         'end_date',
+        'end_year',
         'is_active',
     ];
 

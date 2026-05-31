@@ -8,6 +8,7 @@ const useAppStore = create(
             user: null,
             profile: null,
             token: null,
+            school_annee: null,
             lastLoginTime: null,
             isAdminMode: false,
             loading: true,
@@ -20,6 +21,7 @@ const useAppStore = create(
                     user: userData.user,
                     profile: userData.profile,
                     token: userData.token,
+                    school_annee: userData.annee || null, // 👈 Capture 'annee' from backend response
                     isAdminMode: userData.role === 'admin',
                     lastLoginTime: Date.now(),
                     loading: false
@@ -46,6 +48,7 @@ const useAppStore = create(
                         user: null,
                         profile: null,
                         token: null,
+                        school_annee: null, // 👈 Clear it out on logout
                         lastLoginTime: null,
                         isAdminMode: false,
                         loading: false
@@ -84,6 +87,7 @@ const useAppStore = create(
                 user: state.user,
                 profile: state.profile,
                 token: state.token,
+                school_annee: state.school_annee,
                 isAdminMode: state.isAdminMode,
                 services: state.services,
                 lastLoginTime: state.lastLoginTime,

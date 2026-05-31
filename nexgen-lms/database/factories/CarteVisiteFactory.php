@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\CarteVisite;
 use App\Models\Representant;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CarteVisiteFactory extends Factory
@@ -15,6 +16,7 @@ class CarteVisiteFactory extends Factory
     {
         return [
             'rep_id' => Representant::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'model' => $this->faker->word(),
             'date_commande' => $this->faker->date(),
             'nom_sur_carte' => $this->faker->name(),

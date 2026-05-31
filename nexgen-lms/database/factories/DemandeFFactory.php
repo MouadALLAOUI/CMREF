@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\DemandeF;
 use App\Models\Representant;
 use App\Models\Client;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DemandeFFactory extends Factory
@@ -16,6 +17,7 @@ class DemandeFFactory extends Factory
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'client_id' => Client::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'date_demande' => $this->faker->date(),
             'ref' => $this->faker->randomDigitNotNull(),
             'type' => $this->faker->randomElement(['MSM', 'Wataniya']),

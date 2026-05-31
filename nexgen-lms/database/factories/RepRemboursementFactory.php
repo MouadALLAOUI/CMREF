@@ -6,6 +6,7 @@ use App\Models\RepRemboursement;
 use App\Models\Representant;
 use App\Models\Banque;
 use App\Models\Fact;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RepRemboursementFactory extends Factory
@@ -18,6 +19,7 @@ class RepRemboursementFactory extends Factory
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'fact_id' => Fact::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'date_payment' => $this->faker->date(),
             'banque_id' => Banque::pluck('id')->random(),
             // 'banque_nom' => $this->faker->company() . ' Bank',

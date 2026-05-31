@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\DetFact;
 use App\Models\Fact;
 use App\Models\Livre;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DetFactFactory extends Factory
@@ -21,6 +22,7 @@ class DetFactFactory extends Factory
         return [
             'fact_id' => Fact::pluck('id')->random(),
             'livre_id' => Livre::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'quantite' => $qty,
             'prix_unitaire_ht' => $price,
             'remise' => $remise,

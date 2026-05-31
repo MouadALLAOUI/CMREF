@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('password'); // Renamed from 'pass'
             $table->unsignedInteger('bl_count')->default(0); // Standardized INT
             $table->unsignedInteger('remb_count')->default(0);
+            $table->timestamp('last_online_at')->nullable();
             $table->timestamps(); // Added for tracking
         });
     }

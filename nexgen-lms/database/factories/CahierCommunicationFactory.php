@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\CahierCommunication;
 use App\Models\Representant;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CahierCommunicationFactory extends Factory
@@ -15,6 +16,7 @@ class CahierCommunicationFactory extends Factory
     {
         return [
             'rep_id' => Representant::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'ecole' => $this->faker->company(),
             'type' => $this->faker->word(),
             'qte' => $this->faker->numberBetween(10, 500),

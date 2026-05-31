@@ -18,7 +18,7 @@ const HeaderPages = ({ role }) => {
     return (
         <div className="min-h-screen flex flex-col bg-slate-50/50">
             <HeaderComponent />
-            <div className="relative flex-1 m-5 mx-auto bg-white rounded-xl shadow-sm border border-slate-100 p-8 min-w-[95%]">
+            <div className="relative flex-1 m-5 mx-auto bg-white rounded-xl shadow-sm border border-slate-100 p-8 max-w-[97%] min-w-[95%]">
                 <div className="breadcrumb mb-8 p-3 w-full rounded-lg bg-slate-100/50 border border-slate-200/50">
                     <Breadcrumb>
                         <BreadcrumbList>

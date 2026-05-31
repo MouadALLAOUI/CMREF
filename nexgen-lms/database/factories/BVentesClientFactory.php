@@ -6,6 +6,7 @@ use App\Models\BVentesClient;
 use App\Models\Representant;
 use App\Models\Client;
 use App\Models\Livre;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BVentesClientFactory extends Factory
@@ -17,6 +18,7 @@ class BVentesClientFactory extends Factory
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'client_id' => Client::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'b_vente_number' => $this->faker->unique()->bothify('BV-####'),
             'date_vente' => $this->faker->date(),
             'type' => $this->faker->randomElement(['normal', 'retour']),

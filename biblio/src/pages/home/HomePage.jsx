@@ -25,7 +25,7 @@ function HomePage() {
     //     groupedReportData,
     //     totalGlobalStock,
     //     isLoading
-    // })
+    // })()
 
     // Find the name of the selected destination to pass to the PDF
     const currentDestinationObj = destinations.find(d => d.id === selectedDestination);

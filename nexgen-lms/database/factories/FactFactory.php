@@ -6,6 +6,7 @@ use App\Models\DemandeF;
 use App\Models\Fact;
 use App\Models\Representant;
 use App\Models\FactSequence;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class FactFactory extends Factory
@@ -22,6 +23,7 @@ class FactFactory extends Factory
             'rep_id' => Representant::pluck('id')->random(),
             'sequence_id' => FactSequence::pluck('id')->random(),
             'demande_id' => DemandeF::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'year_session' => $this->faker->year(),
             'number' => $this->faker->unique()->numberBetween(1, 9999),
             'fact_number' => $this->faker->unique()->bothify('FACT-####'),

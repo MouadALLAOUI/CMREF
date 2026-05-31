@@ -72,7 +72,7 @@ const SyntheseRemboursementPage = () => {
 
             setRows(computed);
         } catch (error) {
-            logger("Error computing fournisseurs synthese remboursements:", error);
+            logger("Error computing fournisseurs synthese remboursements:", error)();
             toast.error("Erreur lors du chargement de la synthèse");
         } finally {
             setIsLoading(false);

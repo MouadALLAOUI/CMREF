@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('b_vente_number', 50); // Reference number
             $table->date('date_vente'); // Professional DATE type
             $table->string('type', 50)->nullable(); // e.g., Facturé, Offert
-            $table->foreignUuid('livre_id')->constrained('livres')->onDelete('restrict'); // Link to Book
+            $table->foreignUuid('livre_id')->nullable()->constrained('livres')->nullOnDelete(); // Link to Book
             $table->integer('quantite')->default(0); // Sold quantity
             $table->decimal('remise', 5, 2)->default(0.00); // Changed from INT to DECIMAL for precision
             $table->string('annee', 50)->nullable();

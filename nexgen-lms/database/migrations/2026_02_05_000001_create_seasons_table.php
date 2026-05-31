@@ -12,10 +12,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name'); // e.g., "2024-2025"
             $table->date('start_date');
+            $table->string('start_year', 4);
             $table->date('end_date');
+            $table->string('end_year', 4);
             $table->boolean('is_active')->default(false);
             $table->timestamps();
-            
             $table->index('is_active');
         });
     }

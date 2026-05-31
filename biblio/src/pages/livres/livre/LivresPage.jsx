@@ -58,7 +58,7 @@ function LivresPage() {
                 categoryService.getAll()
             ]);
             const rawLivres = livresRes;
-            // logger({ rawLivres })
+            // logger({ rawLivres })()
             setLivres(rawLivres);
             setCategories(categoriesRes);
         } catch (error) {

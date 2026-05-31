@@ -37,7 +37,7 @@ function CahierTextePage() {
       setRows(res);
       setRepresentants(reps);
     } catch (error) {
-      logger("Error fetching cahier communications:", error);
+      logger(error, "error")();
       toast.error("Erreur lors du chargement des données");
     } finally {
       setIsLoading(false);
@@ -79,7 +79,7 @@ function CahierTextePage() {
           toast.success("Entrée supprimée");
           fetchData();
         } catch (error) {
-          logger("Error deleting cahier communication:", error);
+          logger(error, "error")();
           toast.error("Erreur lors de la suppression");
         }
       },
@@ -152,7 +152,7 @@ function CahierTextePage() {
       setIsDialogOpen(false);
       fetchData();
     } catch (error) {
-      logger("Error saving cahier communication:", error);
+      logger(error, "error")();
       toast.error("Erreur lors de l'enregistrement");
     }
   };

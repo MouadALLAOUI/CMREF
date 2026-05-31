@@ -286,7 +286,7 @@ function RemboursementFacturesPage() {
     return (
         <div className="space-y-6">
             {/* Financial Summary Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/*<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-4">
                     <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
                         <CreditCard size={24} />
@@ -314,7 +314,7 @@ function RemboursementFacturesPage() {
                         <p className="text-2xl font-black text-amber-900">{formatMoney(financialSummary.totalReste)}</p>
                     </div>
                 </div>
-            </div>
+            </div>*/}
 
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Remboursements Factures</h1>

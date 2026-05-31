@@ -50,7 +50,7 @@ function FournisseurSaisirBl() {
                     toast.success("b_livraison supprimée");
                     fetchData();
                 } catch (error) {
-                    logger("Error deleting b_livraison:", error);
+                    logger("Error deleting b_livraison:", error)();
                     toast.error("Erreur lors de la suppression");
                 }
             },
@@ -75,7 +75,7 @@ function FournisseurSaisirBl() {
                         items: prev.items.filter(i => i.id !== row.id)
                     }));
                 } catch (error) {
-                    logger("Error deleting b_livraison:", error);
+                    logger("Error deleting b_livraison:", error)();
                     toast.error("Erreur lors de la suppression");
                 }
             },

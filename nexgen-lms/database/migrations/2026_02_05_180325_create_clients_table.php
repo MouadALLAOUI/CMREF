@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
             $table->foreignUuid('representant_id')->constrained('representants')->onDelete('cascade'); // Link to Representative
-            $table->foreignUuid('destination_id')->nullable()->constrained('destinations')->onDelete('set null'); // Link to Zone (Destination)
+            $table->foreignUuid('destination_id')->nullable()->constrained('destinations')->nullOnDelete(); // Link to Zone (Destination)
             $table->string('raison_sociale', 255); // Renamed from 'ste'
             $table->string('ice', 20)->nullable(); // Identifiant Commun des Entreprises
             $table->string('ville', 100)->nullable();

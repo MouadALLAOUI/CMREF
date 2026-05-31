@@ -109,13 +109,24 @@ function RembourserFacturePage() {
   };
 
   const columns = [
-    { header: "Facture N°", accessor: "facture.fact_number", className: "bg-slate-50/50" },
-    { header: "Montant (DH)", accessor: "facture.total_ttc", type: "money", className: "bg-slate-50/50" },
-    { header: "Banque", accessor: "banque.nom || banque_nom" },
-    { header: "N° de chèque", accessor: "cheque_number" },
-    { header: "Règlement (DH)", accessor: "montant", type: "money" },
-    { header: "Commentaire", accessor: "remarks" },
+    {
+      header: "Facture",
+      subColumns: [
+        { header: "Facture N°", accessor: "facture.fact_number", className: "bg-slate-50/50" },
+        { header: "Montant (DH)", accessor: "facture.total_ttc", type: "money", className: "bg-slate-50/50" },
+      ]
+    },
+    {
+      header: "Remboursement",
+      subColumns: [
+        { header: "Banque", accessor: "banque.nom || banque_nom" },
+        { header: "N° de chèque", accessor: "cheque_number" },
+        { header: "Réglement (DH)", accessor: "amount", type: "money" },
+        { header: "Commentaire", accessor: "remarks" },
+      ]
+    }
   ];
+
 
   const schema = useMemo(
     () => [
@@ -267,7 +278,7 @@ function RembourserFacturePage() {
   };
 
   const SaveButton = () => (
-    <Button 
+    <Button
       onClick={() => toast.success("Modifications enregistrées")}
       className="bg-[#0ea5e9] hover:bg-[#0ea5e9]/90 text-white px-4 h-9 rounded-lg font-bold text-xs uppercase tracking-tight shadow-sm transition-all"
     >
@@ -313,14 +324,14 @@ function RembourserFacturePage() {
 
           <div className="relative border border-slate-100 rounded-xl overflow-hidden">
             {/* Double Header Simulation */}
-            <div className="grid grid-cols-[repeat(2,minmax(0,1fr))_repeat(4,minmax(0,1fr))] bg-slate-50/80 border-b border-slate-100">
+            {/* <div className="grid grid-cols-[repeat(2,minmax(0,1fr))_repeat(4,minmax(0,1fr))] bg-slate-50/80 border-b border-slate-100">
               <div className="col-span-2 px-4 py-2 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 border-r border-slate-100">
                 Facture
               </div>
               <div className="col-span-4 px-4 py-2 text-center text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Remboursement
               </div>
-            </div>
+            </div> */}
 
             <MyTable
               data={rows}

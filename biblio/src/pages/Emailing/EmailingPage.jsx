@@ -41,7 +41,7 @@ const EmailingPage = () => {
         recipientId: ""
       });
     } catch (error) {
-      logger("Error sending email:", error);
+      logger("Error sending email:", error)();
       toast.error("Erreur lors de l'envoi de l'email");
     } finally {
       setIsSending(false);

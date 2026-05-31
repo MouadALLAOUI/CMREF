@@ -41,26 +41,28 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Foundation Seeders (Call these first)
         $this->call([
+            SeasonsSeeder::class,
             AdminSeeder::class,
             DestinationSeeder::class,
             CategorySeeder::class,
             ImprimeurSeeder::class,
             BanqueSeeder::class,
             LoginSeeder::class,
+            LivreSeeder::class,
         ]);
 
         // 2. Parent Factories
         Destination::factory(5)->create();
-        $livres = Livre::factory(20)->create(); // Create books first to assign to depots later
-        Imprimeur::factory(20)->create();
-        Banque::factory(20)->create();
-        FactSequence::factory(20)->create();
-        User::factory(20)->create();
-        Content::factory(20)->create();
+        $livres = Livre::get(); // Create books first to assign to depots later
+        Imprimeur::factory(7)->create();
+        Banque::factory(7)->create();
+        FactSequence::factory(7)->create();
+        User::factory(7)->create();
+        Content::factory(7)->create();
 
         // 3. Create Representants AND their Login/Depots immediately
         // This ensures NO representant is left behind
-        Representant::factory(15)->create()->each(function ($rep) use ($livres) {
+        Representant::factory(7)->create()->each(function ($rep) use ($livres) {
             // Create the polymorphic Login
             Login::factory()->create([
                 'username' => $rep->login,
@@ -81,9 +83,9 @@ class DatabaseSeeder extends Seeder
         });
 
         // 4. Secondary Entities (Clients depend on Reps)
-        Client::factory(20)->create();
-        Catalogue::factory(20)->create();
-        Robot::factory(20)->create();
+        Client::factory(7)->create();
+        Catalogue::factory(7)->create();
+        Robot::factory(7)->create();
 
         // 5. Items & Transactions
         // Create the delivery notes
@@ -113,15 +115,15 @@ class DatabaseSeeder extends Seeder
         }
 
         // 6. Final Transactions
-        BVentesClient::factory(20)->create();
-        ClientRemboursement::factory(20)->create();
-        RembImp::factory(20)->create();
-        DemandeF::factory(20)->create();
-        Fact::factory(20)->create();
-        RepRemboursement::factory(20)->create();
-        DetFact::factory(20)->create();
-        CarteVisite::factory(20)->create();
-        CahierCommunication::factory(20)->create();
+        BVentesClient::factory(7)->create();
+        ClientRemboursement::factory(7)->create();
+        RembImp::factory(7)->create();
+        DemandeF::factory(7)->create();
+        Fact::factory(7)->create();
+        RepRemboursement::factory(7)->create();
+        DetFact::factory(7)->create();
+        CarteVisite::factory(7)->create();
+        CahierCommunication::factory(7)->create();
     }
 
     private function faker()

@@ -1,24 +1,15 @@
-// import toast from "react-hot-toast";
-
 function logger(message, type = "log") {
-  // console.log("All Env Vars:", process.env);
-  // console.log("condition", process.env.REACT_APP_ENV === "Development")
   if (process.env.REACT_APP_ENV === "Development") {
-    switch (type) {
-      case "log":
-        console.log(message);
-        break;
-      case "error":
-        console.error(message);
-        break;
-      case "info":
-        console.info(message);
-        break;
-      default:
-        console.log(message);
-        break;
-    }
+    // We fetch the correct native console function
+    const nativeConsoleFunc = console[type] || console.log;
+
+    // We use .bind() to pass the arguments without executing it here.
+    // This hands execution back to the caller file, preserving the stack trace!
+    return nativeConsoleFunc.bind(console, message);
   }
+
+  // Return a no-operation function for production environment
+  return () => { };
 }
 
 export default logger;

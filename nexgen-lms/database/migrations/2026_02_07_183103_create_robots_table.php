@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('robots', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
-            $table->foreignUuid('destination_id')->nullable()->constrained('destinations')->onDelete('set null');
+            $table->foreignUuid('destination_id')->nullable()->constrained('destinations')->nullOnDelete();
 
             // Tracking & Logistics
             $table->date('date_operation'); // Date of the action (placement/demo)

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('det_fact', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('fact_id')->constrained('fact')->onDelete('cascade'); // Link to Invoice Header
-            $table->foreignUuid('livre_id')->constrained('livres')->onDelete('restrict'); // Link to Book
+            $table->foreignUuid('livre_id')->nullable()->constrained('livres')->nullOnDelete(); // Link to Book
             $table->integer('quantite')->default(1);
             $table->decimal('prix_unitaire_ht', 15, 2); // Price at time of invoicing
             $table->decimal('remise', 5, 2)->default(0.00); // Specific discount for this item

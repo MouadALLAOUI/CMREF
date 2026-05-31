@@ -11,7 +11,7 @@ class SeasonController extends Controller
 {
     public function index()
     {
-        $seasons = Season::orderBy('created_at', 'desc')->paginate(20);
+        $seasons = Season::orderBy('name', 'asc')->get();
         return response()->json($seasons);
     }
 
@@ -20,7 +20,9 @@ class SeasonController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_date' => 'required|date',
+            'start_year' => 'required|date',
             'end_date' => 'required|date|after:start_date',
+            'end_year' => 'required|date|after:start_date',
             'is_active' => 'boolean',
         ]);
 
@@ -72,15 +74,21 @@ class SeasonController extends Controller
 
     public function setActive(Request $request)
     {
+        // Validate both the season ID and the boolean state you want to apply
         $validated = $request->validate([
             'season_id' => 'required|uuid|exists:seasons,id',
+            'is_active' => 'required|boolean', // 👈 Added this to know if you are turning it ON or OFF
         ]);
 
-        DB::transaction(function () use ($validated) {
-            Season::where('is_active', true)->update(['is_active' => false]);
-            Season::find($validated['season_id'])->update(['is_active' => true]);
-        });
+        // Update ONLY the target season record
+        Season::where('id', $validated['season_id'])->update([
+            'is_active' => $validated['is_active']
+        ]);
 
-        return response()->json(['message' => 'Season activated successfully']);
+        $statusMessage = $validated['is_active'] ? 'activée' : 'désactivée';
+
+        return response()->json([
+            'message' => "La saison a été {$statusMessage} avec succès"
+        ]);
     }
 }

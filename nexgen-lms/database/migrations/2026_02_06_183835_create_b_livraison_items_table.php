@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('b_livraison_items', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
             $table->uuidMorphs('deliverable'); // Link to the delivery note
-            $table->foreignUuid('livre_id')->constrained('livres')->onDelete('restrict'); // Link to the book
+            $table->foreignUuid('livre_id')->nullable()->constrained('livres')->nullOnDelete(); // Link to the book
             $table->integer('quantite')->default(0); // Number of books delivered
             $table->timestamps();
         });

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('catalogues', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
             $table->string('titre', 255); // Renamed from TEXT
-            $table->foreignUuid('categorie_id')->constrained('categories')->onDelete('cascade'); // Link to category
+            $table->foreignUuid('categorie_id')->nullable()->constrained('categories')->nullOnDelete(); // Link to category
             $table->text('image_url')->nullable(); // Renamed from 'image'
             $table->text('content')->nullable(); // For rich descriptions
             $table->timestamps();

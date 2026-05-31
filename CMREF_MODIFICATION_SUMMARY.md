@@ -8,7 +8,7 @@ This document provides a concise summary of all modifications made to upgrade th
 ## 📊 Statistics
 
 - **Total Files Created:** 8 new files
-- **Total Files Modified:** 9 existing files  
+- **Total Files Modified:** 9 existing files
 - **Lines Added:** ~3,087
 - **Lines Removed:** ~125
 - **Backend Changes:** 11 files (migrations, models, controllers, observers, routes)
@@ -393,23 +393,23 @@ npm run build
 
 ## ✅ Compliance Verification
 
-| Requirement | Status | Notes |
-|-------------|--------|-------|
-| Do NOT modify header component | ✅ | Header untouched |
-| Do NOT generate build/dist folders | ✅ | No build artifacts |
-| Do NOT create vendor folder | ✅ | Composer deps only in composer.json |
-| Preserve code DNA | ✅ | All patterns matched |
-| No destructive changes | ✅ | Existing features preserved |
-| livres & Fournisseurs untouched | ✅ | Not modified |
-| Season scoping implemented | ✅ | Global scope + FK |
-| Entity scoping implemented | ✅ | MSM/Wataniya support |
-| InvoiceObserver auto-deduction | ✅ | Stock deducted on livrée=true |
-| Online status indicator | ✅ | Green/red dot + timestamp |
-| Password optional on update | ✅ | Only updates if provided |
-| Declaration Depot Part 2 | ✅ | Per-rep validation added |
-| Helper utilities library | ✅ | 217 lines of reusable functions |
-| Activity logging | ✅ | Spatie package integrated |
-| Emailing module | ✅ | Compose + send + history |
+| Requirement                        | Status | Notes                               |
+| ---------------------------------- | ------ | ----------------------------------- |
+| Do NOT modify header component     | ✅      | Header untouched                    |
+| Do NOT generate build/dist folders | ✅      | No build artifacts                  |
+| Do NOT create vendor folder        | ✅      | Composer deps only in composer.json |
+| Preserve code DNA                  | ✅      | All patterns matched                |
+| No destructive changes             | ✅      | Existing features preserved         |
+| livres & Fournisseurs untouched    | ✅      | Not modified                        |
+| Season scoping implemented         | ✅      | Global scope + FK                   |
+| Entity scoping implemented         | ✅      | MSM/Wataniya support                |
+| InvoiceObserver auto-deduction     | ✅      | Stock deducted on livrée=true       |
+| Online status indicator            | ✅      | Green/red dot + timestamp           |
+| Password optional on update        | ✅      | Only updates if provided            |
+| Declaration Depot Part 2           | ✅      | Per-rep validation added            |
+| Helper utilities library           | ✅      | 217 lines of reusable functions     |
+| Activity logging                   | ✅      | Spatie package integrated           |
+| Emailing module                    | ✅      | Compose + send + history            |
 
 ---
 

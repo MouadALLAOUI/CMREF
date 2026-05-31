@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\BLivraison;
 use App\Models\Representant;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BLivraisonFactory extends Factory
@@ -15,6 +16,7 @@ class BLivraisonFactory extends Factory
     {
         return [
             'rep_id' => Representant::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'bl_number' => $this->faker->unique()->bothify('BL-####'),
             'date_emission' => $this->faker->date(),
             'type' => $this->faker->randomElement(['Livre', 'Specimen', 'Pedagogie', 'Retour']),
@@ -22,7 +24,7 @@ class BLivraisonFactory extends Factory
             'statut_recu' => $this->faker->boolean(),
             'statut_vu' => $this->faker->boolean(),
             'status' => $this->faker->randomElement(['Pending', 'Seen', 'Received']),
-            'annee' => $this->generateSchoolYear(5),
+            'annee' => $this->generateSchoolYear(2),
             'remarks' => $this->faker->sentence(),
         ];
     }

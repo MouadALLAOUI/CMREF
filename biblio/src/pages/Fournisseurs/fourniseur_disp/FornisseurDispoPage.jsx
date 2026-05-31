@@ -37,7 +37,7 @@ function FournisseursDisponibles() {
                     toast.success("Catégorie supprimée");
                     fetchData();
                 } catch (error) {
-                    logger("Error deleting category:", error);
+                    logger("Error deleting category:", error)();
                     toast.error("Erreur lors de la suppression");
                 }
             },
@@ -51,7 +51,7 @@ function FournisseursDisponibles() {
             const response = await imprimeurService.getAll();
             setImprimeurs(response);
         } catch (error) {
-            logger(("Error fetching fournisseurs:", error), "error");
+            logger(("Error fetching fournisseurs:", error), "error")();
             toast.error("Erreur lors du chargement des fournisseurs");
         } finally {
             setIsLoading(false);

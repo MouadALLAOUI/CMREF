@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Events\RepresentantUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Login;
+use App\Models\Season;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -19,9 +20,17 @@ class LoginController extends Controller
     {
         // 1. Validate the incoming request
         $request->validate([
+            'annee' => 'required|string',
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
+
+        $season = Season::where('name', $request->annee)->first();
+        if (!$season || !$season->is_active) {
+            throw ValidationException::withMessages([
+                'login' => ['Ces identifiants sont incorrects ou la période sélectionnée est clôturée.'],
+            ]);
+        }
 
         // 2. Find the user in the central 'logins' table
         // We use 'with(profile)' to automatically pull Admin or Representant data
@@ -32,7 +41,7 @@ class LoginController extends Controller
         // 3. Verify user existence and password
         if (!$loginRecord || !Hash::check($request->password, $loginRecord->password)) {
             throw ValidationException::withMessages([
-                'username' => ['Les identifiants fournis sont incorrects.'],
+                'login' => ['Les identifiants fournis sont incorrects ou la période sélectionnée est clôturée.'],
             ]);
         }
 
@@ -63,6 +72,7 @@ class LoginController extends Controller
                 'username' => $loginRecord->username,
                 'role'     => $loginRecord->role, // 'admin' or 'representant'
             ],
+            'annee' => $request->annee,
             // This is the polymorphic data (Admin table or Representant table)
             'profile' => $loginRecord->profile
         ]);

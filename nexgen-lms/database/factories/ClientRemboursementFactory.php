@@ -6,6 +6,7 @@ use App\Models\ClientRemboursement;
 use App\Models\Representant;
 use App\Models\Client;
 use App\Models\Banque;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ClientRemboursementFactory extends Factory
@@ -17,6 +18,7 @@ class ClientRemboursementFactory extends Factory
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'client_id' => Client::pluck('id')->random(),
+            'season_id' => Season::pluck('id')->random(),
             'date_payment' => $this->faker->date(),
             'banque_id' => Banque::pluck('id')->random(),
             'banque_nom' => $this->faker->company() . ' Bank',

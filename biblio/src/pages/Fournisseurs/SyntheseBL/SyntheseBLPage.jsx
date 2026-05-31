@@ -35,7 +35,7 @@ const SyntheseBLPage = () => {
             const allBLs = blResponse;
             const allLivres = livresResponse;
             const livreById = new Map(allLivres.map((l) => [l.id, l]));
-            // logger({ allBLs, allLivres });
+            // logger({ allBLs, allLivres })();
 
             /** allBLs :
              *
@@ -145,7 +145,7 @@ const SyntheseBLPage = () => {
                 String(b.date_reception).localeCompare(String(a.date_reception))
             ));
         } catch (error) {
-            logger("Error fetching fournisseurs synthese BL:", error);
+            logger("Error fetching fournisseurs synthese BL:", error)();
             toast.error("Erreur lors du chargement de la synthèse");
         } finally {
             setIsLoading(false);
@@ -162,7 +162,7 @@ const SyntheseBLPage = () => {
             setIsPrintDialogOpen(true);
         }
     };
-    // logger({ selectedForPrint, isPrintDialogOpen })
+    // logger({ selectedForPrint, isPrintDialogOpen })()
     const filteredRows = useMemo(() => {
         if (!selectedAnnee || selectedAnnee === "all") return rows;
         return rows.filter(row => row.annee === selectedAnnee);

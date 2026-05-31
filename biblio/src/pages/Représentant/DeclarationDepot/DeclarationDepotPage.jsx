@@ -75,9 +75,9 @@ function DeclarationDepotPage() {
         { header: "Livre", accessor: "livre.titre", color: "#0ea5e9" },
         { header: "Quantité Déclarée", accessor: "quantite" },
         { header: "Quantité Balance", accessor: "quantite_balance" },
-        { 
-            header: "Validé", 
-            accessor: "valide", 
+        {
+            header: "Validé",
+            accessor: "valide",
             type: "bool",
             onClick: (row) => handleValidateDepot(row.id, !row.valide),
             render: (value, row) => (

@@ -25,7 +25,7 @@ const FournisseurRemboursement = () => {
   const [imprimeurs, setImprimeurs] = useState([]);
   const [banque, setBanque] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  // logger(remboursement)
+  // logger(remboursement)();
   const actionsDetaille = {
     delete: {
       title: "Supprimer",
@@ -39,7 +39,7 @@ const FournisseurRemboursement = () => {
           toast.success("Remboursement supprimée");
           fetchData();
         } catch (error) {
-          logger("Error deleting Remboursement:", error);
+          logger("Error deleting Remboursement:", error)();
           toast.error("Erreur lors de la suppression");
         }
       },
@@ -72,7 +72,7 @@ const FournisseurRemboursement = () => {
       setRemboursement(impRemb);
       setImprimeurs(imp);
       setBanque(bank);
-      // logger({ remb: impRemb, imp: imp, bank: bank })
+      // logger({ remb: impRemb, imp: imp, bank: bank })()
     } catch (error) {
       console.error("Error fetching Rembourcement:", error);
       toast.error("Erreur lors du chargement des Rembourcement");

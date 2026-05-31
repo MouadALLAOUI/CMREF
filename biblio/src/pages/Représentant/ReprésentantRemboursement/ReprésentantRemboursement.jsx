@@ -272,9 +272,9 @@ function ReprésentantRemboursement() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-3">
             {/* Financial Summary Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-4">
                     <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
                         <CreditCard size={24} />
@@ -302,7 +302,7 @@ function ReprésentantRemboursement() {
                         <p className="text-2xl font-black text-amber-900">{formatMoney(financialSummary.totalReste)}</p>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Remboursements (Représentant)</h1>
@@ -315,7 +315,7 @@ function ReprésentantRemboursement() {
                             onClick={() => setDialogMode("add")}
                             className="bg-slate-900 hover:bg-black text-white px-6 h-11 rounded-xl font-bold shadow-lg transition-all hover:scale-[1.02]"
                         >
-                            + Nouveau remboursement
+                            + Ajouter un Chèque
                         </Button>
                     }
                     schema={schema}
@@ -332,7 +332,7 @@ function ReprésentantRemboursement() {
                 <MyTable
                     data={rows}
                     columns={columns}
-                    pageSize={10}
+                    pageSize={5}
                     actions={["view", "edit", "delete"]}
                     onAction={handleAction}
                     variant="slate"

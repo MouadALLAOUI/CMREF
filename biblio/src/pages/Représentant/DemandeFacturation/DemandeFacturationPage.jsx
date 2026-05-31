@@ -82,12 +82,7 @@ function DemandeFacturationPage() {
         { header: "Date", accessor: "date_demande", type: "date" },
         { header: "Client", accessor: "client.raison_sociale" },
         { header: "ICE", accessor: "client.ice" },
-        { header: "Contenu", accessor: "contenu" },
-        {
-            header: "Facture N°",
-            accessor: "fact.fact_number || ''",
-            className: "font-mono text-xs text-slate-500"
-        },
+        // { header: "Contenu", accessor: "contenu" },
         {
             header: "Montant HT",
             accessor: "fact.total_ht",
@@ -98,6 +93,11 @@ function DemandeFacturationPage() {
             header: "Net TTC",
             accessor: "fact.total_ttc",
             type: "currency",
+        },
+        {
+            header: "Facture N°",
+            accessor: "fact.fact_number || ''",
+            className: "font-mono text-xs text-slate-500"
         },
         {
             header: "Valider",

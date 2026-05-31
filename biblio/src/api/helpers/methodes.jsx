@@ -43,7 +43,7 @@ export const universalFetch = async ({
 
     return rawData;
   } catch (error) {
-    logger({ "Fetch Error:": error }, "error");
+    logger({ "Fetch Error:": error }, "error")();
     throw error; // Let the component handle the toast
   }
 };

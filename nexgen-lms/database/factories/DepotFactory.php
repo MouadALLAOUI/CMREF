@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Depot;
 use App\Models\Representant;
 use App\Models\Livre;
+use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DepotFactory extends Factory
@@ -17,6 +18,7 @@ class DepotFactory extends Factory
             // Using a factory() here is safer than pluck() for standalone testing,
             // but the seeder logic above will override these anyway.
             'rep_id' => Representant::factory(),
+            'season_id' => Season::pluck('id')->random(),
             'livre_id' => Livre::factory(),
             'quantite_balance' => $this->faker->numberBetween(0, 1000),
             'status' => $this->faker->boolean(),

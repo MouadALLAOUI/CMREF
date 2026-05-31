@@ -110,6 +110,16 @@ const MyTable = ({
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [selectedIds, setSelectedIds] = useState(new Set());
 
+  // Flatten columns for the body rows to work correctly
+  const flatColumns = useMemo(() => {
+    return columns.reduce((acc, col) => {
+      if (col.subColumns) {
+        return [...acc, ...col.subColumns];
+      }
+      return [...acc, col];
+    }, []);
+  }, [columns]);
+
   // Categorical Filter State
   const [catFilterCol, setCatFilterCol] = useState(defaultFilterColumn.accessor || "");
   const [catFilterVal, setCatFilterVal] = useState("all");
@@ -264,7 +274,7 @@ const MyTable = ({
 
           <MyTableBody
             data={paginatedData}
-            columns={columns}
+            columns={flatColumns}
             actions={actions}
             actionsDetaille={actionsDetaille}
             onAction={onAction}
@@ -289,44 +299,70 @@ const MyTable = ({
   )
 }
 
-const MyTableHeader = ({ columns, variant, actions = false, enableSorting, sortConfig, requestSort, enableSelection, onSelectAll, allSelected }) => (
-  <TableHeader className={variant}>
-    <TableRow className={styles.header.tablehead}>
-      {enableSelection && (
-        <TableHead className="w-12 px-4">
-          <Input type="checkbox" checked={allSelected} onChange={onSelectAll} />
-        </TableHead>
-      )}
-      {columns.map((column) => {
-        if (column.type === "hidden") return null;
-        return (
+const MyTableHeader = ({ columns, variant, actions = false, enableSorting, sortConfig, requestSort, enableSelection, onSelectAll, allSelected }) => {
+  // Check if we have any nested columns to decide if we need a double-row header
+  const hasSubColumns = columns.some(col => col.subColumns && col.subColumns.length > 0);
+  return (
+    <TableHeader className={variant}>
+      {/* FIRST ROW: Grouped Headers */}
+      <TableRow className={cn(styles.header.tablehead, "border-b border-slate-200/50")}>
+        {enableSelection && <TableHead rowSpan={hasSubColumns ? 2 : 1} className="w-12 px-4" />}
+
+        {columns.map((column) => {
+          if (column.type === "hidden") return null;
+          return (
+            <TableHead
+              key={column.header}
+              colSpan={column.subColumns ? column.subColumns.length : 1}
+              rowSpan={column.subColumns ? 1 : 2}
+              className={cn(styles.header.tablecell, variant, enableSorting && "cursor-pointer select-none")}
+              onClick={() => enableSorting && requestSort(column.accessor)}
+            >
+              <div className="flex items-center gap-2">
+                {column.header}
+                {enableSorting && (
+                  sortConfig.key === column.accessor ? (
+                    sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                  ) : <ArrowUpDown className="h-3 w-3 opacity-50" />
+                )}
+              </div>
+            </TableHead>
+          )
+        })}
+
+        {actions && (
           <TableHead
-            key={column.header}
-            className={cn(styles.header.tablecell, variant, enableSorting && "cursor-pointer select-none")}
-            onClick={() => enableSorting && requestSort(column.accessor)}
+            rowSpan={hasSubColumns ? 2 : 1}
+            className={cn(styles.header.tablecell, "text-right", variant)}
           >
-            <div className="flex items-center gap-2">
-              {column.header}
-              {enableSorting && (
-                sortConfig.key === column.accessor ? (
-                  sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                ) : <ArrowUpDown className="h-3 w-3 opacity-50" />
-              )}
-            </div>
+            Actions
           </TableHead>
-        )
-      })}
-      {actions && (
-        <TableHead
-          key="actions"
-          className={cn(styles.header.tablecell, "text-right", variant)}
-        >
-          Actions
-        </TableHead>
+        )}
+      </TableRow>
+      {/* SECOND ROW: Sub-headers (only rendered if subColumns exist) */}
+      {hasSubColumns && (
+        <TableRow className={styles.header.tablehead}>
+          {columns.flatMap((column) =>
+            column.subColumns ? column.subColumns.map((sub) => (
+              <TableHead
+                key={sub.accessor}
+                className={cn(styles.header.tablecell, "text-xs py-2 border-x border-slate-200/10", enableSorting && "cursor-pointer select-none")}
+                onClick={() => enableSorting && requestSort(sub.accessor)}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  {sub.header}
+                  {enableSorting && sortConfig.key === sub.accessor && (
+                    sortConfig.direction === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                  )}
+                </div>
+              </TableHead>
+            )) : []
+          )}
+        </TableRow>
       )}
-    </TableRow>
-  </TableHeader>
-)
+    </TableHeader>
+  )
+}
 
 const MyTableBody = ({ data, isLoading, columns, actions, onAction, actionsDetaille, enableSelection, selectedIds, onToggleSelect }) => {
   if (isLoading) {

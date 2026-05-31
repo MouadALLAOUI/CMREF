@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignUuid('client_id')->constrained('clients')->onDelete('cascade'); // Link to Client
             $table->date('date_payment'); //
             $table->string('banque_nom', 100)->nullable();
-            $table->foreignUuid('banque_id')->nullable()->constrained('banques')->onDelete('set null'); //
+            $table->foreignUuid('banque_id')->nullable()->constrained('banques')->nullOnDelete(); //
             $table->string('cheque_number', 50)->nullable(); //
             $table->string('cheque_image_path')->nullable(); // For digital proof
             $table->string('a_lordre_de', 255)->nullable(); // To whom the check is written

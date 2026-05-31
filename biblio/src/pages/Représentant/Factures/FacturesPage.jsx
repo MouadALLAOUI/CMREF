@@ -150,7 +150,7 @@ function FacturesPage() {
         filteredData.forEach(fact => {
             fact.details?.forEach(detail => {
                 const category = detail.livre?.category?.libelle || "Non classé";
-                const bookTitle = detail.livre?.titre || "Livre inconnu";
+                const bookTitle = detail.livre?.code || "Livre inconnu";
 
                 if (!categories[category]) categories[category] = {};
                 if (!categories[category][bookTitle]) categories[category][bookTitle] = 0;

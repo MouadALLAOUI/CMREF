@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary(); // UUID Primary Key
             $table->string('titre', 255); // Renamed from TEXT
             $table->string('code', 50)->unique(); // Standardized SKU code
-            $table->foreignUuid('categorie_id')->constrained('categories')->onDelete('restrict'); // Formal relation to Categories
+            $table->foreignUuid('categorie_id')->nullable()->constrained('categories')->nullOnDelete(); // Formal relation to Categories
             $table->decimal('prix_achat', 10, 2)->default(0.00); // Changed from FLOAT for precision
             $table->decimal('prix_vente', 10, 2)->default(0.00);
             $table->decimal('prix_public', 10, 2)->default(0.00);

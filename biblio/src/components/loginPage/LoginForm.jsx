@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import FormInputRow from "../ui/FormInputRaw";
+import seasonsService from "../../api/services/seasonsService";
 
 function LoginForm({ onLogIn, error }) {
     // 1. Create state for the form fields
@@ -16,6 +17,26 @@ function LoginForm({ onLogIn, error }) {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [seasons, setSeasons] = useState([]);
+
+    const fetchSeasons = async () => {
+        try {
+            const data = await seasonsService.getAll();
+            setSeasons(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSeasons();
+    }, []);
+
+    const seasonFlat = seasons.flatMap(season =>
+        season.is_active
+            ? [{ label: `${season.start_year}-${season.end_year}`, value: season.name }]
+            : []
+    );
 
     useEffect(() => {
         setDataErr({ login: "", password: "", annee: "" });
@@ -52,8 +73,8 @@ function LoginForm({ onLogIn, error }) {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-900 p-4 w-full">
-            <div className="w-full max-w-[450px] rounded-2xl bg-white p-12 shadow-2xl border border-slate-800/10">
+        <div className="flex min-h-screen items-center justify-center bg-slate-900 p-2 w-full">
+            <div className="w-full max-w-[550px] rounded-2xl bg-white p-8 shadow-2xl border border-slate-800/10">
                 <div className="mb-10 flex flex-col items-center text-center">
                     <div className="mb-6 flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-2">
                         <img src="https://dev.ajial-medias.com/logo.png" alt="Logo" className="h-full w-full object-contain" />
@@ -72,8 +93,9 @@ function LoginForm({ onLogIn, error }) {
                             label="Année Scolaire"
                             id="annee"
                             inputType="select"
-                            items={[{ label: "2026 / 2027", value: "2627" }]}
+                            items={seasonFlat}
                             layout="column"
+                            error={dataErr.annee}
                             value={formData.annee}
                             onChange={(value) => setFormData({ ...formData, annee: value })}
                             placeholder="Sélectionner l'année"

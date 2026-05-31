@@ -6,7 +6,8 @@ const seasonsService = {
   create: (data) => api.post('/seasons', data),
   update: (id, data) => api.put(`/seasons/${id}`, data),
   delete: (id) => api.delete(`/seasons/${id}`),
-  active: (params) => api.post(`/seasons/active`, { params }),
+  // Canonical activation contract: { season_id: string (UUID), is_active: boolean }
+  isActive: (params) => api.get(`/seasons/active`, { params }),
   setActive: (data) => api.post(`/seasons/set-active`, data),
 };
 

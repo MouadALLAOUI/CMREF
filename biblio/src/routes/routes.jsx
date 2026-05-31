@@ -55,9 +55,21 @@ import ModelesCahierTextePage from "../pages/Réglages/ModelesCahierTexte/Modele
 // REPRESENTANT PAGES
 import RepHomePage from "../pages/REP/home/home";
 import { useEffect, useRef } from "react";
+import seasonsService from "../api/services/seasonsService";
+
 
 export const AppRoutes = () => {
-    const { user, isAdminMode } = useAppStore();
+    const { user, isAdminMode, activeSeason, loadActiveSeason } = useAppStore();
+
+    /**
+     * URL CASING CONVENTION:
+     *  - Admin portal:          /dash/...          (all lowercase)
+     *  - Representative portal: /REP/dash/...      (uppercase REP root, nested paths lowercase)
+     */
+    useEffect(() => {
+        if (!user || activeSeason) return;
+        loadActiveSeason();
+    }, [user, activeSeason, loadActiveSeason]);
 
     return (
         <Routes>
@@ -66,16 +78,17 @@ export const AppRoutes = () => {
             <Route
                 path="/REP/dash"
                 element={
-                    <HeaderPages role="rep" />
+                    <ProtectedRoute role="rep">
+                        <HeaderPages role="rep" />
+                    </ProtectedRoute>
                 }
             >
-
                 <Route path="home" element={<RepHomePage />} />
 
                 <Route path="bl" element={<Outlet />}>
-                    <Route path="BL" element={<div>/REP/dash/bl/BL</div>} />
-                    <Route path="Remb" element={<div>/REP/dash/bl/Remb</div>} />
-                    <Route path="SBl" element={<div>/REP/dash/bl/SBl</div>} />
+                    <Route path="bl" element={<div>/REP/dash/bl/bl</div>} />
+                    <Route path="remb" element={<div>/REP/dash/bl/remb</div>} />
+                    <Route path="sbl" element={<div>/REP/dash/bl/sbl</div>} />
                     <Route index element={<Navigate to="bl" replace />} />
                 </Route>
 
@@ -85,18 +98,18 @@ export const AppRoutes = () => {
                     <Route index element={<Navigate to="factures" replace />} />
                 </Route>
 
-                <Route path="Clients" element={<Outlet />}>
-                    <Route path="ajouter_client" element={<div>/REP/dash/Clients/ajouter_client</div>} />
-                    <Route path="Saisir_un_BL" element={<div>/REP/dash/Clients/Saisir_un_BL</div>} />
-                    <Route path="Remboursement" element={<div>/REP/dash/Clients/Remboursement</div>} />
-                    <Route path="Synthese_BL" element={<div>/REP/dash/Clients/Synthese_BL</div>} />
-                    <Route path="Synthese_Remboursement" element={<div>/REP/dash/Clients/Synthese_Remboursement</div>} />
+                <Route path="clients" element={<Outlet />}>
+                    <Route path="ajouter_client" element={<div>/REP/dash/clients/ajouter_client</div>} />
+                    <Route path="saisir_un_bl" element={<div>/REP/dash/clients/saisir_un_bl</div>} />
+                    <Route path="remboursement" element={<div>/REP/dash/clients/remboursement</div>} />
+                    <Route path="synthese_bl" element={<div>/REP/dash/clients/synthese_bl</div>} />
+                    <Route path="synthese_remboursement" element={<div>/REP/dash/clients/synthese_remboursement</div>} />
                     <Route path="syntheses_globales" element={<Outlet />}>
-                        <Route path="Livraison_clients" element={<div>/REP/dash/Clients/syntheses_globales/Livraison_clients</div>} />
-                        <Route path="Remboursement_clients" element={<div>/REP/dash/Clients/syntheses_globales/Remboursement_clients</div>} />
+                        <Route path="livraison_clients" element={<div>/REP/dash/clients/syntheses_globales/livraison_clients</div>} />
+                        <Route path="remboursement_clients" element={<div>/REP/dash/clients/syntheses_globales/remboursement_clients</div>} />
                         <Route index element={<Navigate to="syntheses_globales" replace />} />
                     </Route>
-                    <Route index element={<Navigate to="Clients" replace />} />
+                    <Route index element={<Navigate to="clients" replace />} />
                 </Route>
 
                 <Route path="depot" element={<div>/REP/dash/depot</div>} />
@@ -114,9 +127,7 @@ export const AppRoutes = () => {
                 </Route>
 
                 <Route path="robots" element={<div>/REP/dash/robots</div>} />
-
                 <Route path="profil" element={<div>/REP/dash/profil</div>} />
-
                 <Route index element={<Navigate to="home" replace />} />
             </Route>
 
@@ -138,62 +149,62 @@ export const AppRoutes = () => {
                 </Route>
 
                 <Route path="fournisseurs" element={<Outlet />}>
-                    <Route path="Fournisseurs_disponibles" element={<FournisseursDisponibles />} />
-                    <Route path="Saisir_un_BL" element={<FournisseurSaisirBl />} />
-                    <Route path="Remboursement" element={<FournisseurRemboursement />} />
-                    <Route path="Synthese_BL" element={<FournisseurSyntheseBL />} />
-                    <Route path="Synthese_Remboursement" element={<FournisseurSyntheseRemboursement />} />
-                    <Route index element={<Navigate to="Fournisseurs_disponibles" replace />} />
+                    <Route path="fournisseurs_disponibles" element={<FournisseursDisponibles />} />
+                    <Route path="saisir_un_bl" element={<FournisseurSaisirBl />} />
+                    <Route path="remboursement" element={<FournisseurRemboursement />} />
+                    <Route path="synthese_bl" element={<FournisseurSyntheseBL />} />
+                    <Route path="synthese_remboursement" element={<FournisseurSyntheseRemboursement />} />
+                    <Route index element={<Navigate to="fournisseurs_disponibles" replace />} />
                 </Route>
 
                 <Route path="representant" element={<Outlet />}>
-                    <Route path="Representants_disponibles" element={<ReprésentantDisponibles />} />
-                    <Route path="Saisir_un_BL" element={<ReprésentantSaisirBl />} />
-                    <Route path="Remboursement" element={<ReprésentantRemboursement />} />
-                    <Route path="Demande_facturation" element={<ReprésentantDemandeFacturation />} />
-                    <Route path="Factures" element={<ReprésentantFactures />} />
-                    <Route path="Remboursement_Factures" element={<ReprésentantRembourserFacture />} />
-                    <Route path="Declaration_Depot" element={<ReprésentantDeclarationDepot />} />
-                    <Route path="Cahier_texte" element={<ReprésentantCahierTexte />} />
-                    <Route path="Cartes_Visite" element={<ReprésentantCartesVisite />} />
-                    <Route path="Synthese_BL" element={<ReprésentantSyntheseBL />} />
-                    <Route path="Synthese_Remboursement" element={<ReprésentantSyntheseRemboursement />} />
-                    <Route index element={<Navigate to="Representants_disponibles" replace />} />
+                    <Route path="representants_disponibles" element={<ReprésentantDisponibles />} />
+                    <Route path="saisir_un_bl" element={<ReprésentantSaisirBl />} />
+                    <Route path="remboursement" element={<ReprésentantRemboursement />} />
+                    <Route path="demande_facturation" element={<ReprésentantDemandeFacturation />} />
+                    <Route path="factures" element={<ReprésentantFactures />} />
+                    <Route path="remboursement_factures" element={<ReprésentantRembourserFacture />} />
+                    <Route path="declaration_depot" element={<ReprésentantDeclarationDepot />} />
+                    <Route path="cahier_texte" element={<ReprésentantCahierTexte />} />
+                    <Route path="cartes_visite" element={<ReprésentantCartesVisite />} />
+                    <Route path="synthese_bl" element={<ReprésentantSyntheseBL />} />
+                    <Route path="synthese_remboursement" element={<ReprésentantSyntheseRemboursement />} />
+                    <Route index element={<Navigate to="representants_disponibles" replace />} />
                 </Route>
+
                 <Route path="robots" element={<RobotsPage />} />
 
                 <Route path="tracabilite" element={<Outlet />}>
                     <Route path="clients" element={<ClientsPage />} />
-                    <Route path="BL_Clients" element={<BLClientsPage />} />
-                    <Route path="Remboursement_Client" element={<RemboursementClientPage />} />
-                    <Route path="Synthese" element={<SyntheseTracabilitePage />} />
+                    <Route path="bl_clients" element={<BLClientsPage />} />
+                    <Route path="remboursement_client" element={<RemboursementClientPage />} />
+                    <Route path="synthese" element={<SyntheseTracabilitePage />} />
                     <Route index element={<Navigate to="clients" replace />} />
                 </Route>
 
                 <Route path="syntheses_globales" element={<Outlet />}>
-                    <Route path="Livraison_Fournisseurs" element={<LivraisonFournisseursPage />} />
-                    <Route path="Livraison_REP" element={<LivraisonREPPage />} />
-                    <Route path="Ventes" element={<VentesPage />} />
-                    <Route path="Depot" element={<DepotPage />} />
-                    <Route path="Remboursement_Fournisseurs" element={<RemboursementFournisseursPage />} />
-                    <Route path="Remboursement_REP" element={<RemboursementREPPage />} />
-                    <Route path="Balance" element={<BalancePage />} />
-                    <Route index element={<Navigate to="Balance" replace />} />
+                    <Route path="livraison_fournisseurs" element={<LivraisonFournisseursPage />} />
+                    <Route path="livraison_rep" element={<LivraisonREPPage />} />
+                    <Route path="ventes" element={<VentesPage />} />
+                    <Route path="depot" element={<DepotPage />} />
+                    <Route path="remboursement_fournisseurs" element={<RemboursementFournisseursPage />} />
+                    <Route path="remboursement_rep" element={<RemboursementREPPage />} />
+                    <Route path="balance" element={<BalancePage />} />
+                    <Route index element={<Navigate to="balance" replace />} />
                 </Route>
 
                 <Route path="emailing" element={<Outlet />}>
-                    <Route path="Simple_Email" element={<SimpleEmailPage />} />
-                    <Route path="Invitation" element={<InvitationPage />} />
-                    <Route index element={<Navigate to="Simple_Email" replace />} />
+                    <Route path="simple_email" element={<SimpleEmailPage />} />
+                    <Route path="invitation" element={<InvitationPage />} />
+                    <Route index element={<Navigate to="simple_email" replace />} />
                 </Route>
 
                 <Route path="reglages" element={<Outlet />}>
-                    <Route path="Season_travail" element={<SaisonTravailPage />} />
-                    <Route path="Pied_de_facture" element={<PiedDeFacturePage />} />
-                    <Route path="Modeles_Cahier_texte" element={<ModelesCahierTextePage />} />
-                    <Route index element={<Navigate to="Season_travail" replace />} />
+                    <Route path="saison_travail" element={<SaisonTravailPage />} />
+                    <Route path="pied_de_facture" element={<PiedDeFacturePage />} />
+                    <Route path="modeles_cahier_texte" element={<ModelesCahierTextePage />} />
+                    <Route index element={<Navigate to="saison_travail" replace />} />
                 </Route>
-
 
                 <Route index element={<Navigate to="home" replace />} />
             </Route>

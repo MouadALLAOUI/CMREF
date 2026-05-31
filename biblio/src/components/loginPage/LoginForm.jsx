@@ -24,7 +24,7 @@ function LoginForm({ onLogIn, error }) {
             const data = await seasonsService.getAll();
             setSeasons(data);
         } catch (error) {
-            console.error(error);
+            // Fail silently
         }
     };
 
@@ -66,7 +66,7 @@ function LoginForm({ onLogIn, error }) {
 
             onLogIn(formData);
         } catch (error) {
-            console.error(error);
+            // Fail silently
         } finally {
             setIsSubmitting(false);
         }

@@ -3,7 +3,6 @@ import LoginForm from "../../components/loginPage/LoginForm";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { useState } from "react";
-import logger from "../../lib/logger";
 
 function LoginPage() {
     const { login: setAuthUser, setAdminMode } = useAppStore();
@@ -14,8 +13,10 @@ function LoginPage() {
         try {
             setError("");
 
-            // 0. Get CSRF cookie. This is a web route, so we call it directly without the /api prefix.
-            await api.get('http://localhost:8000/sanctum/csrf-cookie');
+            // 0. Derive the Laravel base origin from the API URL (strip trailing /api if present)
+            //    so CSRF works in any environment without code changes.
+            const apiBase = (process.env.REACT_APP_API_URL || "").replace(/\/api\/?$/, "");
+            await api.get(`${apiBase}/sanctum/csrf-cookie`);
 
             // 1. Call the backend
             const response = await api.post('/login', {
@@ -24,19 +25,16 @@ function LoginPage() {
                 annee: credentials.annee,
             });
 
-            logger({ res: response.user }, "error")()
             setAuthUser(response);
             setAdminMode(response.user.role === "admin");
 
             if (response.user.role === "admin") {
                 navigate("/dash/home", { replace: true });
             } else {
-                navigate("/rep/dash/home", { replace: true });
+                navigate("/REP/dash/home", { replace: true });
             }
 
         } catch (err) {
-            logger({ credentials }, "error")()
-            console.error("Login Error:", err.response || err);
             const validationErrors = err.response?.data?.errors;
             if (validationErrors) {
                 // Pull the specific string array errors from login or username targets

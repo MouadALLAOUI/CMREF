@@ -1,17 +1,27 @@
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import useAppStore from '../store/useAppStore';
+import logger from '../lib/logger';
+import { getCsrfCookieUrl } from '../utils/helpers';
+
+const CSRF_COOKIE_URL = getCsrfCookieUrl();
 
 const instance = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
     withCredentials: true,
     withXSRFToken: true,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
     }
 });
+
+instance.fetchCsrfCookie = async () => {
+    return axios.get(CSRF_COOKIE_URL, { withCredentials: true });
+};
 
 instance.interceptors.request.use((config) => {
     // Get token from your Zustand store or localStorage
@@ -35,17 +45,15 @@ instance.interceptors.response.use(
         return response.data?.data || response.data || [];
     },
     (error) => {
-        console.error("Axios Interceptor Error:", error);
+        logger({ "Axios Interceptor Error": error }, "error")();
         const { response, config } = error;
         if (response) {
-            console.error("Axios Error Status:", response.status);
-            console.error("Error Response Data:", response.data);
+            logger({ "Axios Error Status": response.status, "Error Response Data": response.data }, "error")();
             switch (response.status) {
                 case 401:
-                    console.warn("401 Unauthorized detected. Logging out...");
                     // Clear auth state and redirect to login
                     if (!config.url.includes('/logout')) {
-                        console.warn("Unauthorized! Redirecting to login...");
+                        logger({ "Unauthorized — redirecting to login": config.url }, "warn")();
                         useAppStore.getState().logout();
                         window.location.href = '/login';
                     }

@@ -16,7 +16,7 @@
 Two independent projects side by side — NOT a monorepo workspace.
 
 | Path | Stack | Entry |
-|---|---|---|
+| --- | --- | --- |
 | `biblio/` | React 19 (CRA 5), Zustand 5, Radix UI, Tailwind 3 | `src/App.js` → `routes/routes.jsx` |
 | `nexgen-lms/` | Laravel 12, Sanctum, Spatie activitylog | `routes/api.php` (all API routes) |
 

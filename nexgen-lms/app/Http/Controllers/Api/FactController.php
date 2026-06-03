@@ -11,9 +11,25 @@ use App\Http\Resources\FactResource;
 
 class FactController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $facts = Fact::with(['representant', 'sequence', 'details.livre.category'])->get();
+        $query = Fact::with(['representant', 'sequence', 'details.livre.category']);
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => FactResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $facts = $query->get();
         return FactResource::collection($facts);
     }
 

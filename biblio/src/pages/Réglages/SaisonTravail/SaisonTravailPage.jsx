@@ -1,25 +1,23 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "../../../components/ui/button";
-import FormInputRow from "../../../components/ui/FormInputRaw";
 import { MyTable } from "../../../components/ui/myTable";
 import SectionContainer from "../../../components/ui/SectionContainer";
-import { CalendarDays, Save, Plus, Trash, CheckCircle } from "lucide-react";
+import { CalendarDays, Plus, Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import seasonsService from "../../../api/services/seasonsService";
-// import { buildSchemaFromControllerRules } from "../../../lib/schemaBuilder"; // Adjust path according to your structure
 import UniversalDialog from "../../../components/template/dialog/UniversalDialog";
 import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
 
 const SaisonTravailPage = () => {
     // List & Core Selection Management States
     const [seasons, setSeasons] = useState([]);
-    const [activeSeason, setActiveSeason] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
 
     // UniversalDialog Control States
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [dialogMode, setDialogMode] = useState("add");
+    const [editingSeasonId, setEditingSeasonId] = useState(null);
     const [formData, setFormData] = useState({
         name: "",
         start_year: "",
@@ -70,11 +68,6 @@ const SaisonTravailPage = () => {
         try {
             const data = await seasonsService.getAll();
             setSeasons(data);
-
-            const currentActive = data.find(s => s.is_active);
-            if (currentActive) {
-                setActiveSeason(currentActive.name);
-            }
         } catch (error) {
             logger.error({ "Error fetching seasons data:": error });
             toast.error("Erreur lors de la récupération des saisons");
@@ -87,31 +80,6 @@ const SaisonTravailPage = () => {
         fetchData();
     }, []);
 
-    // Change System-wide Active Season via Left Selector Panel
-    const handleSetActiveSeason = async () => {
-        if (!activeSeason) {
-            toast.error("Veuillez sélectionner une saison");
-            return;
-        }
-        // Resolve the full season object from the list to get its id
-        const targetSeason = seasons.find(s => s.name === activeSeason);
-        if (!targetSeason) {
-            toast.error("Saison introuvable");
-            return;
-        }
-        setIsSaving(true);
-        try {
-            await seasonsService.setActive({ season_id: targetSeason.id, is_active: true });
-            toast.success(`La saison ${activeSeason} est maintenant active.`);
-            await fetchData();
-        } catch (error) {
-            logger.error({ "Error updating active status:": error });
-            toast.error(error.response?.data?.message || "Erreur d'activation");
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
     // Toggle row active/inactive status immediately via table boolean selection click
     const handleToggleSeasonStatus = async (row) => {
         try {
@@ -120,9 +88,7 @@ const SaisonTravailPage = () => {
                 return;
             }
 
-            // 1. Calculate the opposite state dynamically based on what was clicked
             const nextStatusValue = !row.is_active;
-            // Pass the structural parameters required by the updated rules
             await seasonsService.setActive({
                 season_id: row.id,
                 is_active: nextStatusValue
@@ -133,22 +99,25 @@ const SaisonTravailPage = () => {
         } catch (error) {
             logger.error({ "Status toggle failed:": error });
             toast.error(error.response?.data?.message || "Impossible de changer le statut");
-        } finally {
-            setIsSaving(false);
         }
     };
 
     // Handle submission of the generated UniversalDialog fields
     const handleAddSeasonSubmit = async () => {
         try {
-            await seasonsService.create(formData);
-            toast.success("Nouvelle saison ajoutée avec succès");
+            if (dialogMode === "update") {
+                await seasonsService.update(editingSeasonId, formData);
+                toast.success("Saison mise à jour avec succès");
+            } else {
+                await seasonsService.create(formData);
+                toast.success("Nouvelle saison ajoutée avec succès");
+            }
             setIsDialogOpen(false);
             handleResetForm();
             fetchData();
         } catch (error) {
-            logger.error({ "Creation failed:": error });
-            toast.error(error.response?.data?.message || "Erreur lors de la création");
+            logger.error({ "Creation or Update failed:": error });
+            toast.error(error.response?.data?.message || "Erreur lors de l'enregistrement");
         }
     };
 
@@ -160,10 +129,23 @@ const SaisonTravailPage = () => {
             start_date: "",
             end_date: ""
         });
+        setEditingSeasonId(null);
+        setDialogMode("add");
     };
 
     const handleTableAction = async (actionType, row) => {
-        if (actionType === "delete") {
+        if (actionType === "edit") {
+            setDialogMode("update");
+            setEditingSeasonId(row.id);
+            setFormData({
+                name: row.name || "",
+                start_year: row.start_year || "",
+                end_year: row.end_year || "",
+                start_date: row.start_date ? row.start_date.substring(0, 10) : "",
+                end_date: row.end_date ? row.end_date.substring(0, 10) : ""
+            });
+            setIsDialogOpen(true);
+        } else if (actionType === "delete") {
             try {
                 await seasonsService.delete(row.id);
                 toast.success("Saison supprimée définitivement.");
@@ -184,7 +166,6 @@ const SaisonTravailPage = () => {
             header: "Statut Actif",
             accessor: "is_active",
             type: "bool",
-            // Passing onClick binding handles real-time modification events right inside the row cell
             onClick: (row) => handleToggleSeasonStatus(row)
         }
     ];
@@ -203,9 +184,9 @@ const SaisonTravailPage = () => {
     };
 
     const dialogConfig = {
-        title: { add: "Créer une Nouvelle Saison" },
-        subtitle: { add: "Renseignez les paramètres temporels requis par le système de gestion." },
-        submitLabel: "Enregistrer"
+        title: { add: "Créer une Nouvelle Saison", update: "Modifier la Saison" },
+        subtitle: { add: "Renseignez les paramètres temporels requis par le système de gestion.", update: "Mettre à jour les paramètres temporels de la saison." },
+        submitLabel: dialogMode === "add" ? "Enregistrer" : "Mettre à jour"
     };
 
     if (isLoading) {
@@ -236,13 +217,19 @@ const SaisonTravailPage = () => {
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                     schema={dialogSchema}
-                    mode="add"
+                    mode={dialogMode}
                     config={dialogConfig}
                     onSubmit={handleAddSeasonSubmit}
                     handleReset={handleResetForm}
                     grid={2}
                     trigger={
-                        <Button className="bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl flex items-center gap-2 shadow-md shadow-emerald-100 h-11">
+                        <Button 
+                            onClick={() => {
+                                setDialogMode("add");
+                                handleResetForm();
+                            }}
+                            className="bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl flex items-center gap-2 shadow-md shadow-emerald-100 h-11"
+                        >
                             <Plus size={18} />
                             Nouvelle Saison
                         </Button>
@@ -250,15 +237,14 @@ const SaisonTravailPage = () => {
                 />
             </div>
 
-            {/* Layout Configuration Grid Splitter */}
+            {/* Layout Grid */}
             <div className="flex flex-col gap-8 ">
-                {/* RIGHT SIDE PANEL: Full Interactive Actions Ledger */}
                 <div>
                     <SectionContainer title="Historique des Saisons Disponibles" icon={CalendarDays} headerColor="bg-blue-600" collapsible={false}>
                         <MyTable
                             data={seasons}
                             columns={tableColumns}
-                            actions={["delete"]}
+                            actions={["edit", "delete"]}
                             actionsDetaille={actionsDetaille}
                             onAction={handleTableAction}
                             variant="outline"

@@ -1,6 +1,6 @@
 import { cn } from "../../lib/utils";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowUpDown, BadgeCheck, BadgeX, ChevronDown, ChevronUp, Eye, Filter, Printer, Search, SquareArrowLeft, SquareArrowRight, SquarePen, Trash } from "lucide-react";
+import { ArrowUpDown, BadgeCheck, BadgeX, ChevronDown, ChevronUp, Eye, Filter, Printer, Search, SquareArrowLeft, SquareArrowRight, SquarePen, Trash, FileX } from "lucide-react";
 import {
   Table,
   TableHeader,
@@ -94,13 +94,14 @@ const MyTable = ({
   variant = "slate",
   pageSize = 5,
   isLoading = false,
-
+  title = "",
 
   defaultFilterColumn = "",
   enableSearch = false,
   enableSorting = false,
   enableSelection = false,
   enableCategoricalFilter = false,
+  enablePrint = false,
   onSelectionChange = (selectedRows) => { }
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -203,6 +204,30 @@ const MyTable = ({
     }
   }, [currentPage, totalPages, isLoading]);
 
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    const tableHtml = `
+      <html><head><title>${title || 'Impression'}</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h2 { margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
+        th { background: #1e293b; color: white; }
+        tr:nth-child(even) { background: #f8f9fa; }
+      </style></head><body>
+      ${title ? `<h2>${title}</h2>` : ''}
+      <table><thead><tr>
+        ${columns.map(col => `<th>${col.header}</th>`).join('')}
+      </tr></thead><tbody>
+        ${sortedData.map(row => `<tr>${columns.map(col => `<td>${getNestedValue(row, col.accessor) ?? ''}</td>`).join('')}</tr>`).join('')}
+      </tbody></table></body></html>
+    `;
+    printWindow.document.write(tableHtml);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
   // Color Variant Mapping
   const variants = {
     blue: "bg-blue-600 text-white",
@@ -219,6 +244,7 @@ const MyTable = ({
   return (
     <div className={styles.container.rootdiv}>
       <div className="flex flex-wrap items-center justify-between py-4 w-full px-5 gap-4">
+        <div className="flex items-center gap-2 flex-wrap">
         {enableCategoricalFilter && (
           <div className="flex items-center gap-2">
             <Filter size={16} className="text-slate-500" />
@@ -258,7 +284,20 @@ const MyTable = ({
             />
           </div>
         )}
+        </div>
+        {enablePrint && sortedData.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrint}
+            className="flex items-center gap-1 text-slate-600 border-slate-200 hover:bg-slate-50"
+          >
+            <Printer size={14} />
+            Imprimer
+          </Button>
+        )}
       </div>
+      <div className="overflow-x-auto">
       <div className={styles.container.subrootdiv}>
         <Table>
           <MyTableHeader
@@ -295,6 +334,7 @@ const MyTable = ({
             totalPages={totalPages}
           />
         </Table>
+      </div>
       </div>
     </div>
   )
@@ -384,8 +424,12 @@ const MyTableBody = ({ data, isLoading, columns, actions, onAction, actionsDetai
     <TableBody>
       {data.length === 0 ? (
         <TableRow>
-          <TableCell colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="h-32 text-center text-slate-400 italic">
-            Aucune donnée disponible
+          <TableCell colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="h-40 text-center">
+            <div className="flex flex-col items-center justify-center space-y-3">
+              <FileX size={40} className="text-slate-300" />
+              <p className="text-slate-500 font-medium">Aucune donnée disponible</p>
+              <p className="text-slate-400 text-xs">Modifiez vos filtres ou ajoutez de nouvelles données</p>
+            </div>
           </TableCell>
         </TableRow>
       ) : (

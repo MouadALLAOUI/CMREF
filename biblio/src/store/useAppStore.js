@@ -95,6 +95,18 @@ const useAppStore = create(
                 }));
             },
 
+            // --- API Loading State ---
+            apiCallCount: 0,
+            isApiLoading: false,
+            startApiCall: () => set((state) => {
+                const next = state.apiCallCount + 1;
+                return { apiCallCount: next, isApiLoading: true };
+            }),
+            endApiCall: () => set((state) => {
+                const next = Math.max(state.apiCallCount - 1, 0);
+                return { apiCallCount: next, isApiLoading: next > 0 };
+            }),
+
             // --- Service State (Placeholder for global 'Service' state) ---
             services: [],
             selectedService: null,

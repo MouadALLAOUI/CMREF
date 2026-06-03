@@ -10,9 +10,25 @@ use App\Http\Resources\LivreResource;
 
 class LivreController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $livres = Livre::with('category')->paginate(1000);
+        $query = Livre::with('category');
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => LivreResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $livres = $query->paginate(1000);
         return LivreResource::collection($livres);
     }
 

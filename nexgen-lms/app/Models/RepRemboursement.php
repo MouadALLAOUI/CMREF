@@ -5,13 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\ScopedByRepresentant;
+use App\Models\Traits\FilterBySeason;
 
 class RepRemboursement extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, ScopedByRepresentant, FilterBySeason;
 
     protected $fillable = [
         'rep_id',
+        'season_id',
+        'entity_type',
         'fact_id',
         'date_payment',
         'banque_id',

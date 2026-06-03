@@ -1,4 +1,4 @@
-import api from '../api/axios';
+import api from '../axios';
 
 const rembFactureService = {
   getAll: (params) => api.get('/remboursement-factures', { params }),

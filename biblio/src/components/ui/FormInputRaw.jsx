@@ -33,7 +33,6 @@ function FormInputRow({
     );
 
 
-    // const labelClasses = `text-sm font-semibold text-slate-700 ${isRow ? "" : "mb-1"} ${labelClassName}`;
     const labelClasses = cn(
         "text-sm font-semibold text-slate-700",
         isRow ? "" : "mb-1",

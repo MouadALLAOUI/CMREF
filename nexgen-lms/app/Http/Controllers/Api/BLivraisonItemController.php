@@ -12,9 +12,25 @@ use App\Models\BLivraisonImp;
 
 class BLivraisonItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $bLivraisonItems = BLivraisonItem::with(['deliverable', 'livre'])->paginate(1000);
+        $query = BLivraisonItem::with(['deliverable', 'livre']);
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => BLivraisonItemResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $bLivraisonItems = $query->paginate(1000);
         return BLivraisonItemResource::collection($bLivraisonItems);
     }
 

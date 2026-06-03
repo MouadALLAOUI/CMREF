@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
   textCell: { margin: 'auto', fontSize: 10, color: '#374151' }
 });
 
-const StockReportPDF = ({ destinationName, groupedData }) => {
-  const isGlobal = !destinationName || destinationName === "MSM-Medias";
+const StockReportPDF = ({ destinationName, seasonLabel, groupedData, isGlobal: isGlobalProp }) => {
+  const isGlobal = isGlobalProp !== undefined ? isGlobalProp : (!destinationName || destinationName.includes("MSM-Medias"));
 
   return (
     <Document>
@@ -42,12 +42,12 @@ const StockReportPDF = ({ destinationName, groupedData }) => {
             {isGlobal ? (
               <>
                 <Text style={styles.title}>Categorie : {categoryGroup.categoryName}</Text>
-                <Text style={styles.subtitle}>Année : 26/27</Text>
+                <Text style={styles.subtitle}>Année : {seasonLabel}</Text>
               </>
             ) : (
               <>
                 <Text style={styles.title}>Zone : {destinationName}</Text>
-                <Text style={styles.subtitle}>Categorie : {categoryGroup.categoryName}</Text>
+                <Text style={styles.subtitle}>Categorie : {categoryGroup.categoryName} | Année : {seasonLabel}</Text>
               </>
             )}
           </View>

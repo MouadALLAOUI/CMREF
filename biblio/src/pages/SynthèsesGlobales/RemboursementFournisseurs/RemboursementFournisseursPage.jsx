@@ -1,14 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
-import { CreditCard, Download } from "lucide-react";
+import { CreditCard, Printer, Download } from "lucide-react";
 import rembImpService from "../../../api/services/rembImpService";
+import bLivraisonImpService from "../../../api/services/bLivraisonImpService";
+import livreService from "../../../api/services/livreService";
+import seasonsService from "../../../api/services/seasonsService";
+import { calculateRecouvrement, exportToCSV } from "../../../utils/helpers";
+import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
+import RembGlobalePdf from "../../../components/pdfs/syntheses/RembGlobalePdf";
+import { schoolYearFormat } from "../../../lib/utilities";
 
 const fetchAllPaginated = async (serviceGetAll, params = {}) => {
     const first = await serviceGetAll({ ...params, page: 1 });
-    const firstData = first;
+    const firstData = Array.isArray(first) ? first : first?.data || [];
     const meta = first?.meta;
     if (!meta?.last_page) return firstData;
 
@@ -18,7 +25,8 @@ const fetchAllPaginated = async (serviceGetAll, params = {}) => {
         pages.push(serviceGetAll({ ...params, page }));
     }
     const rest = await Promise.all(pages);
-    return [...firstData, ...rest.flatMap((r) => r)];
+    const restData = rest.flatMap((r) => Array.isArray(r) ? r : r?.data || []);
+    return [...firstData, ...restData];
 };
 
 const toNumber = (v) => {
@@ -48,13 +56,49 @@ const pickMainMode = (ops = []) => {
 
 const RemboursementFournisseursPage = () => {
     const [rows, setRows] = useState([]);
-    const [kpis, setKpis] = useState({ total: 0, fournisseurs: 0, operations: 0 });
+    const [kpis, setKpis] = useState({ total: 0, fournisseurs: 0, operations: 0, credit: 0, avance: 0, reste: 0, recouvrement: 0 });
     const [isLoading, setIsLoading] = useState(true);
+    const [seasons, setSeasons] = useState([]);
+    const [selectedSeasonId, setSelectedSeasonId] = useState("");
+    const [pdfOpen, setPdfOpen] = useState(false);
+    const printRef = useRef(null);
+
+    useEffect(() => {
+        seasonsService.getAll().then(setSeasons).catch(() => {});
+    }, []);
+
+    useEffect(() => {
+        if (seasons.length > 0 && !selectedSeasonId) {
+            const active = seasons.find(s => s.is_active);
+            setSelectedSeasonId(active?.id || seasons[0]?.id || "");
+        }
+    }, [seasons]);
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const ops = await fetchAllPaginated(rembImpService.getAll);
+            const params = {};
+            if (selectedSeasonId && selectedSeasonId !== "all") {
+                params.season_id = selectedSeasonId;
+            }
+            const [ops, livraisonsImp, livres] = await Promise.all([
+                fetchAllPaginated(rembImpService.getAll, params),
+                fetchAllPaginated(bLivraisonImpService.getAll, params),
+                fetchAllPaginated(livreService.getAll),
+            ]);
+
+            const livreById = new Map(livres.map((l) => [l.id, l]));
+
+            const credit = livraisonsImp.reduce((sum, it) => {
+                const livre = livreById.get(it.livre_id || it.livre?.id);
+                const unit = toNumber(livre?.prix_achat ?? 0);
+                return sum + unit * toNumber(it.quantite);
+            }, 0);
+
+            const avance = ops.reduce((sum, o) => sum + toNumber(o.montant), 0);
+            const reste = credit - avance;
+            const recouvrement = calculateRecouvrement(avance, credit);
+
             const grouped = new Map();
 
             for (const o of ops) {
@@ -79,9 +123,13 @@ const RemboursementFournisseursPage = () => {
 
             setRows(computed);
             setKpis({
-                total: computed.reduce((sum, r) => sum + toNumber(r.totalRemb), 0),
+                total: avance,
                 fournisseurs: computed.length,
                 operations: ops.length,
+                credit,
+                avance,
+                reste,
+                recouvrement,
             });
         } catch (error) {
             logger("Error computing remboursements fournisseurs:", error);
@@ -89,7 +137,7 @@ const RemboursementFournisseursPage = () => {
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [selectedSeasonId]);
 
     useEffect(() => {
         fetchData();
@@ -98,50 +146,122 @@ const RemboursementFournisseursPage = () => {
     const columns = useMemo(
         () => [
             { header: "Fournisseur", accessor: "fournisseur" },
+            { header: "Crédit (DH)", accessor: "credit", type: "money" },
+            { header: "Avance (DH)", accessor: "avance", type: "money" },
+            { header: "Reste (DH)", accessor: "reste", type: "money" },
+            { header: "Recouvrement", accessor: "recouvrement", type: "percentage" },
             { header: "Opérations", accessor: "operations" },
-            { header: "Total remboursé (DH)", accessor: "totalRemb", type: "money" },
             { header: "Mode principal", accessor: "mode" },
             { header: "Statut", accessor: "status" },
         ],
         []
     );
 
+    const seasonLabel = selectedSeasonId && selectedSeasonId !== "all"
+        ? schoolYearFormat(seasons.find(s => s.id === selectedSeasonId)?.name)
+        : "Toutes les saisons";
+
+    const handleExportCSV = () => {
+        const cols = [
+            { header: "Fournisseur", accessor: "fournisseur" },
+            { header: "Crédit (DH)", accessor: "credit" },
+            { header: "Avance (DH)", accessor: "avance" },
+            { header: "Reste (DH)", accessor: "reste" },
+            { header: "Recouvrement", accessor: "recouvrement" },
+            { header: "Opérations", accessor: "operations" },
+            { header: "Mode principal", accessor: "mode" },
+            { header: "Statut", accessor: "status" },
+        ];
+        exportToCSV(rows, cols, `RembFournisseurs_${seasonLabel.replace(/\s+|\//g, '_')}.csv`);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <CreditCard className="text-emerald-600" />
-                    <h1 className="text-2xl font-bold text-slate-800">Remboursements Fournisseurs (Global)</h1>
+                <div>
+                    <div className="flex items-center gap-2">
+                        <CreditCard className="text-emerald-600" />
+                        <h1 className="text-2xl font-bold text-slate-800">Remboursements Fournisseurs (Global)</h1>
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Saison:</span>
+                        <select
+                            value={selectedSeasonId}
+                            onChange={(e) => setSelectedSeasonId(e.target.value)}
+                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
+                        >
+                            <option value="all">Toutes les saisons</option>
+                            {seasons.map(s => (
+                                <option key={s.id} value={s.id}>{s.name.slice(0, 2)} / {s.name.slice(2)}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-                <Button className="bg-slate-900 text-white hover:bg-black"><Download size={16} /></Button>
+                <div className="flex gap-2">
+                    <Button onClick={handleExportCSV} className="bg-emerald-700 text-white flex items-center gap-2 hover:bg-emerald-800">
+                        <Download size={16} /> CSV
+                    </Button>
+                    <Button onClick={() => setPdfOpen(true)} className="bg-slate-900 text-white flex items-center gap-2 hover:bg-black">
+                        <Printer size={16} /> Imprimer
+                    </Button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-                    <p className="text-xs text-slate-500 font-bold uppercase mb-1">Fournisseurs</p>
-                    <p className="text-2xl font-black text-slate-900">{kpis.fournisseurs}</p>
+                    <p className="text-xs text-slate-500 font-bold uppercase mb-1">Crédit (DH)</p>
+                    <p className="text-2xl font-black text-blue-700">{kpis.credit.toLocaleString()} DH</p>
                 </div>
                 <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-                    <p className="text-xs text-slate-500 font-bold uppercase mb-1">Opérations</p>
-                    <p className="text-2xl font-black text-slate-900">{kpis.operations}</p>
+                    <p className="text-xs text-slate-500 font-bold uppercase mb-1">Avance (DH)</p>
+                    <p className="text-2xl font-black text-emerald-700">{kpis.avance.toLocaleString()} DH</p>
                 </div>
                 <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
-                    <p className="text-xs text-slate-500 font-bold uppercase mb-1">Total remboursé</p>
-                    <p className="text-2xl font-black text-emerald-700">{kpis.total.toLocaleString()} DH</p>
+                    <p className="text-xs text-slate-500 font-bold uppercase mb-1">Reste (DH)</p>
+                    <p className="text-2xl font-black text-red-700">{kpis.reste.toLocaleString()} DH</p>
+                </div>
+                <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm">
+                    <p className="text-xs text-slate-500 font-bold uppercase mb-1">Recouvrement</p>
+                    <p className="text-2xl font-black text-amber-700">{kpis.recouvrement.toFixed(1)}%</p>
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <MyTable
-                    data={rows}
-                    columns={columns}
-                    pageSize={10}
-                    variant="slate"
-                    isLoading={isLoading}
-                    enableSearch
-                    enableSorting
-                />
+            <div ref={printRef}>
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <MyTable
+                        data={rows}
+                        columns={columns}
+                        pageSize={10}
+                        variant="slate"
+                        isLoading={isLoading}
+                        enableSearch
+                        enableSorting
+                    />
+                    {rows.length > 0 && (
+                        <div className="grid grid-cols-4 bg-slate-50 border-t-2 border-slate-200 text-sm font-bold">
+                            <div className="px-4 py-3 text-slate-700 uppercase">TOTAL</div>
+                            <div className="px-4 py-3 text-center text-blue-700">{kpis.credit.toLocaleString()} DH</div>
+                            <div className="px-4 py-3 text-center text-emerald-700">{kpis.avance.toLocaleString()} DH</div>
+                            <div className="px-4 py-3 text-center text-red-700">{kpis.reste.toLocaleString()} DH</div>
+                        </div>
+                    )}
+                </div>
             </div>
+
+            <PdfDialogViewer
+                open={pdfOpen}
+                onOpenChange={setPdfOpen}
+                title="Remboursements Fournisseurs"
+                document={
+                    <RembGlobalePdf
+                        title="Remboursements Fournisseurs (Global)"
+                        rows={rows}
+                        kpis={kpis}
+                        labelField="fournisseur"
+                        seasonLabel={seasonLabel}
+                    />
+                }
+            />
         </div>
     );
 };

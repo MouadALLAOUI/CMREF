@@ -13,8 +13,10 @@ import UniversalDialog from "../../../components/template/dialog/UniversalDialog
 import bLivraisonItemService from "../../../api/services/bLivraisonItemService";
 import { useNavigate } from "react-router-dom";
 import { FileDown } from "lucide-react";
+import useAppStore from "../../../store/useAppStore";
 
 function FournisseurSaisirBl() {
+    const { activeSeason } = useAppStore();
     const navigate = useNavigate();
     const [blData, setBlData] = useState([]);
     const [imprimeurs, setImprimeurs] = useState([]);
@@ -33,14 +35,14 @@ function FournisseurSaisirBl() {
         quantite: "",
         livre_id: "",
         remarks: "",
-        annee: "2627",
+        annee: activeSeason?.name || "",
         details: [], // This will store items with qte > 0
     });
 
     const actionsDetaille = {
         delete: {
             title: "Supprimer",
-            description: "Êtes-vous sûr de vouloir supprimer ce fornisseur?",
+            description: "Êtes-vous sûr de vouloir supprimer ce BL?",
             actionText: "Supprimer",
             cancelText: "Annuler",
             type: "delete",
@@ -61,7 +63,7 @@ function FournisseurSaisirBl() {
     const actionsSubDetaille = {
         delete: {
             title: "Supprimer",
-            description: "Êtes-vous sûr de vouloir supprimer ce fornisseur?",
+            description: "Êtes-vous sûr de vouloir supprimer ce BL?",
             actionText: "Supprimer",
             cancelText: "Annuler",
             type: "delete",
@@ -122,7 +124,7 @@ function FournisseurSaisirBl() {
         setIsLoading(true);
         try {
             // Backend now returns headers with nested items
-            const response = await bLivraisonImpService.getAll();
+            const response = await bLivraisonImpService.getAll({ annee: activeSeason?.name });
             setBlData(response);
 
             const [impRes, livreRes, catRes] = await Promise.all([
@@ -141,7 +143,7 @@ function FournisseurSaisirBl() {
         }
     };
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { fetchData(); }, [activeSeason?.name]);
 
     const updateDetail = (livreId, label, qte) => {
         setFormData(prev => {
@@ -196,7 +198,7 @@ function FournisseurSaisirBl() {
             quantite: "",
             livre_id: "",
             remarks: "",
-            annee: "2627",
+            annee: activeSeason?.name || "",
             details: [],
         });
     }

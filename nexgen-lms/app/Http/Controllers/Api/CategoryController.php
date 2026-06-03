@@ -7,13 +7,34 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 
 use App\Http\Resources\CategoryResource;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
-    public function index()
+    private const CACHE_KEY = 'categories_all';
+    private const CACHE_TTL = 3600;
+
+    public function index(Request $request)
     {
-        $categories = Category::paginate(1000);
-        // $categories = Category::with("livres")->paginate(1000);
+        if ($request->has('page')) {
+            $query = Category::query();
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => CategoryResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $categories = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+            return Category::orderBy('libelle', 'asc')->get();
+        });
+
         return CategoryResource::collection($categories);
     }
 
@@ -25,6 +46,7 @@ class CategoryController extends Controller
         ]);
 
         $category = Category::create($validatedData);
+        Cache::forget(self::CACHE_KEY);
         return new CategoryResource($category);
     }
 
@@ -44,6 +66,7 @@ class CategoryController extends Controller
         ]);
 
         $category->update($validatedData);
+        Cache::forget(self::CACHE_KEY);
 
         return new CategoryResource($category);
     }
@@ -52,6 +75,7 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
         $category->delete();
+        Cache::forget(self::CACHE_KEY);
 
         return response()->json(null, 204);
     }

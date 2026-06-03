@@ -62,7 +62,6 @@ function ReprésentantDisponibles() {
     ]
 
     const handleActiveCompte = async (row) => {
-        // console.log({ row });
         try {
             setIsLoading(true);
             await representantService.active_compte({
@@ -196,9 +195,8 @@ function ReprésentantDisponibles() {
         try {
             const response = await representantService.getAll();
             setRepresentants(response);
-            // console.log(response);
         } catch (error) {
-            console.error("Error fetching representants:", error);
+            logger("Error fetching representants:", error);
             toast.error("Erreur lors du chargement des representants");
         } finally {
             setIsLoading(false);
@@ -210,7 +208,6 @@ function ReprésentantDisponibles() {
 
         const channel = echo.channel('representants-channel')
             .listen('.representant.updated', (e) => {
-                // console.log('Update detected!', e.representant);
                 setRepresentants((prevList) =>
                     prevList.map((rep) =>
                         rep.id === e.representant.id ? { ...rep, ...e.representant } : rep

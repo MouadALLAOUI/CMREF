@@ -10,9 +10,25 @@ use App\Http\Resources\CatalogueResource;
 
 class CatalogueController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $catalogues = Catalogue::with('category')->paginate(1000);
+        $query = Catalogue::with('category');
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => CatalogueResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $catalogues = $query->paginate(1000);
         return CatalogueResource::collection($catalogues);
     }
 

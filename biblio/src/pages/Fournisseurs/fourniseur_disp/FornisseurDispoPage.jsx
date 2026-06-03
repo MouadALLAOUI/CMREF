@@ -5,6 +5,45 @@ import toast from "react-hot-toast";
 import { MyTable } from "../../../components/ui/myTable";
 import logger from "../../../lib/logger";
 import UniversalDialog from "../../../components/template/dialog/UniversalDialog";
+import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
+
+const IMPRIMEUR_RULES = {
+    raison_sociale: 'required|string|max:255',
+    adresse: 'nullable|string',
+    directeur_nom: 'nullable|string|max:255',
+    directeur_tel: 'nullable|string|max:20',
+    directeur_email: 'nullable|string|email|max:255',
+    adjoint_nom: 'nullable|string|max:255',
+    adjoint_tel: 'nullable|string|max:20',
+    adjoint_email: 'nullable|string|email|max:255',
+};
+
+const IMPRIMEUR_LABELS = {
+    raison_sociale: "Raison Sociale",
+    adresse: "Adresse Complète",
+    directeur_nom: "Nom Directeur",
+    directeur_tel: "Téléphone",
+    directeur_email: "Email",
+    adjoint_nom: "Nom Adjoint",
+    adjoint_tel: "Téléphone",
+    adjoint_email: "Email",
+};
+
+const IMPRIMEUR_PLACEHOLDERS = {
+    raison_sociale: "Ex: SARL Librairie Centrale",
+    adresse: "Adresse du siège...",
+    directeur_nom: "Nom et Prénom",
+    directeur_tel: "06XXXXXXXX",
+    directeur_email: "directeur@email.com",
+    adjoint_nom: "Nom et Prénom",
+    adjoint_tel: "06XXXXXXXX",
+    adjoint_email: "adjoint@email.com",
+};
+
+const IMPRIMEUR_GRID = {
+    raison_sociale: "col-span-2",
+    adresse: "col-span-2",
+};
 
 function FournisseursDisponibles() {
     const [imprimeurs, setImprimeurs] = useState([]);
@@ -27,7 +66,7 @@ function FournisseursDisponibles() {
     const actionsDetaille = {
         delete: {
             title: "Supprimer",
-            description: "Êtes-vous sûr de vouloir supprimer ce fornisseur?",
+            description: "Êtes-vous sûr de vouloir supprimer ce fournisseur?",
             actionText: "Supprimer",
             cancelText: "Annuler",
             type: "delete",
@@ -100,81 +139,28 @@ function FournisseursDisponibles() {
         })
     };
 
-    const schema = useMemo(() => [
-        {
-            type: "section",
-            label: "Informations Générales"
-        },
-        {
-            name: "raison_sociale",
-            label: "Raison Sociale",
-            placeholder: "Ex: SARL Librairie Centrale",
-            value: form.raison_sociale,
-            onChange: (v) => setForm(prev => ({ ...prev, raison_sociale: v })),
-            required: true,
-            gridSpan: 2 // Assuming your UniversalDialog handles col-span-2
-        },
-        {
-            name: "adresse",
-            label: "Adresse Complète",
-            placeholder: "Adresse du siège...",
-            value: form.adresse,
-            onChange: (v) => setForm(prev => ({ ...prev, adresse: v })),
-            gridSpan: 2
-        },
-        {
-            type: "section",
-            label: "Informations Directeur"
-        },
-        {
-            name: "directeur_nom",
-            label: "Nom Directeur",
-            placeholder: "Nom et Prénom",
-            value: form.directeur_nom,
-            onChange: (v) => setForm(prev => ({ ...prev, directeur_nom: v })),
-        },
-        {
-            name: "directeur_email",
-            label: "Email",
-            type: "email",
-            placeholder: "directeur@email.com",
-            value: form.directeur_email,
-            onChange: (v) => setForm(prev => ({ ...prev, directeur_email: v })),
-        },
-        {
-            name: "directeur_tel",
-            label: "Téléphone",
-            placeholder: "06XXXXXXXX",
-            value: form.directeur_tel,
-            onChange: (v) => setForm(prev => ({ ...prev, directeur_tel: v })),
-        },
-        {
-            type: "section",
-            label: "Informations Adjoint"
-        },
-        {
-            name: "adjoint_nom",
-            label: "Nom Adjoint",
-            placeholder: "Nom et Prénom",
-            value: form.adjoint_nom,
-            onChange: (v) => setForm(prev => ({ ...prev, adjoint_nom: v })),
-        },
-        {
-            name: "adjoint_email",
-            label: "Email",
-            type: "email",
-            placeholder: "adjoint@email.com",
-            value: form.adjoint_email,
-            onChange: (v) => setForm(prev => ({ ...prev, adjoint_email: v })),
-        },
-        {
-            name: "adjoint_tel",
-            label: "Téléphone",
-            placeholder: "06XXXXXXXX",
-            value: form.adjoint_tel,
-            onChange: (v) => setForm(prev => ({ ...prev, adjoint_tel: v })),
-        },
-    ], [form]);
+    const baseSchema = useMemo(() => buildSchemaFromControllerRules({
+        rules: IMPRIMEUR_RULES,
+        formData: form,
+        setFormData: setForm,
+        labels: IMPRIMEUR_LABELS,
+        placeholders: IMPRIMEUR_PLACEHOLDERS,
+        gridSpan: IMPRIMEUR_GRID,
+        exclude: ["id", "created_at", "updated_at"],
+    }), [form]);
+
+    const schema = useMemo(() => {
+        const sections = [
+            { type: "section", label: "Informations Générales" },
+            "raison_sociale", "adresse",
+            { type: "section", label: "Informations Directeur" },
+            "directeur_nom", "directeur_email", "directeur_tel",
+            { type: "section", label: "Informations Adjoint" },
+            "adjoint_nom", "adjoint_email", "adjoint_tel",
+        ];
+        const fieldMap = Object.fromEntries(baseSchema.map(f => [f.name, f]));
+        return sections.map(s => typeof s === "string" ? fieldMap[s] : s).filter(Boolean);
+    }, [baseSchema]);
 
     return (
         <div className="space-y-6">

@@ -5,19 +5,23 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Banque;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 use App\Http\Resources\BanqueRequest;
 
 class BanqueController extends Controller
 {
-    /**
-     * Display a listing of the banks.
-     */
+    private const CACHE_KEY = 'banques_all';
+    private const CACHE_TTL = 3600; // 1 hour
+
     public function index()
     {
-        // Return all banks, ordered by name
-        return response()->json(Banque::orderBy('nom', 'asc')->get());
+        $banques = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+            return Banque::orderBy('nom', 'asc')->get();
+        });
+
+        return response()->json($banques);
     }
 
     public function show($id)
@@ -26,9 +30,6 @@ class BanqueController extends Controller
         return new BanqueRequest($banque);
     }
 
-    /**
-     * Store a newly created bank.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -39,6 +40,7 @@ class BanqueController extends Controller
 
         try {
             $banque = Banque::create($validated);
+            Cache::forget(self::CACHE_KEY);
             return response()->json($banque, 201);
         } catch (\Exception $e) {
             Log::error("Erreur création banque: " . $e->getMessage());
@@ -46,9 +48,6 @@ class BanqueController extends Controller
         }
     }
 
-    /**
-     * Update the specified bank.
-     */
     public function update(Request $request, $id)
     {
         $banque = Banque::findOrFail($id);
@@ -60,21 +59,15 @@ class BanqueController extends Controller
         ]);
 
         $banque->update($validated);
+        Cache::forget(self::CACHE_KEY);
         return response()->json($banque);
     }
 
-    /**
-     * Remove the specified bank.
-     */
     public function destroy($id)
     {
         $banque = Banque::findOrFail($id);
-
-        // Check if bank is linked to any payments before deleting
-        // $hasPayments = \App\Models\RembImp::where('banque_id', $id)->exists();
-        // if ($hasPayments) return response()->json(['message' => 'Impossible de supprimer une banque liée à des paiements'], 422);
-
         $banque->delete();
+        Cache::forget(self::CACHE_KEY);
         return response()->json(null, 204);
     }
 }

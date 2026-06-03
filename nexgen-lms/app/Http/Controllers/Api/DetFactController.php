@@ -10,9 +10,25 @@ use App\Http\Resources\DetFactResource;
 
 class DetFactController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $detFacts = DetFact::with(['fact', 'livre'])->paginate(1000);
+        $query = DetFact::with(['fact', 'livre']);
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => DetFactResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $detFacts = $query->paginate(1000);
         return DetFactResource::collection($detFacts);
     }
 

@@ -5,8 +5,48 @@ import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
 import UniversalDialog from "../../../components/template/dialog/UniversalDialog";
 import representantService from "../../../api/services/representantService";
-import { User, UserCheck, UserX, Wifi, WifiOff } from "lucide-react";
+import { User } from "lucide-react";
 import { isOnline } from "../../../utils/helpers";
+import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
+
+const REPRESENTANT_RULES = {
+    nom: 'required|string|max:255',
+    email: 'required|email|max:255',
+    telephone: 'nullable|string|max:20',
+    adresse: 'nullable|string',
+    ville: 'nullable|string|max:100',
+    code_postal: 'nullable|string|max:10',
+    password: 'nullable|string|min:8',
+    est_actif: 'nullable|boolean',
+    remarques: 'nullable|string',
+};
+
+const REPRESENTANT_LABELS = {
+    nom: "Nom complet",
+    email: "Email",
+    telephone: "Téléphone",
+    adresse: "Adresse",
+    ville: "Ville",
+    code_postal: "Code postal",
+    password: "Mot de passe",
+    est_actif: "Compte actif",
+    remarques: "Remarques",
+};
+
+const REPRESENTANT_PLACEHOLDERS = {
+    nom: "Nom du représentant",
+    email: "email@exemple.com",
+    telephone: "+212 6 XX XX XX XX",
+    adresse: "Adresse complète",
+    ville: "Ville",
+    code_postal: "Code postal",
+    password: "Laisser vide pour ne pas changer",
+};
+
+const REPRESENTANT_GRID = {
+    adresse: "col-span-2",
+    remarques: "col-span-2",
+};
 
 function RepresentantsPage() {
   const [rows, setRows] = useState([]);
@@ -123,86 +163,35 @@ function RepresentantsPage() {
     },
   ];
 
-  const schema = useMemo(
-    () => [
-      {
-        name: "nom",
-        label: "Nom complet",
-        placeholder: "Nom du représentant",
-        required: true,
-        value: formData.nom,
-        onChange: (v) => setFormData((prev) => ({ ...prev, nom: v })),
-      },
-      {
-        name: "email",
-        label: "Email",
-        type: "email",
-        placeholder: "email@exemple.com",
-        required: true,
-        value: formData.email,
-        onChange: (v) => setFormData((prev) => ({ ...prev, email: v })),
-      },
-      {
-        name: "telephone",
-        label: "Téléphone",
-        placeholder: "+212 6 XX XX XX XX",
-        value: formData.telephone,
-        onChange: (v) => setFormData((prev) => ({ ...prev, telephone: v })),
-      },
-      {
-        name: "adresse",
-        label: "Adresse",
-        placeholder: "Adresse complète",
-        inputType: "textarea",
-        value: formData.adresse,
-        onChange: (v) => setFormData((prev) => ({ ...prev, adresse: v })),
-        className: "col-span-2",
-      },
-      {
-        name: "ville",
-        label: "Ville",
-        placeholder: "Ville",
-        value: formData.ville,
-        onChange: (v) => setFormData((prev) => ({ ...prev, ville: v })),
-      },
-      {
-        name: "code_postal",
-        label: "Code postal",
-        placeholder: "Code postal",
-        value: formData.code_postal,
-        onChange: (v) => setFormData((prev) => ({ ...prev, code_postal: v })),
-      },
-      {
-        name: "password",
-        label: "Mot de passe",
-        type: "password",
-        placeholder: "Laisser vide pour ne pas changer",
-        value: formData.password,
-        onChange: (v) => setFormData((prev) => ({ ...prev, password: v })),
-        helperText: dialogMode === "update" ? "Laisser vide pour conserver le mot de passe actuel" : undefined,
-      },
-      {
-        name: "est_actif",
-        label: "Compte actif",
-        inputType: "select",
-        items: [
-          { label: "Oui", value: true },
-          { label: "Non", value: false },
-        ],
-        value: formData.est_actif,
-        onChange: (v) => setFormData((prev) => ({ ...prev, est_actif: v })),
-      },
-      {
-        name: "remarques",
-        label: "Remarques",
-        inputType: "textarea",
-        value: formData.remarques,
-        onChange: (v) => setFormData((prev) => ({ ...prev, remarques: v })),
-        className: "col-span-2",
-      },
-    ],
-    [formData, dialogMode]
-  );
+  const baseSchema = useMemo(() => buildSchemaFromControllerRules({
+    rules: REPRESENTANT_RULES,
+    formData,
+    setFormData,
+    labels: REPRESENTANT_LABELS,
+    placeholders: REPRESENTANT_PLACEHOLDERS,
+    gridSpan: REPRESENTANT_GRID,
+    exclude: ["id", "created_at", "updated_at"],
+  }), [formData]);
+
+  const schema = useMemo(() => baseSchema.map(field => {
+    if (field.name === "adresse") return { ...field, inputType: "textarea" };
+    if (field.name === "password") return {
+      ...field,
+      inputType: "password",
+      type: "password",
+      helperText: dialogMode === "update" ? "Laisser vide pour conserver le mot de passe actuel" : undefined,
+    };
+    if (field.name === "est_actif") return {
+      ...field,
+      inputType: "select",
+      items: [
+        { label: "Oui", value: true },
+        { label: "Non", value: false },
+      ],
+    };
+    if (field.name === "remarques") return { ...field, inputType: "textarea" };
+    return field;
+  }), [baseSchema, dialogMode]);
 
   const onSubmit = async () => {
     try {

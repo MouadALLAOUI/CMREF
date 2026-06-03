@@ -9,12 +9,15 @@ import bVentesClientService from "../../../api/services/bVentesClientService";
 import representantService from "../../../api/services/representantService";
 import clientService from "../../../api/services/clientService";
 import livreService from "../../../api/services/livreService";
+import useAppStore from "../../../store/useAppStore";
 
 function BLClientsPage() {
+    const { activeSeason } = useAppStore();
     const [rows, setRows] = useState([]);
     const [representants, setRepresentants] = useState([]);
     const [clients, setClients] = useState([]);
     const [livres, setLivres] = useState([]);
+    const [selectedRep, setSelectedRep] = useState("all");
     const [isLoading, setIsLoading] = useState(true);
 
     const [dialogMode, setDialogMode] = useState("add");
@@ -36,8 +39,9 @@ function BLClientsPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
+            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
             const [res, reps, cls, lvs] = await Promise.all([
-                bVentesClientService.getAll(),
+                bVentesClientService.getAll(seasonParams),
                 representantService.getAll(),
                 clientService.getAll(),
                 livreService.getAll(),
@@ -56,7 +60,17 @@ function BLClientsPage() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [activeSeason?.name]);
+
+    const filteredRows = useMemo(() => {
+        if (selectedRep === "all") return rows;
+        return rows.filter(r => r.rep_id === selectedRep);
+    }, [rows, selectedRep]);
+
+    const repOptions = useMemo(() => [
+        { label: "Tous les représentants", value: "all" },
+        ...representants.map((r) => ({ label: r.nom, value: r.id })),
+    ], [representants]);
 
     useEffect(() => {
         if (!isDialogOpen) {
@@ -206,7 +220,19 @@ function BLClientsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">BL clients</h1>
-                    <p className="text-sm text-slate-500">Gestion des bons de livraison côté clients.</p>
+                    <p className="text-sm text-slate-500 mb-2">Gestion des bons de livraison côté clients.</p>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase">Représentant:</span>
+                        <select
+                            value={selectedRep}
+                            onChange={(e) => setSelectedRep(e.target.value)}
+                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
+                        >
+                            {repOptions.map(opt => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 <UniversalDialog
                     open={isDialogOpen}
@@ -232,7 +258,7 @@ function BLClientsPage() {
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <MyTable
-                    data={rows}
+                    data={filteredRows}
                     columns={columns}
                     pageSize={5}
                     actions={["view", "edit", "delete"]}

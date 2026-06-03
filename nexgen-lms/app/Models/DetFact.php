@@ -5,15 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\ScopedByRepresentant;
+use App\Models\Traits\FilterBySeason;
 
 class DetFact extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, ScopedByRepresentant, FilterBySeason;
 
     protected $table = 'det_fact'; // Forced singular name
 
     protected $fillable = [
         'fact_id',
+        'season_id',
+        'entity_type',
         'livre_id',
         'quantite',
         'prix_unitaire_ht',

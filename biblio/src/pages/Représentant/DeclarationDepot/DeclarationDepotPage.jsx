@@ -1,14 +1,15 @@
 import { useEffect, useState, useMemo } from "react";
-import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
 import depotService from "../../../api/services/depotService";
 import representantService from "../../../api/services/representantService";
+import useAppStore from "../../../store/useAppStore";
 import { Package, CheckCircle2, XCircle } from "lucide-react";
 import SectionContainer from "../../../components/ui/SectionContainer";
 
 function DeclarationDepotPage() {
+    const { activeSeason } = useAppStore();
     const [rows, setRows] = useState([]);
     const [repDepots, setRepDepots] = useState([]);
     const [representants, setRepresentants] = useState([]);
@@ -18,8 +19,9 @@ function DeclarationDepotPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
+            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
             const [depotsRes, repsRes] = await Promise.all([
-                depotService.getAll(),
+                depotService.getAll(seasonParams),
                 representantService.getAll(),
             ]);
             setRows(depotsRes);
@@ -48,7 +50,7 @@ function DeclarationDepotPage() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [activeSeason?.name]);
 
     const handleValidateDepot = async (depotId, validated) => {
         try {
@@ -65,7 +67,7 @@ function DeclarationDepotPage() {
     };
 
     const columns = [
-        { header: "Representant", accessor: "representant.nom", type: "hidden" },
+        { header: "Représentant", accessor: "representant.nom", type: "hidden" },
         { header: "Livre", accessor: "livre.titre", color: "#f00" },
         { header: "Quantité", accessor: "-quantite_balance" },
         { header: "Statut", accessor: "status", type: "bool" },
@@ -122,7 +124,7 @@ function DeclarationDepotPage() {
                         variant="slate"
                         isLoading={isLoading}
                         enableSearch
-                        defaultFilterColumn={{ header: "Representant", accessor: "representant.nom" }}
+                        defaultFilterColumn={{ header: "Représentant", accessor: "representant.nom" }}
                         enableCategoricalFilter
                         enableSorting
                     />

@@ -277,9 +277,30 @@ function RembourserFacturePage() {
     }
   };
 
+  const handleSaveAll = async () => {
+    try {
+      const modifiedRows = rows.filter(r => r._dirty);
+      if (modifiedRows.length === 0) {
+        toast.success("Aucune modification à enregistrer");
+        return;
+      }
+      await Promise.all(
+        modifiedRows.map(r => repRemboursementService.update(r.id, {
+          remarks: r.remarks,
+          date_versement: r.date_versement,
+        }))
+      );
+      toast.success(`${modifiedRows.length} modification(s) enregistrée(s)`);
+      fetchData();
+    } catch (error) {
+      logger("Error saving remboursements:", error);
+      toast.error("Erreur lors de l'enregistrement");
+    }
+  };
+
   const SaveButton = () => (
     <Button
-      onClick={() => toast.success("Modifications enregistrées")}
+      onClick={handleSaveAll}
       className="bg-[#0ea5e9] hover:bg-[#0ea5e9]/90 text-white px-4 h-9 rounded-lg font-bold text-xs uppercase tracking-tight shadow-sm transition-all"
     >
       <Save className="w-3.5 h-3.5 mr-2" />
@@ -323,16 +344,6 @@ function RembourserFacturePage() {
           </div>
 
           <div className="relative border border-slate-100 rounded-xl overflow-hidden">
-            {/* Double Header Simulation */}
-            {/* <div className="grid grid-cols-[repeat(2,minmax(0,1fr))_repeat(4,minmax(0,1fr))] bg-slate-50/80 border-b border-slate-100">
-              <div className="col-span-2 px-4 py-2 text-center text-[10px] font-black uppercase tracking-widest text-slate-500 border-r border-slate-100">
-                Facture
-              </div>
-              <div className="col-span-4 px-4 py-2 text-center text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Remboursement
-              </div>
-            </div> */}
-
             <MyTable
               data={rows}
               columns={columns}

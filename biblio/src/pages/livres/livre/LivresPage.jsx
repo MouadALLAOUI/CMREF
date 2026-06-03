@@ -6,8 +6,47 @@ import categoryService from "../../../api/services/categoryService";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
 import UniversalDialog from "../../../components/template/dialog/UniversalDialog";
+import useAppStore from "../../../store/useAppStore";
+import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
+
+const LIVRE_RULES = {
+    titre: 'required|string|max:255',
+    code: 'required|string|max:50',
+    categorie_id: 'required|uuid|exists:categories,id',
+    prix_achat: 'required|numeric|min:0',
+    prix_vente: 'required|numeric|min:0',
+    prix_public: 'required|numeric|min:0',
+    nb_pages: 'required|integer|min:0',
+    color_code: 'sometimes|string|max:7',
+    description: 'nullable|string',
+    annee_publication: 'nullable|string|max:4',
+};
+
+const LIVRE_LABELS = {
+    titre: "Titre du livre",
+    code: "Code / Référence",
+    categorie_id: "Catégorie",
+    prix_achat: "Prix d'Achat (DH)",
+    prix_vente: "Prix de Vente (DH)",
+    prix_public: "Prix Public (DH)",
+    nb_pages: "Nombre de pages",
+    color_code: "Couleur",
+    description: "Description",
+    annee_publication: "Année",
+};
+
+const LIVRE_PLACEHOLDERS = {
+    titre: "Entrer le titre complet",
+    code: "Ex: R-102",
+    categorie_id: "Sélectionner une catégorie",
+    prix_achat: "0.00",
+    prix_vente: "0.00",
+    prix_public: "0.00",
+    nb_pages: "0",
+};
 
 function LivresPage() {
+    const { activeSeason } = useAppStore();
     const [livres, setLivres] = useState([]);
     const [categories, setCategories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +61,7 @@ function LivresPage() {
         nb_pages: "",
         color_code: "#FFFFFF",
         description: "",
-        annee_publication: "2627"
+        annee_publication: activeSeason?.name || ""
     });
     const [livreID, setLivreID] = useState("");
     const actionsDetaille = {
@@ -38,7 +77,7 @@ function LivresPage() {
                     toast.success("Livre supprimé");
                     fetchData();
                 } catch (error) {
-                    console.error("Error deleting livre:", error);
+                    logger({ msg: "Error deleting livre", error }, "error")();
                     toast.error("Erreur lors de la suppression");
                 }
             },
@@ -49,6 +88,12 @@ function LivresPage() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogMode, setDialogMode] = useState("add");
 
+    // Sync activeSeason.name with form.annee_publication when in 'add' mode or when activeSeason changes
+    useEffect(() => {
+        if (dialogMode === "add" && activeSeason?.name) {
+            setForm(prev => ({ ...prev, annee_publication: activeSeason.name }));
+        }
+    }, [activeSeason, dialogMode]);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -58,11 +103,10 @@ function LivresPage() {
                 categoryService.getAll()
             ]);
             const rawLivres = livresRes;
-            // logger({ rawLivres })()
             setLivres(rawLivres);
             setCategories(categoriesRes);
         } catch (error) {
-            console.error("Error fetching data:", error);
+            logger({ msg: "Error fetching data", error }, "error")();
             toast.error("Erreur lors du chargement des données");
         } finally {
             setIsLoading(false);
@@ -99,7 +143,7 @@ function LivresPage() {
             nb_pages: "",
             color_code: "#FFFFFF",
             description: "",
-            annee_publication: "2627"
+            annee_publication: activeSeason?.name || ""
         });
     };
 
@@ -116,7 +160,7 @@ function LivresPage() {
                 nb_pages: row.nb_pages || 0,
                 color_code: row.color_code || "#FFFFFF",
                 description: row.description || "",
-                annee_publication: "2627"
+                annee_publication: row.annee_publication || activeSeason?.name || ""
             });
             setLivreID(row.id);
             setDialogOpen(true);
@@ -133,7 +177,7 @@ function LivresPage() {
                 nb_pages: row.nb_pages || 0,
                 color_code: row.color_code || "#FFFFFF",
                 description: row.description || "",
-                annee_publication: "2627"
+                annee_publication: row.annee_publication || activeSeason?.name || ""
             });
             setDialogOpen(true);
         }
@@ -149,92 +193,31 @@ function LivresPage() {
         { header: "Nombre de pages", accessor: "nb_pages" },
     ]
 
-    const livreSchema = useMemo(
-        () => [
-            {
-                name: "titre",
-                label: "Titre du livre",
-                placeholder: "Entrer le titre complet",
-                value: form.titre,
-                onChange: (v) => setForm((prev) => ({ ...prev, titre: v })),
-                required: true
-            },
-            {
-                name: "code",
-                label: "Code / Référence",
-                placeholder: "Ex: R-102",
-                value: form.code,
-                onChange: (v) => setForm((prev) => ({ ...prev, code: v })),
-                required: true
-            },
-            {
-                name: "categorie_id",
-                label: "Catégorie",
-                placeholder: "Sélectionner une catégorie",
-                type: "select",
-                inputType: "select",
-                items: categories.map(c => ({ label: c.libelle, value: c.id })),
-                value: form.categorie_id,
-                onChange: (v) => setForm((prev) => ({ ...prev, categorie_id: v })),
-            },
-            {
-                name: "prix_achat",
-                label: "Prix d'Achat (DH)",
-                type: "number",
-                placeholder: "0.00",
-                value: form.prix_achat,
-                onChange: (v) => setForm((prev) => ({ ...prev, prix_achat: v })),
-            },
-            {
-                name: "prix_vente",
-                label: "Prix de Vente (DH)",
-                type: "number",
-                placeholder: "0.00",
-                value: form.prix_vente,
-                onChange: (v) => setForm((prev) => ({ ...prev, prix_vente: v })),
-            },
-            {
-                name: "prix_public",
-                label: "Prix Public (DH)",
-                type: "number",
-                placeholder: "0.00",
-                value: form.prix_public,
-                onChange: (v) => setForm((prev) => ({ ...prev, prix_public: v })),
-            },
-            {
-                name: "nb_pages",
-                label: "Nombre de pages",
-                type: "number",
-                placeholder: "0",
-                value: form.nb_pages,
-                onChange: (v) => setForm((prev) => ({ ...prev, nb_pages: v })),
-            },
-            {
-                name: "annee_publication",
-                label: "Année",
-                placeholder: "2026/2027",
-                disabled: true,
-                value: "2627"
-            },
-            {
-                name: "color_code",
-                label: "Couleur",
-                type: "color",
-                value: form.color_code,
-                onChange: (v) => setForm((prev) => ({ ...prev, color_code: v })),
-            },
-            {
-                name: "description",
-                label: "Description",
-                type: "textarea",
-                // fullWidth: true,
-                value: form.description,
-                onChange: (v) => setForm((prev) => ({ ...prev, description: v })),
-            },
-        ],
+    const baseLivreSchema = useMemo(() => buildSchemaFromControllerRules({
+        rules: LIVRE_RULES,
+        formData: form,
+        setFormData: setForm,
+        labels: LIVRE_LABELS,
+        placeholders: LIVRE_PLACEHOLDERS,
+        selectItems: {
+            categorie_id: categories.map(c => ({ label: c.libelle, value: c.id })),
+        },
+        exclude: ["id", "created_at", "updated_at"],
+    }), [form, categories]);
 
-        [form, categories]
-    );
+    const livreSchema = useMemo(() => baseLivreSchema.map(field => {
+        if (field.name === "color_code") return { ...field, type: "color" };
+        if (field.name === "description") return { ...field, inputType: "textarea" };
+        if (field.name === "annee_publication") return {
+            ...field,
+            placeholder: activeSeason?.name
+                ? `${activeSeason.name.slice(0, 2)}/${activeSeason.name.slice(2)}`
+                : "----",
+            disabled: true,
+            value: form.annee_publication || activeSeason?.name || "",
+        };
+        return field;
+    }), [baseLivreSchema, activeSeason, form.annee_publication]);
 
     return (
         <div className="space-y-6">

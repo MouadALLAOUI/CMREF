@@ -6,15 +6,19 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Traits\ScopedByRepresentant;
+use App\Models\Traits\FilterBySeason;
 
 class DemandeF extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, ScopedByRepresentant, FilterBySeason;
 
     protected $table = 'demande_f'; // Nom exact de la table
 
     protected $fillable = [
         'rep_id',
+        'season_id',
+        'entity_type',
         'client_id',
         'date_demande',
         'ref',

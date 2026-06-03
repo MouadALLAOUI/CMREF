@@ -7,7 +7,6 @@ const numberRound = (number) => {
 
     return numericVal;
   } catch (err) {
-    console.log(err)
     return 0
   }
 }
@@ -62,14 +61,12 @@ const dateFormat = (dateInput, showTime = false) => {
   return formattedDate;
 };
 
-const getSchoolYearFromDate = (dateString) => {
-  if (!dateString) return "2627"; // Default fallback
-  const date = new Date(dateString);
+const getSchoolYearFromDate = (dateInput) => {
+  const dateVal = dateInput ? new Date(dateInput) : new Date();
+  const date = isNaN(dateVal.getTime()) ? new Date() : dateVal;
   const year = date.getFullYear();
-  const month = date.getMonth() + 1; // getMonth is 0-indexed
+  const month = date.getMonth() + 1;
 
-  // Logic: If month is Sept (9) or later, it belongs to the year starting now
-  // Example: Oct 2025 -> "2526" | Jan 2026 -> "2526"
   if (month >= 9) {
     const start = String(year).slice(-2);
     const end = String(year + 1).slice(-2);

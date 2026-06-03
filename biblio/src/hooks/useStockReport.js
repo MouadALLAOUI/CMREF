@@ -5,7 +5,7 @@ import categoryService from "../api/services/categoryService";
 import livreService from "../api/services/livreService";
 import toast from "react-hot-toast";
 
-export function useStockReport(selectedDestinationId) {
+export function useStockReport(selectedDestinationId, selectedSeasonId) {
   const [destinations, setDestinations] = useState([]);
   const [categories, setCategories] = useState([]);
   const [livres, setLivres] = useState([]);
@@ -16,8 +16,12 @@ export function useStockReport(selectedDestinationId) {
     const fetchAllData = async () => {
       setIsLoading(true);
       try {
+        const params = {};
+        if (selectedSeasonId && selectedSeasonId !== "all") {
+          params.season_id = selectedSeasonId;
+        }
         const [destRes, catRes, livRes] = await Promise.all([
-          destinationService.getAll(),
+          destinationService.getAll(params),
           categoryService.getAll(),
           livreService.getAll()
         ]);
@@ -32,7 +36,7 @@ export function useStockReport(selectedDestinationId) {
       }
     };
     fetchAllData();
-  }, []);
+  }, [selectedSeasonId]);
 
   // 2. CALCULATE AND GROUP DATA
   const groupedReportData = useMemo(() => {

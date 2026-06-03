@@ -11,13 +11,18 @@ import representantService from "../../../api/services/representantService";
 import bLivraisonItemService from "../../../api/services/bLivraisonItemService";
 import FormInputRow from "../../../components/ui/FormInputRaw";
 import { numberRound } from "../../../lib/utilities";
+import useAppStore from "../../../store/useAppStore";
+import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
+import SingleRepBlPdf from "../../../components/pdfs/representants/SingleRepBlPdf";
 
 function ReprésentantSaisirBl() {
+    const { activeSeason } = useAppStore();
     const [blData, setBlData] = useState([]);
     const [livres, setLivres] = useState([]);
     const [categories, setCategories] = useState([]);
     const [representants, setRepresentants] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedRep, setSelectedRep] = useState("all");
 
     const [formData, setFormData] = useState({
         rep_id: "",
@@ -28,7 +33,7 @@ function ReprésentantSaisirBl() {
         statut_recu: false,
         statut_vu: false,
         status: "",
-        annee: "2627",
+        annee: activeSeason?.name || "",
         details: []
     });
 
@@ -38,7 +43,7 @@ function ReprésentantSaisirBl() {
     const actionsDetaille = {
         delete: {
             title: "Supprimer",
-            description: "Êtes-vous sûr de vouloir supprimer ce fornisseur?",
+            description: "Êtes-vous sûr de vouloir supprimer ce BL?",
             actionText: "Supprimer",
             cancelText: "Annuler",
             type: "delete",
@@ -94,17 +99,18 @@ function ReprésentantSaisirBl() {
     };
 
     const [selectedBlItems, setSelectedBlItems] = useState(null);
+    const [selectedForPrint, setSelectedForPrint] = useState(null);
+    const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
 
     const fetchData = async () => {
         setIsLoading(true);
         try {
             const [blRes, livreRes, catRes, repRes] = await Promise.all([
-                bLivraisonService.getAll(),
+                bLivraisonService.getAll({ annee: activeSeason?.name }),
                 livreService.getAll(),
                 categoryService.getAll(),
                 representantService.getAll()
             ]);
-            console.log(blRes)
             setBlData(blRes);
             setLivres(livreRes);
             setCategories(catRes);
@@ -116,11 +122,9 @@ function ReprésentantSaisirBl() {
         }
     }
 
-    // logger({ blData, livres, categories, representants })
-
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [activeSeason?.name]);
 
     const updateDetail = (livreId, label, qte) => {
         setFormData(prev => {
@@ -138,11 +142,24 @@ function ReprésentantSaisirBl() {
                 representant: row.representant?.nom,
                 number: row.bl_number,
                 date: row.date_emission,
-                items: row.items
+                type: row.type,
+                mode_envoi: row.mode_envoi,
+                items: row.items,
+                rawItems: row.items
             });
             setTimeout(() => {
                 document.getElementById('bl-details-section')?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
+        } else if (type === "imp") {
+            setSelectedForPrint({
+                bl_number: row.bl_number,
+                representant: row.representant?.nom,
+                date: row.date_emission,
+                type: row.type,
+                mode_envoi: row.mode_envoi,
+                rawItems: row.items
+            });
+            setIsPrintDialogOpen(true);
         }
     };
 
@@ -173,7 +190,7 @@ function ReprésentantSaisirBl() {
             statut_recu: false,
             statut_vu: false,
             status: "",
-            annee: "2627",
+            annee: activeSeason?.name || "",
             details: []
         });
     }
@@ -191,8 +208,18 @@ function ReprésentantSaisirBl() {
         });
     });
 
+    const filteredBlData = useMemo(() => {
+        if (selectedRep === "all") return blData;
+        return blData.filter(bl => bl.rep_id === selectedRep);
+    }, [blData, selectedRep]);
+
+    const repOptions = useMemo(() => [
+        { label: "Tous les représentants", value: "all" },
+        ...representants.map(r => ({ label: r.nom, value: r.id })),
+    ], [representants]);
+
     const columns = [
-        { header: "Representant", accessor: "representant.nom" },
+        { header: "Représentant", accessor: "representant.nom" },
         { header: "Date", accessor: "date_emission", type: "date" },
         { header: "Type", accessor: "type" },
         { header: "N° BL", accessor: "bl_number" },
@@ -202,23 +229,21 @@ function ReprésentantSaisirBl() {
         { header: "Reçu", accessor: "statut_recu", type: "bool", onClick: (row) => handleRecu(row) },
     ]
     const handleVu = async (row) => {
-        return console.log("stopped")
         try {
             const newStatus = !row.statut_vu;
             await bLivraisonService.update(row.id, { statut_vu: newStatus });
             toast.success(newStatus ? "Marqué comme vu" : "Marqué comme non vu");
-            fetchData(); // Refresh the table
+            fetchData();
         } catch (error) {
             toast.error("Erreur lors de la modification du statut");
         }
     }
     const handleRecu = async (row) => {
-        return console.log("stopped")
         try {
             const newStatus = !row.statut_recu;
             await bLivraisonService.update(row.id, { statut_recu: newStatus });
             toast.success(newStatus ? "Marqué comme Recu" : "Marqué comme non Recu");
-            fetchData(); // Refresh the table
+            fetchData();
         } catch (error) {
             toast.error("Erreur lors de la modification du statut");
         }
@@ -292,7 +317,6 @@ function ReprésentantSaisirBl() {
         <div className="p-4">
             <div className="flex items-center justify-between mb-4">
                 <h1 className="text-xl font-bold">Liste des BLs (Représentant)</h1>
-                {/* <BLDialog formData={formData} setFormData={setFormData} onUpdateDetail={updateDetail} /> */}
                 <UniversalDialog
                     schema={schema}
                     config={{ title: "Ajouter un BL (MSM-MEDIAS -- Représentant)" }}
@@ -306,19 +330,40 @@ function ReprésentantSaisirBl() {
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                 />
+            </div>
 
+            <div className="flex items-center gap-4 mb-4">
+                <label className="text-sm font-semibold text-slate-700">Filtrer par représentant:</label>
+                <select
+                    value={selectedRep}
+                    onChange={(e) => setSelectedRep(e.target.value)}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    {repOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                </select>
             </div>
 
             <MyTable
-                data={blData}
+                data={filteredBlData}
                 variant="blue"
                 pageSize={4}
-                actions={["view"]}
+                actions={["view", "imp"]}
                 onAction={handleAction}
                 columns={columns}
                 isLoading={isLoading}
                 enableSearch enableSorting
             />
+            {selectedForPrint && (
+                <PdfDialogViewer
+                    key={selectedForPrint.bl_number}
+                    open={isPrintDialogOpen}
+                    onOpenChange={setIsPrintDialogOpen}
+                    title={`Impression BL ${selectedForPrint.bl_number}`}
+                    document={<SingleRepBlPdf blData={selectedForPrint} />}
+                />
+            )}
             {selectedBlItems && (
                 <div id="bl-details-section" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="flex items-center justify-between mb-4">

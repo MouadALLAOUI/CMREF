@@ -1,15 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
-import { MyTable } from "../../../components/ui/myTable";
-import { Truck, Download } from "lucide-react";
+import { Truck, Printer, Download } from "lucide-react";
 import bLivraisonImpService from "../../../api/services/bLivraisonImpService";
 import livreService from "../../../api/services/livreService";
+import seasonsService from "../../../api/services/seasonsService";
+import { exportToCSV } from "../../../utils/helpers";
+import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
+import LivraisonPdf from "../../../components/pdfs/syntheses/LivraisonPdf";
+import { schoolYearFormat } from "../../../lib/utilities";
 
 const fetchAllPaginated = async (serviceGetAll, params = {}) => {
     const first = await serviceGetAll({ ...params, page: 1 });
-    const firstData = first;
+    const firstData = Array.isArray(first) ? first : first?.data || [];
     const meta = first?.meta;
     if (!meta?.last_page) return firstData;
 
@@ -19,7 +23,8 @@ const fetchAllPaginated = async (serviceGetAll, params = {}) => {
         pages.push(serviceGetAll({ ...params, page }));
     }
     const rest = await Promise.all(pages);
-    return [...firstData, ...rest.flatMap((r) => r)];
+    const restData = rest.flatMap((r) => Array.isArray(r) ? r : r?.data || []);
+    return [...firstData, ...restData];
 };
 
 const toNumber = (v) => {
@@ -27,21 +32,42 @@ const toNumber = (v) => {
     return Number.isFinite(n) ? n : 0;
 };
 
+const CATEGORY_ORDER = ["Primaire", "Collège", "Lycée", "Préscolaire", "Robotos"];
+
 const LivraisonFournisseursPage = () => {
-    const [rows, setRows] = useState([]);
+    const [categorySections, setCategorySections] = useState([]);
+    const [summaryRows, setSummaryRows] = useState([]);
     const [kpis, setKpis] = useState({ fournisseurs: 0, quantite: 0, montant: 0 });
-    const [isLoading, setIsLoading] = useState(true);
+    const [seasons, setSeasons] = useState([]);
+    const [selectedSeasonId, setSelectedSeasonId] = useState("");
+    const [pdfOpen, setPdfOpen] = useState(false);
+    const printRef = useRef(null);
+
+    useEffect(() => {
+        seasonsService.getAll().then(setSeasons).catch(() => {});
+    }, []);
+
+    useEffect(() => {
+        if (seasons.length > 0 && !selectedSeasonId) {
+            const active = seasons.find(s => s.is_active);
+            setSelectedSeasonId(active?.id || seasons[0]?.id || "");
+        }
+    }, [seasons]);
 
     const fetchData = useCallback(async () => {
-        setIsLoading(true);
         try {
+            const params = {};
+            if (selectedSeasonId && selectedSeasonId !== "all") {
+                params.season_id = selectedSeasonId;
+            }
             const [livraisons, livres] = await Promise.all([
-                fetchAllPaginated(bLivraisonImpService.getAll),
+                fetchAllPaginated(bLivraisonImpService.getAll, params),
                 fetchAllPaginated(livreService.getAll),
             ]);
 
             const livreById = new Map(livres.map((l) => [l.id, l]));
-            const grouped = new Map();
+            const impGrouped = new Map();
+            const catBookMap = new Map();
 
             for (const l of livraisons) {
                 const impId = l.imprimeur_id || l.imprimeur?.id;
@@ -52,7 +78,7 @@ const LivraisonFournisseursPage = () => {
                 const qty = toNumber(l.quantite);
                 const total = unit * qty;
 
-                const prev = grouped.get(impId) || {
+                const prev = impGrouped.get(impId) || {
                     id: impId,
                     fournisseur: l.imprimeur?.nom || l.imprimeur?.raison_sociale || impId,
                     nbLivres: 0,
@@ -60,17 +86,24 @@ const LivraisonFournisseursPage = () => {
                     lastDate: "",
                     blNumbers: new Set(),
                 };
-
                 prev.nbLivres += qty;
                 prev.montant += total;
                 if (l.date_reception && (!prev.lastDate || String(l.date_reception) > String(prev.lastDate))) {
                     prev.lastDate = l.date_reception;
                 }
                 if (l.b_livraison_number) prev.blNumbers.add(String(l.b_livraison_number));
-                grouped.set(impId, prev);
+                impGrouped.set(impId, prev);
+
+                const cat = livre?.categorie?.libelle || "Autres";
+                const bookKey = `${cat}::${l.livre_id || l.livre?.id}`;
+                if (!catBookMap.has(bookKey)) {
+                    catBookMap.set(bookKey, { cat, livreId: l.livre_id || l.livre?.id, impQty: new Map() });
+                }
+                const cb = catBookMap.get(bookKey);
+                cb.impQty.set(impId, (cb.impQty.get(impId) || 0) + qty);
             }
 
-            const computed = Array.from(grouped.values()).map((g) => ({
+            const computed = Array.from(impGrouped.values()).map((g) => ({
                 id: g.id,
                 fournisseur: g.fournisseur,
                 nbLivres: g.nbLivres,
@@ -79,43 +112,105 @@ const LivraisonFournisseursPage = () => {
                 nbBL: g.blNumbers.size,
             })).sort((a, b) => b.montant - a.montant);
 
-            setRows(computed);
+            setSummaryRows(computed);
             setKpis({
                 fournisseurs: computed.length,
                 quantite: computed.reduce((sum, r) => sum + toNumber(r.nbLivres), 0),
                 montant: computed.reduce((sum, r) => sum + toNumber(r.montant), 0),
             });
+
+            const catMap = new Map();
+            for (const [, cb] of catBookMap) {
+                if (!catMap.has(cb.cat)) catMap.set(cb.cat, []);
+                const livre = livreById.get(cb.livreId);
+                catMap.get(cb.cat).push({
+                    id: cb.livreId,
+                    code: livre?.code || "",
+                    titre: livre?.titre || "",
+                    impQty: Object.fromEntries(cb.impQty),
+                    total: Array.from(cb.impQty.values()).reduce((s, v) => s + v, 0),
+                });
+            }
+
+            const sections = CATEGORY_ORDER
+                .filter(cat => catMap.has(cat))
+                .map(cat => ({
+                    category: cat,
+                    books: catMap.get(cat),
+                }));
+
+            const extraCats = Array.from(catMap.keys())
+                .filter(cat => !CATEGORY_ORDER.includes(cat))
+                .map(cat => ({ category: cat, books: catMap.get(cat) }));
+
+            setCategorySections([...sections, ...extraCats]);
         } catch (error) {
             logger("Error computing livraisons fournisseurs:", error);
             toast.error("Erreur lors du chargement des livraisons fournisseurs");
-        } finally {
-            setIsLoading(false);
         }
-    }, []);
+    }, [selectedSeasonId]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    const columns = useMemo(
-        () => [
-            { header: "Fournisseur", accessor: "fournisseur" },
-            { header: "Nb BL", accessor: "nbBL" },
-            { header: "Quantité", accessor: "nbLivres" },
-            { header: "Montant (DH)", accessor: "montant", type: "money" },
-            { header: "Dernière réception", accessor: "date", type: "date" },
-        ],
-        []
-    );
+    const seasonLabel = selectedSeasonId && selectedSeasonId !== "all"
+        ? schoolYearFormat(seasons.find(s => s.id === selectedSeasonId)?.name)
+        : "Toutes les saisons";
+
+    const handleExportCSV = () => {
+        const exportData = [];
+        categorySections.forEach(section => {
+            section.books.forEach(book => {
+                exportData.push({
+                    Catégorie: section.category,
+                    Ouvrage: book.titre,
+                    Code: book.code,
+                    Quantité: book.quantite,
+                    "Montant (DH)": book.montant,
+                });
+            });
+        });
+        const cols = [
+            { header: "Catégorie", accessor: "Catégorie" },
+            { header: "Ouvrage", accessor: "Ouvrage" },
+            { header: "Code", accessor: "Code" },
+            { header: "Quantité", accessor: "Quantité" },
+            { header: "Montant (DH)", accessor: "Montant (DH)" },
+        ];
+        exportToCSV(exportData, cols, `LivraisonFournisseurs_${seasonLabel.replace(/\s+|\//g, '_')}.csv`);
+    };
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Truck className="text-blue-600" />
-                    <h1 className="text-2xl font-bold text-slate-800">Livraisons Fournisseurs</h1>
+                <div>
+                    <div className="flex items-center gap-2">
+                        <Truck className="text-blue-600" />
+                        <h1 className="text-2xl font-bold text-slate-800">Livraisons Fournisseurs</h1>
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Saison:</span>
+                        <select
+                            value={selectedSeasonId}
+                            onChange={(e) => setSelectedSeasonId(e.target.value)}
+                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
+                        >
+                            <option value="all">Toutes les saisons</option>
+                            {seasons.map(s => (
+                                <option key={s.id} value={s.id}>{s.name.slice(0, 2)} / {s.name.slice(2)}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-                <Button className="bg-slate-900 text-white hover:bg-black"><Download size={16} /></Button>
+                <div className="flex gap-2">
+                    <Button onClick={handleExportCSV} className="bg-emerald-700 text-white flex items-center gap-2 hover:bg-emerald-800">
+                        <Download size={16} /> CSV
+                    </Button>
+                    <Button onClick={() => setPdfOpen(true)} className="bg-slate-900 text-white flex items-center gap-2 hover:bg-black">
+                        <Printer size={16} /> Imprimer
+                    </Button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -133,17 +228,91 @@ const LivraisonFournisseursPage = () => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <MyTable
-                    data={rows}
-                    columns={columns}
-                    pageSize={10}
-                    variant="slate"
-                    isLoading={isLoading}
-                    enableSearch
-                    enableSorting
-                />
+            <div ref={printRef}>
+                {categorySections.map((section) => (
+                    <div key={section.category} className="mb-6">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                                <h2 className="text-sm font-bold text-slate-700 uppercase">
+                                    Synthèse Livraisons Fournisseurs → MSM-MEDIAS — Catégorie : {section.category}
+                                </h2>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                    <thead>
+                                        <tr className="bg-slate-100">
+                                            <th className="px-4 py-2 text-left font-bold text-slate-600">Ouvrage</th>
+                                            <th className="px-4 py-2 text-center font-bold text-slate-600">Code</th>
+                                            {summaryRows.map(r => (
+                                                <th key={r.id} className="px-4 py-2 text-center font-bold text-slate-600">{r.fournisseur}</th>
+                                            ))}
+                                            <th className="px-4 py-2 text-center font-bold text-slate-600">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {section.books.map((book) => (
+                                            <tr key={book.id} className="border-t border-slate-100 hover:bg-slate-50">
+                                                <td className="px-4 py-2 text-slate-700">{book.titre}</td>
+                                                <td className="px-4 py-2 text-center text-slate-500">{book.code}</td>
+                                                {summaryRows.map(r => (
+                                                    <td key={r.id} className="px-4 py-2 text-center">{book.impQty[r.id] || 0}</td>
+                                                ))}
+                                                <td className="px-4 py-2 text-center font-bold text-blue-700">{book.total}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                        <h2 className="text-sm font-bold text-slate-700 uppercase">Détail par fournisseur</h2>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-slate-100">
+                                    <th className="px-4 py-2 text-left font-bold text-slate-600">Fournisseur</th>
+                                    <th className="px-4 py-2 text-center font-bold text-slate-600">Nb BL</th>
+                                    <th className="px-4 py-2 text-center font-bold text-slate-600">Quantité</th>
+                                    <th className="px-4 py-2 text-right font-bold text-slate-600">Montant (DH)</th>
+                                    <th className="px-4 py-2 text-center font-bold text-slate-600">Dernière réception</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {summaryRows.map((row) => (
+                                    <tr key={row.id} className="border-t border-slate-100 hover:bg-slate-50">
+                                        <td className="px-4 py-2 text-slate-700">{row.fournisseur}</td>
+                                        <td className="px-4 py-2 text-center">{row.nbBL}</td>
+                                        <td className="px-4 py-2 text-center font-bold">{row.nbLivres}</td>
+                                        <td className="px-4 py-2 text-right text-blue-700">{row.montant.toLocaleString()} DH</td>
+                                        <td className="px-4 py-2 text-center text-slate-500">{row.date}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+
+            <PdfDialogViewer
+                open={pdfOpen}
+                onOpenChange={setPdfOpen}
+                title="Livraisons Fournisseurs"
+                document={
+                    <LivraisonPdf
+                        title="Livraisons Fournisseurs → MSM-MEDIAS"
+                        categorySections={categorySections}
+                        summaryRows={summaryRows}
+                        kpis={kpis}
+                        labelField="fournisseur"
+                        seasonLabel={seasonLabel}
+                    />
+                }
+            />
         </div>
     );
 };

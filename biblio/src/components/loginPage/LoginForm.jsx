@@ -4,11 +4,10 @@ import FormInputRow from "../ui/FormInputRaw";
 import seasonsService from "../../api/services/seasonsService";
 
 function LoginForm({ onLogIn, error }) {
-    // 1. Create state for the form fields
     const [formData, setFormData] = useState({
         login: "admin",
         password: "12345678",
-        annee: "2627"
+        annee: ""
     });
     const [dataErr, setDataErr] = useState({
         login: "",
@@ -31,6 +30,16 @@ function LoginForm({ onLogIn, error }) {
     useEffect(() => {
         fetchSeasons();
     }, []);
+
+    // Auto-select active season once seasons are loaded
+    useEffect(() => {
+        if (seasons.length > 0 && !formData.annee) {
+            const active = seasons.find(s => s.is_active);
+            if (active?.name) {
+                setFormData(prev => ({ ...prev, annee: active.name }));
+            }
+        }
+    }, [seasons]);
 
     const seasonFlat = seasons.flatMap(season =>
         season.is_active

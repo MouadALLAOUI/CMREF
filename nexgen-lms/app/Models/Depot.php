@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\ScopedByRepresentant;
+use App\Models\Traits\FilterBySeason;
 
 class Depot extends Model
 {
-    use HasFactory, HasUlids;
+    use HasFactory, HasUlids, ScopedByRepresentant, FilterBySeason;
     protected $fillable = [
         'rep_id',
+        'season_id',
+        'entity_type',
         'livre_id',
         'type',
         'quantite_balance',

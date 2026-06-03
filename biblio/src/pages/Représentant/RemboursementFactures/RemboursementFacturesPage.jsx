@@ -10,7 +10,7 @@ import factService from "../../../api/services/factService";
 import representantService from "../../../api/services/representantService";
 import banqueService from "../../../api/services/banqueService";
 import { formatMoney, calculateFinancialSummary } from "../../../utils/helpers";
-import { TrendingDown, Wallet, CreditCard, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import SectionContainer from "../../../components/ui/SectionContainer";
 
 function RemboursementFacturesPage() {
@@ -285,37 +285,6 @@ function RemboursementFacturesPage() {
 
     return (
         <div className="space-y-6">
-            {/* Financial Summary Bar */}
-            {/*<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-4">
-                    <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
-                        <CreditCard size={24} />
-                    </div>
-                    <div>
-                        <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest">Crédit Total Factures</p>
-                        <p className="text-2xl font-black text-emerald-900">{formatMoney(financialSummary.totalCredit)}</p>
-                    </div>
-                </div>
-                <div className="p-6 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-4">
-                    <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-                        <Wallet size={24} />
-                    </div>
-                    <div>
-                        <p className="text-xs text-blue-600 font-bold uppercase tracking-widest">Avance Totale Factures</p>
-                        <p className="text-2xl font-black text-blue-900">{formatMoney(financialSummary.totalAvance)}</p>
-                    </div>
-                </div>
-                <div className="p-6 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-4">
-                    <div className="p-3 bg-amber-100 rounded-full text-amber-600">
-                        <TrendingDown size={24} />
-                    </div>
-                    <div>
-                        <p className="text-xs text-amber-600 font-bold uppercase tracking-widest">Reste à Payer Factures</p>
-                        <p className="text-2xl font-black text-amber-900">{formatMoney(financialSummary.totalReste)}</p>
-                    </div>
-                </div>
-            </div>*/}
-
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Remboursements Factures</h1>
                 <UniversalDialog

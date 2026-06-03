@@ -4,10 +4,15 @@ import useAppStore from "../../../store/useAppStore";
 import { cn } from "../../../lib/utils";
 
 export const HeaderComponent = () => {
-    const { isAdminMode } = useAppStore();
+    const { isAdminMode, activeSeason, isApiLoading } = useAppStore();
     const [openMenu, setOpenMenu] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const timeoutRef = useRef(null);
+
+    const seasonLabel = activeSeason?.name
+        ? `SAISON : ${activeSeason.name.slice(0, 2)} / ${activeSeason.name.slice(2)}`
+        : "SAISON : —";
+
     let menuItems =
         isAdminMode
             ? [
@@ -20,71 +25,72 @@ export const HeaderComponent = () => {
                 },
                 {
                     label: "Fournisseurs", isTrigger: true, subItems: [
-                        { label: "Fournisseurs disponibles", href: "/dash/fournisseurs/Fournisseurs_disponibles" },
-                        { label: "Saisir un BL", href: "/dash/fournisseurs/Saisir_un_BL" },
-                        { label: "Remboursement", href: "/dash/fournisseurs/Remboursement" },
-                        { label: "Synthèse BL", href: "/dash/fournisseurs/Synthese_BL" },
-                        { label: "Synthèse Remboursement", href: "/dash/fournisseurs/Synthese_Remboursement" },
+                        { label: "Fournisseurs disponibles", href: "/dash/fournisseurs/fournisseurs_disponibles" },
+                        { label: "Saisir un BL", href: "/dash/fournisseurs/saisir_un_bl" },
+                        { label: "Remboursement", href: "/dash/fournisseurs/remboursement" },
+                        { label: "Synthèse BL", href: "/dash/fournisseurs/synthese_bl" },
+                        { label: "Synthèse Remboursement", href: "/dash/fournisseurs/synthese_remboursement" },
                     ]
                 },
                 {
                     label: "Représentant", isTrigger: true, subItems: [
-                        { label: "Représentants disponibles", href: "/dash/representant/Representants_disponibles" },
-                        { label: "Saisir un BL", href: "/dash/representant/Saisir_un_BL" },
-                        { label: "Remboursement", href: "/dash/representant/Remboursement" },
-                        { label: "Demande de facturation", href: "/dash/representant/Demande_facturation" },
-                        { label: "Factures", href: "/dash/representant/Factures" },
-                        { label: "Remboursement Factures", href: "/dash/representant/Remboursement_Factures" },
-                        { label: "Déclaration Dépôt", href: "/dash/representant/Declaration_Depot" },
-                        { label: "Cahier de texte", href: "/dash/representant/Cahier_texte", color: "bg-blue-500 text-white" },
-                        { label: "Cartes de Visite & Chevalet", href: "/dash/representant/Cartes_Visite", color: "bg-orange-500 text-white" },
-                        { label: "synthèse BL", href: "/dash/representant/Synthese_BL" },
-                        { label: "synthèse Remboursement", href: "/dash/representant/Synthese_Remboursement" },
+                        { label: "Représentants disponibles", href: "/dash/representant/representants_disponibles" },
+                        { label: "Saisir un BL", href: "/dash/representant/saisir_un_bl" },
+                        { label: "Remboursement", href: "/dash/representant/remboursement" },
+                        { label: "Demande de facturation", href: "/dash/representant/demande_facturation" },
+                        { label: "Factures", href: "/dash/representant/factures" },
+                        { label: "Remboursement Factures", href: "/dash/representant/remboursement_factures" },
+                        { label: "Déclaration Dépôt", href: "/dash/representant/declaration_depot" },
+                        { label: "Cahier de texte", href: "/dash/representant/cahier_texte", color: "bg-blue-500 text-white" },
+                        { label: "Cartes de Visite & Chevalet", href: "/dash/representant/cartes_visite", color: "bg-orange-500 text-white" },
+                        { label: "synthèse BL", href: "/dash/representant/synthese_bl" },
+                        { label: "synthèse Remboursement", href: "/dash/representant/synthese_remboursement" },
                     ]
                 },
                 { label: "ROBOTS", href: "/dash/robots", isTrigger: false },
                 {
                     label: "Traçabilité", isTrigger: true, subItems: [
-                        { label: "clients", href: "/dash/tracabilite/clients" },
-                        { label: "BL Clients", href: "/dash/tracabilite/BL_Clients" },
-                        { label: "Remboursement Client", href: "/dash/tracabilite/Remboursement_Client" },
-                        { label: "Synthèse", href: "/dash/tracabilite/Synthese" },
+                        { label: "Clients", href: "/dash/tracabilite/clients" },
+                        { label: "BL Clients", href: "/dash/tracabilite/bl_clients" },
+                        { label: "Remboursement Client", href: "/dash/tracabilite/remboursement_client" },
+                        { label: "Synthèse", href: "/dash/tracabilite/synthese" },
+                        { label: "Journal d'activité", href: "/dash/tracabilite/activite" },
                     ]
                 },
                 {
                     label: "Synthèses Globales", isTrigger: true, subItems: [
-                        { label: "Livraison Fournisseurs --> MSM-MEDIAS", href: "/dash/syntheses_globales/Livraison_Fournisseurs" },
-                        { label: "Livraison MSM-MEDIAS --> REP", href: "/dash/syntheses_globales/Livraison_REP" },
-                        { label: "Ventes", href: "/dash/syntheses_globales/Ventes" },
-                        { label: "Dépôt", href: "/dash/syntheses_globales/Depot" },
-                        { label: "Remboursement Fournisseurs", href: "/dash/syntheses_globales/Remboursement_Fournisseurs" },
-                        { label: "Remboursement REP", href: "/dash/syntheses_globales/Remboursement_REP" },
-                        { label: "Balance", href: "/dash/syntheses_globales/Balance" },
+                        { label: "Livraison Fournisseurs --> MSM-MEDIAS", href: "/dash/syntheses_globales/livraison_fournisseurs" },
+                        { label: "Livraison MSM-MEDIAS --> REP", href: "/dash/syntheses_globales/livraison_rep" },
+                        { label: "Ventes", href: "/dash/syntheses_globales/ventes" },
+                        { label: "Dépôt", href: "/dash/syntheses_globales/depot" },
+                        { label: "Remboursement Fournisseurs", href: "/dash/syntheses_globales/remboursement_fournisseurs" },
+                        { label: "Remboursement REP", href: "/dash/syntheses_globales/remboursement_rep" },
+                        { label: "Balance", href: "/dash/syntheses_globales/balance" },
                     ]
                 },
                 {
                     label: "Emailing", isTrigger: true, subItems: [
-                        { label: "Simple Email", href: "/dash/emailing/Simple_Email" },
-                        { label: "Invitation", href: "/dash/emailing/Invitation" },
+                        { label: "Simple Email", href: "/dash/emailing/simple_email" },
+                        { label: "Invitation", href: "/dash/emailing/invitation" },
                     ]
                 },
                 {
                     label: "Réglages", isTrigger: true, subItems: [
-                        { label: "Season de travail", href: "/dash/reglages/Season_travail" },
-                        { label: "Pied de facture", href: "/dash/reglages/Pied_de_facture" },
-                        { label: "Modèles Cahier de texte", href: "/dash/reglages/Modeles_Cahier_texte" },
+                        { label: "Saison de travail", href: "/dash/reglages/saison_travail" },
+                        { label: "Pied de facture", href: "/dash/reglages/pied_de_facture" },
+                        { label: "Modèles Cahier de texte", href: "/dash/reglages/modeles_cahier_texte" },
                     ]
                 },
-                { label: "SAISON : 2026 / 2027", href: "#", isTrigger: false },
+                { label: seasonLabel, href: "#", isTrigger: false },
                 { label: "Déconnexion", href: "/logout", isTrigger: false, color: "text-slate-900 bg-slate-100 hover:bg-slate-900 hover:text-white" },
             ]
             : [
                 { label: "ACCUEIL", href: "/REP/dash", isTrigger: false },
                 {
-                    label: "BON DE LIVRISON", isTrigger: true, subItems: [
-                        { label: "BL", href: "/REP/dash/bl/BL" },
-                        { label: "Remboursement", href: "/REP/dash/bl/Remb" },
-                        { label: "Synthèse BL", href: "/REP/dash/bl/SBl" },
+                    label: "BON DE LIVRAISON", isTrigger: true, subItems: [
+                        { label: "BL", href: "/REP/dash/bl/bl" },
+                        { label: "Remboursement", href: "/REP/dash/bl/remb" },
+                        { label: "Synthèse BL", href: "/REP/dash/bl/sbl" },
                     ]
                 },
                 {
@@ -95,18 +101,17 @@ export const HeaderComponent = () => {
                 },
                 {
                     label: "CLIENTS", isTrigger: true, subItems: [
-                        { label: "Ajouter Client", href: "/REP/dash/Clients/ajouter_client" },
-                        { label: "Saisir un BL", href: "/REP/dash/Clients/Saisir_un_BL" },
-                        { label: "Remboursement", href: "/REP/dash/Clients/Remboursement" },
-                        { label: "synthèse BL", href: "/REP/dash/Clients/Synthese_BL" },
-                        { label: "synthèse Remboursement", href: "/REP/dash/Clients/Synthese_Remboursement" },
-                        { label: "Historique", href: "/REP/dash/Clients/Historique" },
+                        { label: "Ajouter Client", href: "/REP/dash/clients/ajouter_client" },
+                        { label: "Saisir un BL", href: "/REP/dash/clients/saisir_un_bl" },
+                        { label: "Remboursement", href: "/REP/dash/clients/remboursement" },
+                        { label: "synthèse BL", href: "/REP/dash/clients/synthese_bl" },
+                        { label: "synthèse Remboursement", href: "/REP/dash/clients/synthese_remboursement" },
                         {
                             label: "Synthèses Globales", isTrigger: true,
                             color: "bg-emerald-300 text-emerald-600 hover:bg-emerald-100 hover:text-slate-900",
                             subItems: [
-                                { label: "Livraison Clients", href: "/REP/dash/Clients/syntheses_globales/Livraison_clients" },
-                                { label: "Remboursement Clients", href: "/REP/dash/Clients/syntheses_globales/Remboursement_clients" },
+                                { label: "Livraison Clients", href: "/REP/dash/clients/syntheses_globales/livraison_clients" },
+                                { label: "Remboursement Clients", href: "/REP/dash/clients/syntheses_globales/remboursement_clients" },
                             ]
                         }
                     ]
@@ -119,14 +124,14 @@ export const HeaderComponent = () => {
                     ]
                 },
                 {
-                    label: "CARTES DE VISITS & CHEVALET", isTrigger: true, subItems: [
-                        { label: "FAIRE UNE Commander", href: "/REP/dash/cartes_visits/commander" },
-                        { label: "Suivi des commandes", href: "/REP/dash/cartes_visits/suivi" },
+                    label: "CARTES DE VISITE & CHEVALET", isTrigger: true, subItems: [
+                        { label: "Commander une carte", href: "/REP/dash/cartes_visite/commander" },
+                        { label: "Suivi des commandes", href: "/REP/dash/cartes_visite/suivi" },
                     ]
                 },
                 { label: "ROBOTS", href: "/REP/dash/robots", isTrigger: false },
                 { label: "PROFIL", href: "/REP/dash/profil", isTrigger: false },
-                { label: "SAISON : 2026 / 2027", href: "#", isTrigger: false },
+                { label: seasonLabel, href: "#", isTrigger: false },
                 { label: "Déconnexion", href: "/logout", isTrigger: false, color: "text-slate-900 bg-slate-100 hover:bg-slate-900 hover:text-white" },
             ];
 
@@ -141,6 +146,11 @@ export const HeaderComponent = () => {
 
     return (
         <header className="w-[98%] mx-auto mt-2 bg-white rounded-lg shadow-sm border border-slate-100 sticky top-0 z-50">
+            {isApiLoading && (
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-slate-100 overflow-hidden rounded-t-lg">
+                    <div className="h-full bg-blue-500 animate-loading-bar" />
+                </div>
+            )}
             <div className="px-4 h-14 flex items-center justify-between">
 
                 {/* Mobile Toggle */}

@@ -10,10 +10,25 @@ use App\Http\Resources\DemandeFResource;
 
 class DemandeFController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $demandeFs = DemandeF::with(['representant', 'client', 'fact'])->latest('date_demande')->get();
-        return DemandeFResource::collection($demandeFs);
+        $query = DemandeF::with(['representant', 'client', 'fact'])->latest('date_demande');
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->paginate($perPage);
+            return response()->json([
+                'data' => DemandeFResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        return DemandeFResource::collection($query->get());
     }
 
     public function store(Request $request)
@@ -24,8 +39,7 @@ class DemandeFController extends Controller
             'date_demande'   => 'required|date',
             'ref'            => 'required|integer',
             'type'           => 'required|string|max:255',
-            // 'objet'          => 'nullable|string|max:255',
-            'statut'         => 'required|integer', // Match migration integer type
+            'statut'         => 'required|integer',
             'livree'         => 'sometimes|boolean',
             'annee_scolaire' => 'nullable|string|max:4',
             'contenu'        => 'nullable|string',

@@ -7,10 +7,12 @@ import UniversalDialog from "../../components/template/dialog/UniversalDialog";
 import { buildSchemaFromControllerRules } from "../../api/helpers/methodes";
 import robotService from "../../api/services/robotService";
 import representantService from "../../api/services/representantService";
+import { Bot } from "lucide-react";
 
 function RobotsPage() {
   const [rows, setRows] = useState([]);
   const [representants, setRepresentants] = useState([]);
+  const [selectedRep, setSelectedRep] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
 
   const [dialogMode, setDialogMode] = useState("add");
@@ -73,6 +75,16 @@ function RobotsPage() {
   useEffect(() => {
     if (!isDialogOpen) resetForm();
   }, [isDialogOpen]);
+
+  const filteredRows = useMemo(() => {
+    if (selectedRep === "all") return rows;
+    return rows.filter(r => (r.rep_id || r.representant?.id) === selectedRep);
+  }, [rows, selectedRep]);
+
+  const repOptions = useMemo(() => [
+    { label: "Tous les représentants", value: "all" },
+    ...representants.map((r) => ({ label: r.nom, value: r.id })),
+  ], [representants]);
 
   const actionsDetaille = {
     delete: {
@@ -214,8 +226,23 @@ function RobotsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Robots</h1>
-          <p className="text-sm text-slate-500">Suivi des opérations et du statut du parc.</p>
+          <div className="flex items-center gap-2">
+            <Bot className="text-slate-900" />
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Robots</h1>
+          </div>
+          <p className="text-sm text-slate-500 mt-1">Suivi des opérations et du statut du parc robotique.</p>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 uppercase">Représentant:</span>
+            <select
+              value={selectedRep}
+              onChange={(e) => setSelectedRep(e.target.value)}
+              className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
+            >
+              {repOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <UniversalDialog
           open={isDialogOpen}
@@ -241,7 +268,7 @@ function RobotsPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <MyTable
-          data={rows}
+          data={filteredRows}
           columns={columns}
           pageSize={10}
           actions={["view", "edit", "delete"]}

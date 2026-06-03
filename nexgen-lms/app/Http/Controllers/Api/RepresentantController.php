@@ -13,9 +13,25 @@ use Illuminate\Support\Facades\DB;
 
 class RepresentantController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $representants = Representant::with(["login"])->paginate(1000);
+        $query = Representant::with(["login"]);
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => RepresentantResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $representants = $query->paginate(1000);
         return RepresentantResource::collection($representants);
     }
 

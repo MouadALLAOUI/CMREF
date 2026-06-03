@@ -10,9 +10,25 @@ use App\Http\Resources\BVentesClientResource;
 
 class BVentesClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $bVentesClients = BVentesClient::with(['representant', 'client', 'livre'])->paginate(1000);
+        $query = BVentesClient::with(['representant', 'client', 'livre']);
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => BVentesClientResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $bVentesClients = $query->paginate(1000);
         return BVentesClientResource::collection($bVentesClients);
     }
 

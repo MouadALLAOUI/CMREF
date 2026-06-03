@@ -11,12 +11,25 @@ use Illuminate\Support\Facades\DB;
 
 class BLivraisonController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $bLivraisons = BLivraison::with(['representant', 'items.livre'])
-            ->latest()
-            ->get();
-        return BLivraisonResource::collection($bLivraisons);
+        $query = BLivraison::with(['representant', 'items.livre'])->latest();
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->paginate($perPage);
+            return response()->json([
+                'data' => BLivraisonResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        return BLivraisonResource::collection($query->get());
     }
 
     public function store(Request $request)
@@ -28,14 +41,13 @@ class BLivraisonController extends Controller
             'mode_envoi' => 'nullable|string',
             'type' => 'required|in:Livre,Specimen,Pedagogie,Retour',
             'annee' => 'nullable|string',
-            'details' => 'required|array|min:1', // Ensure at least one book is selected
+            'details' => 'required|array|min:1',
             'details.*.livre_id' => 'required|uuid|exists:livres,id',
             'details.*.qte' => 'required|integer',
         ]);
 
         try {
             $result = DB::transaction(function () use ($validatedData) {
-                // 1. Create the Header
                 $bLivraison = BLivraison::create([
                     'rep_id' => $validatedData['rep_id'],
                     'bl_number' => $validatedData['bl_number'],
@@ -46,7 +58,6 @@ class BLivraisonController extends Controller
                     'status' => 'Pending',
                 ]);
 
-                // 2. Create all Items linked to this BL
                 foreach ($validatedData['details'] as $item) {
                     $bLivraison->items()->create([
                         'livre_id' => $item['livre_id'],
@@ -96,7 +107,6 @@ class BLivraisonController extends Controller
         $bLivraison = BLivraison::findOrFail($id);
 
         return DB::transaction(function () use ($bLivraison) {
-            // Delete related items first if not using database cascade
             $bLivraison->items()->delete();
             $bLivraison->delete();
             return response()->json(['message' => "BL supprimé"]);

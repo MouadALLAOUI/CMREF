@@ -9,8 +9,34 @@ import imprimeurService from "../../../api/services/imprimeurService";
 import banqueService from "../../../api/services/banqueService";
 import UniversalDialog from "../../../components/template/dialog/UniversalDialog";
 import { useNavigate } from "react-router-dom";
+import useAppStore from "../../../store/useAppStore";
+import { currencyFormat } from "../../../lib/utilities";
+import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
+
+const REMB_IMP_RULES = {
+    imprimeur_id: 'required|uuid|exists:imprimeurs,id',
+    date_payment: 'required|date',
+    banque_id: 'nullable|uuid|exists:banques,id',
+    cheque_number: 'nullable|string|max:50',
+    montant: 'required|numeric|min:0',
+    annee: 'nullable|string',
+};
+
+const REMB_IMP_LABELS = {
+    imprimeur_id: "Fournisseur",
+    date_payment: "Date",
+    banque_id: "Banque",
+    cheque_number: "N° de Chèque",
+    montant: "Montant (DH)",
+    annee: "Année",
+};
+
+const REMB_IMP_GRID = {
+    imprimeur_id: "col-span-2",
+};
 
 const FournisseurRemboursement = () => {
+  const { activeSeason } = useAppStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     imprimeur_id: "",
@@ -20,12 +46,13 @@ const FournisseurRemboursement = () => {
     cheque_image_path: "",
     cheque_number: "",
     montant: "",
+    annee: activeSeason?.name || "",
   });
   const [remboursement, setRemboursement] = useState([]);
   const [imprimeurs, setImprimeurs] = useState([]);
   const [banque, setBanque] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  // logger(remboursement)();
+
   const actionsDetaille = {
     delete: {
       title: "Supprimer",
@@ -65,17 +92,16 @@ const FournisseurRemboursement = () => {
     setIsLoading(true);
     try {
       const [impRemb, imp, bank] = await Promise.all([
-        rembImpService.getAll(),
+        rembImpService.getAll({ annee: activeSeason?.name }),
         imprimeurService.getAll(),
         banqueService.getAll()
       ]);
       setRemboursement(impRemb);
       setImprimeurs(imp);
       setBanque(bank);
-      // logger({ remb: impRemb, imp: imp, bank: bank })()
     } catch (error) {
-      console.error("Error fetching Rembourcement:", error);
-      toast.error("Erreur lors du chargement des Rembourcement");
+      logger("Error fetching Remboursement:", error)();
+      toast.error("Erreur lors du chargement des Remboursement");
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +109,7 @@ const FournisseurRemboursement = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activeSeason?.name]);
 
   const handleReset = () => {
     setFormData({
@@ -94,6 +120,7 @@ const FournisseurRemboursement = () => {
       cheque_image_path: "",
       cheque_number: "",
       montant: "",
+      annee: activeSeason?.name || "",
     });
   };
 
@@ -108,6 +135,7 @@ const FournisseurRemboursement = () => {
         banque_nom: row.banque_nom || "",
         cheque_number: row.cheque_number,
         montant: row.montant,
+        annee: row.annee || activeSeason?.name || "",
       });
       setDialogOpen(true);
     }
@@ -154,63 +182,44 @@ const FournisseurRemboursement = () => {
     }
   };
 
-  const schema = useMemo(() => [
-    {
-      name: "imprimeur_id",
-      label: "Fournisseur",
-      placeholder: "Choisir fournisseur",
-      inputType: "select",
-      items: imprimeurs.map(i => ({ label: i.raison_sociale, value: i.id })),
-      value: formData.imprimeur_id,
-      onChange: (v) => setFormData(prev => ({ ...prev, imprimeur_id: v })),
-      required: true,
-      className: "col-span-2"
+  const baseSchema = useMemo(() => buildSchemaFromControllerRules({
+    rules: REMB_IMP_RULES,
+    formData,
+    setFormData,
+    labels: REMB_IMP_LABELS,
+    gridSpan: REMB_IMP_GRID,
+    selectItems: {
+      imprimeur_id: imprimeurs.map(i => ({ label: i.raison_sociale, value: i.id })),
+      banque_id: banque.map(b => ({ label: b.nom, value: b.id })),
     },
-    {
-      name: "date_payment",
-      label: "Date",
-      type: "date",
-      inputType: "date",
-      value: formData.date_payment,
-      onChange: (v) => setFormData(prev => ({ ...prev, date_payment: v })),
-      required: true
-    },
-    {
-      name: "banque_id",
-      label: "Banque",
+    exclude: ["id", "created_at", "updated_at", "statut_recu", "statut_rejete", "remarks", "banque_nom", "cheque_image_path"],
+  }), [formData, imprimeurs, banque]);
+
+  const schema = useMemo(() => baseSchema.map(field => {
+    if (field.name === "imprimeur_id") return { ...field, placeholder: "Choisir fournisseur" };
+    if (field.name === "banque_id") return {
+      ...field,
       placeholder: "Choisir banque",
-      inputType: "select",
-      items: banque.map(b => ({ label: b.nom, value: b.id })),
-      value: formData.banque_id,
       onChange: (v) => {
         const selected = banque.find(b => b.id === v);
         setFormData(prev => ({ ...prev, banque_id: v, banque_nom: selected?.nom || "" }));
-      }
-    },
-    {
-      name: "cheque_number",
-      label: "N° de Chèque",
-      placeholder: "Entrer n° chèque",
-      value: formData.cheque_number,
-      onChange: (v) => setFormData(prev => ({ ...prev, cheque_number: v })),
-    },
-    {
-      name: "montant",
-      label: "Montant (DH)",
-      type: "number",
-      placeholder: "0.00",
-      value: formData.montant,
-      onChange: (v) => setFormData(prev => ({ ...prev, montant: v })),
-      required: true
-    }
-  ], [formData, imprimeurs, banque]);
+      },
+    };
+    if (field.name === "cheque_number") return { ...field, placeholder: "Entrer n° chèque" };
+    if (field.name === "montant") return { ...field, placeholder: "0.00" };
+    return field;
+  }), [baseSchema, banque]);
 
   const rembStatus = useMemo(() => {
     return remboursement.reduce((acc, remb) => {
-      if (remb.statut_recu) acc.recu++;
+      if (remb.statut_recu) {
+        acc.recu++;
+        acc.totalRecu += Number(remb.montant) || 0;
+      }
       if (remb.statut_rejete) acc.rejete++;
+      acc.total += Number(remb.montant) || 0;
       return acc;
-    }, { recu: 0, rejete: 0 });
+    }, { recu: 0, rejete: 0, total: 0, totalRecu: 0 });
   }, [remboursement]);
 
   return (
@@ -240,12 +249,15 @@ const FournisseurRemboursement = () => {
           }
         />
       </div>
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-slate-900 px-6 py-4 flex items-center gap-3">
           <FileText className="text-white" size={20} />
           <h2 className="text-white font-bold flex flex-wrap items-center gap-x-4 gap-y-1">
             <div className="flex gap-4 text-sm font-normal border-l border-slate-700 pl-4 ml-2">
-              <span>Reçu : <span className="text-slate-300 font-bold">{rembStatus.recu}</span></span>
+              <span>Crédit : <span className="text-slate-300 font-bold">{currencyFormat(rembStatus.total)}</span></span>
+              <span>Avance : <span className="text-slate-300 font-bold">{currencyFormat(rembStatus.totalRecu)}</span></span>
+              <span>Reste : <span className="text-slate-300 font-bold">{currencyFormat(rembStatus.total - rembStatus.totalRecu)}</span></span>
+              <span className="border-l border-slate-700 pl-4">Reçu : <span className="text-slate-300 font-bold">{rembStatus.recu}</span></span>
               <span>Rejeté : <span className="text-slate-300 font-bold">{rembStatus.rejete}</span></span>
             </div>
           </h2>

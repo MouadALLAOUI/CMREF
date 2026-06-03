@@ -10,9 +10,25 @@ use App\Http\Resources\ImprimeurResource;
 
 class ImprimeurController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $imprimeurs = Imprimeur::paginate(1000);
+        $query = Imprimeur::query();
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => ImprimeurResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $imprimeurs = $query->paginate(1000);
         return ImprimeurResource::collection($imprimeurs);
     }
 

@@ -82,7 +82,6 @@ function DemandeFacturationPage() {
         { header: "Date", accessor: "date_demande", type: "date" },
         { header: "Client", accessor: "client.raison_sociale" },
         { header: "ICE", accessor: "client.ice" },
-        // { header: "Contenu", accessor: "contenu" },
         {
             header: "Montant HT",
             accessor: "fact.total_ht",

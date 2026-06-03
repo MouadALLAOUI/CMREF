@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import bLivraisonImpService from "../../../api/services/bLivraisonImpService";
 import livreService from "../../../api/services/livreService";
+import categoryService from "../../../api/services/categoryService";
+import seasonsService from "../../../api/services/seasonsService";
 import { currencyFormat } from "../../../lib/utilities";
 import SyntheseBlPdf from "../../../components/pdfs/fornisseurs/SyntheseBlPdf";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
@@ -19,8 +21,28 @@ const toNumber = (v) => {
 const SyntheseBLPage = () => {
     const [rows, setRows] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [seasons, setSeasons] = useState([]);
 
-    const [selectedAnnee, setSelectedAnnee] = useState("2627");
+    const [selectedAnnee, setSelectedAnnee] = useState("");
+
+    useEffect(() => {
+        seasonsService.getAll().then(setSeasons).catch(() => {});
+    }, []);
+
+    const seasonOptions = useMemo(() => {
+        return seasons.map(s => ({
+            value: s.name,
+            label: `${new Date(s.start_date).getFullYear()} / ${new Date(s.end_date).getFullYear()}`
+        }));
+    }, [seasons]);
+
+    // Auto-select first season after loading
+    useEffect(() => {
+        if (seasons.length > 0 && !selectedAnnee) {
+            const active = seasons.find(s => s.is_active);
+            setSelectedAnnee(active?.name || seasons[0]?.name || "");
+        }
+    }, [seasons]);
 
     const [selectedForPrint, setSelectedForPrint] = useState(null);
     const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
@@ -28,93 +50,16 @@ const SyntheseBLPage = () => {
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [blResponse, livresResponse] = await Promise.all([
+            const [blResponse, livresResponse, catsResponse] = await Promise.all([
                 bLivraisonImpService.getAll(),
                 livreService.getAll(),
+                categoryService.getAll()
             ]);
             const allBLs = blResponse;
             const allLivres = livresResponse;
+            const allCats = catsResponse?.data?.data || catsResponse?.data || catsResponse || [];
             const livreById = new Map(allLivres.map((l) => [l.id, l]));
-            // logger({ allBLs, allLivres })();
-
-            /** allBLs :
-             *
-            {
-                "id": "019d78ac-0f70-7100-a41b-0719bee04e95",
-                "imprimeur_id": "019d78ab-cd7d-70d2-9eae-505843545699",
-                "date_reception": "2019-04-18",
-                "b_livraison_number": "BLI-4659",
-                "remarks": "Perspiciatis molestiae velit fuga molestiae.",
-                "annee": "2828",
-                "created_at": "2026-04-10T18:33:55.000000Z",
-                "updated_at": "2026-04-10T18:33:55.000000Z",
-                "imprimeur": {
-                    "id": "019d78ab-cd7d-70d2-9eae-505843545699",
-                    "raison_sociale": "Remy SARL",
-                    "adresse": "rue de Mallet\n71446 Lefevre-les-Bains",
-                    "directeur_nom": "Alphonse Dos Santos",
-                    "directeur_tel": "+33 1 29 99 64 50",
-                    "directeur_email": "valentine.antoine@bailly.com",
-                    "adjoint_nom": "Adrien de Ruiz",
-                    "adjoint_tel": "+33 2 77 38 07 97",
-                    "adjoint_email": "imbert.bernadette@example.com",
-                    "created_at": "2026-04-10T18:33:38.000000Z",
-                    "updated_at": "2026-04-10T18:33:38.000000Z"
-                },
-                "items": [
-                    {
-                        "id": "019d78ac-125a-70b3-9b3c-d6b80f33d7ff",
-                        "deliverable_type": "App\\Models\\BLivraisonImp",
-                        "deliverable_id": "019d78ac-0f70-7100-a41b-0719bee04e95",
-                        "livre_id": "019d78ab-c8e9-7178-818c-17c8dbb76f1a",
-                        "quantite": 99,
-                        "created_at": "2026-04-10T18:33:56.000000Z",
-                        "updated_at": "2026-04-10T18:33:56.000000Z",
-                        "livre": {
-                            "id": "019d78ab-c8e9-7178-818c-17c8dbb76f1a",
-                            "titre": "Informatique et Robotique au primaire N 3",
-                            "code": "R3",
-                            "categorie_id": "019d78ab-c62a-73f1-b2a9-68ca5b567cfa",
-                            "prix_achat": "10.00",
-                            "prix_vente": "15.00",
-                            "prix_public": "20.00",
-                            "nb_pages": 48,
-                            "color_code": "#00DDFF",
-                            "description": null,
-                            "annee_publication": null,
-                            "created_at": "2026-04-10T18:33:37.000000Z",
-                            "updated_at": "2026-04-10T18:33:37.000000Z"
-                        }
-                    }
-                ]
-            }
-             */
-
-            /** allLivres:
-             *{
-            "id": "019d78ab-c853-70fb-a039-e6ce741cec40",
-            "titre": "Informatique et Robotique au primaire N 1",
-            "code": "R1",
-            "categorie_id": "019d78ab-c62a-73f1-b2a9-68ca5b567cfa",
-            "prix_achat": "10.00",
-            "prix_vente": "15.00",
-            "prix_public": "20.00",
-            "nb_pages": 40,
-            "color_code": "#00DDFF",
-            "description": null,
-            "annee_publication": null,
-            "created_at": "2026-04-10T18:33:37.000000Z",
-            "updated_at": "2026-04-10T18:33:37.000000Z",
-            "category": {
-                "id": "019d78ab-c62a-73f1-b2a9-68ca5b567cfa",
-                "libelle": "Primaire",
-                "description": "Enseignement primaire",
-                "created_at": "2026-04-10T18:33:36.000000Z",
-                "updated_at": "2026-04-10T18:33:36.000000Z"
-            }
-        },
-            */
-
+            const catById = new Map(allCats.map((c) => [c.id, c]));
 
             const processedRows = allBLs.map((bl) => {
                 // Calculate totals for this specific BL
@@ -128,16 +73,31 @@ const SyntheseBLPage = () => {
                     return acc;
                 }, { qty: 0, total: 0 });
 
+                // Group items by category for this BL
+                const itemsByCategory = {};
+                (bl.items || []).forEach(item => {
+                    const livre = livreById.get(item.livre_id);
+                    const cat = catById.get(livre?.categorie_id);
+                    const catLabel = cat?.libelle || "Non classifié";
+                    if (!itemsByCategory[catLabel]) itemsByCategory[catLabel] = [];
+                    itemsByCategory[catLabel].push({
+                        ...item,
+                        livre,
+                        total: toNumber(livre?.prix_achat ?? 0) * toNumber(item.quantite)
+                    });
+                });
+
                 return {
                     id: bl.id,
                     fournisseur: bl.imprimeur?.raison_sociale || bl.imprimeur?.nom || "—",
                     bl_number: bl.b_livraison_number || "—",
                     date_reception: bl.date_reception || "",
                     lignes: (bl.items || []).length,
-                    annee: bl.annee, // 👈 CRITICAL: Keep the year here
+                    annee: bl.annee,
                     quantite: stats.qty,
                     total_ht: stats.total,
-                    rawItems: bl.items
+                    rawItems: bl.items,
+                    itemsByCategory
                 };
             });
 
@@ -162,7 +122,7 @@ const SyntheseBLPage = () => {
             setIsPrintDialogOpen(true);
         }
     };
-    // logger({ selectedForPrint, isPrintDialogOpen })()
+
     const filteredRows = useMemo(() => {
         if (!selectedAnnee || selectedAnnee === "all") return rows;
         return rows.filter(row => row.annee === selectedAnnee);
@@ -185,6 +145,24 @@ const SyntheseBLPage = () => {
         []
     );
 
+    const categorySummary = useMemo(() => {
+        if (!filteredRows.length) return [];
+        const summary = {};
+        filteredRows.forEach(row => {
+            Object.entries(row.itemsByCategory || {}).forEach(([cat, items]) => {
+                if (!summary[cat]) summary[cat] = { qty: 0, total: 0, lignes: 0 };
+                items.forEach(item => {
+                    summary[cat].qty += toNumber(item.quantite);
+                    summary[cat].total += toNumber(item.total);
+                    summary[cat].lignes += 1;
+                });
+            });
+        });
+        return Object.entries(summary)
+            .map(([cat, data]) => ({ category: cat, ...data }))
+            .sort((a, b) => b.total - a.total);
+    }, [filteredRows]);
+
     return (
         <div className="space-y-6">
             <div className="mt-2 flex items-center gap-2">
@@ -195,9 +173,9 @@ const SyntheseBLPage = () => {
                     className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
                 >
                     <option value="all">Toutes les années</option>
-                    <option value="2526">2025 / 2026</option>
-                    <option value="2627">2026 / 2027</option>
-                    <option value="2728">2027 / 2028</option>
+                    {seasonOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
                 </select>
             </div>
             <div className="flex items-center justify-between">
@@ -240,6 +218,23 @@ const SyntheseBLPage = () => {
                     <p className="text-4xl font-black tracking-tight">{totalBL}</p>
                 </div>
             </div>
+
+            {categorySummary.length > 0 && (
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">Synthèse par Catégorie</h3>
+                    </div>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {categorySummary.map((cat) => (
+                            <div key={cat.category} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{cat.category}</p>
+                                <p className="text-lg font-black text-slate-900">{cat.lignes} lignes</p>
+                                <p className="text-sm text-slate-600">{cat.qty} livres — <span className="font-bold">{currencyFormat(cat.total)}</span></p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 {/* Hidden PDF Viewer triggered by handleAction */}

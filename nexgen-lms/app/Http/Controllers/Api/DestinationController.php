@@ -6,12 +6,34 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DestinationResource;
 use App\Models\Destination;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DestinationController extends Controller
 {
-    public function index()
+    private const CACHE_KEY = 'destinations_all';
+    private const CACHE_TTL = 3600;
+
+    public function index(Request $request)
     {
-        $destinations = Destination::with(['representants', 'ventes', 'livraisons'])->paginate(1000);
+        if ($request->has('page')) {
+            $query = Destination::with(['representants', 'ventes', 'livraisons']);
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => DestinationResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $destinations = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
+            return Destination::with(['representants', 'ventes', 'livraisons'])->get();
+        });
+
         return DestinationResource::collection($destinations);
     }
 
@@ -25,6 +47,7 @@ class DestinationController extends Controller
         ]);
 
         $Destination = Destination::create($validatedData);
+        Cache::forget(self::CACHE_KEY);
         return new DestinationResource($Destination);
     }
 
@@ -44,6 +67,7 @@ class DestinationController extends Controller
         ]);
 
         $Destination->update($validatedData);
+        Cache::forget(self::CACHE_KEY);
 
         return new DestinationResource($Destination);
     }
@@ -52,6 +76,7 @@ class DestinationController extends Controller
     {
         $Destination = Destination::findOrFail($id);
         $Destination->delete();
+        Cache::forget(self::CACHE_KEY);
 
         return response()->json(null, 204);
     }

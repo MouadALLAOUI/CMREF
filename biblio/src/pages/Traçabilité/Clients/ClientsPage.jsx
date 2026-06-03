@@ -11,6 +11,7 @@ import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
 function ClientsPage() {
     const [rows, setRows] = useState([]);
     const [representants, setRepresentants] = useState([]);
+    const [selectedRep, setSelectedRep] = useState("all");
     const [isLoading, setIsLoading] = useState(true);
 
     const [dialogMode, setDialogMode] = useState("add");
@@ -46,6 +47,16 @@ function ClientsPage() {
     useEffect(() => {
         fetchData();
     }, []);
+
+    const filteredRows = useMemo(() => {
+        if (selectedRep === "all") return rows;
+        return rows.filter(r => r.representant_id === selectedRep);
+    }, [rows, selectedRep]);
+
+    const repOptions = useMemo(() => [
+        { label: "Tous les représentants", value: "all" },
+        ...representants.map((r) => ({ label: r.nom, value: r.id })),
+    ], [representants]);
 
     useEffect(() => {
         if (!isDialogOpen) {
@@ -176,7 +187,19 @@ function ClientsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Gestion des clients</h1>
-                    <p className="text-sm text-slate-500">Suivi des clients et affectation par représentant.</p>
+                    <p className="text-sm text-slate-500 mb-2">Suivi des clients et affectation par représentant.</p>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase">Représentant:</span>
+                        <select
+                            value={selectedRep}
+                            onChange={(e) => setSelectedRep(e.target.value)}
+                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
+                        >
+                            {repOptions.map(opt => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 <UniversalDialog
                     open={isDialogOpen}
@@ -202,7 +225,7 @@ function ClientsPage() {
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <MyTable
-                    data={rows}
+                    data={filteredRows}
                     columns={columns}
                     pageSize={5}
                     actions={["view", "edit", "delete"]}

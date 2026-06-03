@@ -1,11 +1,15 @@
 .git/*
 .git/
+.agents/
+.antigravity/
 dist/
 build/
 node_modules/
 venv/
 vendor/
 .env
+
+# generted_ai/
 
 package-lock.json
 composer.lock

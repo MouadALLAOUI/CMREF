@@ -5,16 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\ScopedByRepresentant;
+use App\Models\Traits\FilterBySeason;
 
 class BLivraisonItem extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, ScopedByRepresentant, FilterBySeason;
 
     protected $fillable = [
         'deliverable_id',
         'deliverable_type',
         'livre_id',
-        'quantite'
+        'quantite',
+        'season_id',
+        'entity_type'
     ];
 
     public $incrementing = false; // Required for UUIDs

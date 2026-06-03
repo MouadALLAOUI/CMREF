@@ -10,12 +10,27 @@ use App\Http\Resources\CarteVisiteResource;
 
 class CarteVisiteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $carteVisites = CarteVisite::with('representant')
+        $query = CarteVisite::with('representant')
             ->where('is_deleted', false)
-            ->latest()
-            ->paginate(1000);
+            ->latest();
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->paginate($perPage);
+            return response()->json([
+                'data' => CarteVisiteResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $carteVisites = $query->paginate(1000);
         return CarteVisiteResource::collection($carteVisites);
     }
 

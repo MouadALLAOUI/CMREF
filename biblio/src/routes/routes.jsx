@@ -35,8 +35,10 @@ import ClientsPage from "../pages/Traçabilité/Clients/ClientsPage";
 import BLClientsPage from "../pages/Traçabilité/BLClients/BLClientsPage";
 import RemboursementClientPage from "../pages/Traçabilité/RemboursementClient/RemboursementClientPage";
 import SyntheseTracabilitePage from "../pages/Traçabilité/Synthèse/SynthesePage";
+import ActivitePage from "../pages/Traçabilité/Activite/ActivitePage";
 
 import RobotsPage from "../pages/Robots/RobotsPage";
+import RePRobotsPage from "../pages/REP/robots/RePRobotsPage";
 
 import LivraisonFournisseursPage from "../pages/SynthèsesGlobales/LivraisonFournisseurs/LivraisonFournisseursPage";
 import LivraisonREPPage from "../pages/SynthèsesGlobales/LivraisonREP/LivraisonREPPage";
@@ -54,6 +56,22 @@ import ModelesCahierTextePage from "../pages/Réglages/ModelesCahierTexte/Modele
 
 // REPRESENTANT PAGES
 import RepHomePage from "../pages/REP/home/home";
+import RepBLPage from "../pages/REP/BL/RepBLPage";
+import RepRembBLPage from "../pages/REP/BL/RepRembBLPage";
+import RepSyntheseBLPage from "../pages/REP/BL/RepSyntheseBLPage";
+import RepFactureMSMPage from "../pages/REP/factures/RepFactureMSMPage";
+import RepFactureWataniyaPage from "../pages/REP/factures/RepFactureWataniyaPage";
+import RepClientsPage from "../pages/REP/clients/RepClientsPage";
+import RepSaisirBLClientPage from "../pages/REP/clients/RepSaisirBLClientPage";
+import RepRembClientPage from "../pages/REP/clients/RepRembClientPage";
+import RepSyntheseBLClientPage from "../pages/REP/clients/RepSyntheseBLClientPage";
+import RepSyntheseRembClientPage from "../pages/REP/clients/RepSyntheseRembClientPage";
+import RepDepotPage from "../pages/REP/depot/RepDepotPage";
+import RepCahierCommanderPage from "../pages/REP/cahier_texte/RepCahierCommanderPage";
+import RepCahierSuiviPage from "../pages/REP/cahier_texte/RepCahierSuiviPage";
+import RepCartesCommanderPage from "../pages/REP/cartes_visite/RepCartesCommanderPage";
+import RepCartesSuiviPage from "../pages/REP/cartes_visite/RepCartesSuiviPage";
+import RepProfilPage from "../pages/REP/profil/RepProfilPage";
 import { useEffect, useRef } from "react";
 import seasonsService from "../api/services/seasonsService";
 
@@ -86,48 +104,48 @@ export const AppRoutes = () => {
                 <Route path="home" element={<RepHomePage />} />
 
                 <Route path="bl" element={<Outlet />}>
-                    <Route path="bl" element={<div>/REP/dash/bl/bl</div>} />
-                    <Route path="remb" element={<div>/REP/dash/bl/remb</div>} />
-                    <Route path="sbl" element={<div>/REP/dash/bl/sbl</div>} />
+                    <Route path="bl" element={<RepBLPage />} />
+                    <Route path="remb" element={<RepRembBLPage />} />
+                    <Route path="sbl" element={<RepSyntheseBLPage />} />
                     <Route index element={<Navigate to="bl" replace />} />
                 </Route>
 
                 <Route path="factures" element={<Outlet />}>
-                    <Route path="msm" element={<div>/REP/dash/factures/msm</div>} />
-                    <Route path="wataniya" element={<div>/REP/dash/factures/wataniya</div>} />
-                    <Route index element={<Navigate to="factures" replace />} />
+                    <Route path="msm" element={<RepFactureMSMPage />} />
+                    <Route path="wataniya" element={<RepFactureWataniyaPage />} />
+                    <Route index element={<Navigate to="msm" replace />} />
                 </Route>
 
                 <Route path="clients" element={<Outlet />}>
-                    <Route path="ajouter_client" element={<div>/REP/dash/clients/ajouter_client</div>} />
-                    <Route path="saisir_un_bl" element={<div>/REP/dash/clients/saisir_un_bl</div>} />
-                    <Route path="remboursement" element={<div>/REP/dash/clients/remboursement</div>} />
-                    <Route path="synthese_bl" element={<div>/REP/dash/clients/synthese_bl</div>} />
-                    <Route path="synthese_remboursement" element={<div>/REP/dash/clients/synthese_remboursement</div>} />
+                    <Route path="ajouter_client" element={<RepClientsPage />} />
+                    <Route path="saisir_un_bl" element={<RepSaisirBLClientPage />} />
+                    <Route path="remboursement" element={<RepRembClientPage />} />
+                    <Route path="synthese_bl" element={<RepSyntheseBLClientPage />} />
+                    <Route path="synthese_remboursement" element={<RepSyntheseRembClientPage />} />
                     <Route path="syntheses_globales" element={<Outlet />}>
-                        <Route path="livraison_clients" element={<div>/REP/dash/clients/syntheses_globales/livraison_clients</div>} />
-                        <Route path="remboursement_clients" element={<div>/REP/dash/clients/syntheses_globales/remboursement_clients</div>} />
-                        <Route index element={<Navigate to="syntheses_globales" replace />} />
+                        <Route path="livraison_clients" element={<RepSyntheseBLClientPage />} />
+                        <Route path="remboursement_clients" element={<RepSyntheseRembClientPage />} />
+                        <Route index element={<Navigate to="livraison_clients" replace />} />
                     </Route>
-                    <Route index element={<Navigate to="clients" replace />} />
+                    <Route index element={<Navigate to="ajouter_client" replace />} />
                 </Route>
 
-                <Route path="depot" element={<div>/REP/dash/depot</div>} />
+                <Route path="depot" element={<RepDepotPage />} />
 
                 <Route path="cahier_texte" element={<Outlet />}>
-                    <Route path="commander" element={<div>/REP/dash/cahier_texte/commander</div>} />
-                    <Route path="suivi" element={<div>/REP/dash/cahier_texte/suivi</div>} />
-                    <Route index element={<Navigate to="cahier_texte" replace />} />
+                    <Route path="commander" element={<RepCahierCommanderPage />} />
+                    <Route path="suivi" element={<RepCahierSuiviPage />} />
+                    <Route index element={<Navigate to="commander" replace />} />
                 </Route>
 
-                <Route path="cartes_visits" element={<Outlet />}>
-                    <Route path="commander" element={<div>/REP/dash/cartes_visits/commander</div>} />
-                    <Route path="suivi" element={<div>/REP/dash/cartes_visits/suivi</div>} />
-                    <Route index element={<Navigate to="cartes_visits" replace />} />
+                <Route path="cartes_visite" element={<Outlet />}>
+                    <Route path="commander" element={<RepCartesCommanderPage />} />
+                    <Route path="suivi" element={<RepCartesSuiviPage />} />
+                    <Route index element={<Navigate to="commander" replace />} />
                 </Route>
 
-                <Route path="robots" element={<div>/REP/dash/robots</div>} />
-                <Route path="profil" element={<div>/REP/dash/profil</div>} />
+                <Route path="robots" element={<RePRobotsPage />} />
+                <Route path="profil" element={<RepProfilPage />} />
                 <Route index element={<Navigate to="home" replace />} />
             </Route>
 
@@ -178,6 +196,7 @@ export const AppRoutes = () => {
                     <Route path="clients" element={<ClientsPage />} />
                     <Route path="bl_clients" element={<BLClientsPage />} />
                     <Route path="remboursement_client" element={<RemboursementClientPage />} />
+                    <Route path="activite" element={<ActivitePage />} />
                     <Route path="synthese" element={<SyntheseTracabilitePage />} />
                     <Route index element={<Navigate to="clients" replace />} />
                 </Route>
@@ -201,6 +220,7 @@ export const AppRoutes = () => {
 
                 <Route path="reglages" element={<Outlet />}>
                     <Route path="saison_travail" element={<SaisonTravailPage />} />
+                    <Route path="Season_travail" element={<Navigate to="saison_travail" replace />} />
                     <Route path="pied_de_facture" element={<PiedDeFacturePage />} />
                     <Route path="modeles_cahier_texte" element={<ModelesCahierTextePage />} />
                     <Route index element={<Navigate to="saison_travail" replace />} />

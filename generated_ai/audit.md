@@ -7,7 +7,7 @@
 **Master React route list extracted from `biblio/src/routes/routes.jsx`:**
 
 | Route path | Mapped component / element |
-|---|---|
+| --- | --- |
 | `/` | redirect to `/login` |
 | `/login` | `biblio/src/pages/loginPage/login.jsx` |
 | `/logout` | inline `Logout` component in `routes.jsx` |
@@ -15,52 +15,52 @@
 | `/dash/home` | `biblio/src/pages/home/HomePage.jsx` |
 | `/dash/livres/categories` | `biblio/src/pages/livres/categories/CategoriesPage.jsx` |
 | `/dash/livres/livres` | `biblio/src/pages/livres/livre/LivresPage.jsx` |
-| `/dash/fournisseurs/Fournisseurs_disponibles` | `biblio/src/pages/Fournisseurs/fourniseur_disp/FornisseurDispoPage.jsx` |
-| `/dash/fournisseurs/Saisir_un_BL` | `biblio/src/pages/Fournisseurs/BL/SaisirBlPage.jsx` |
-| `/dash/fournisseurs/Remboursement` | `biblio/src/pages/Fournisseurs/Remboursement/Remboursement.jsx` |
-| `/dash/fournisseurs/Synthese_BL` | `biblio/src/pages/Fournisseurs/SyntheseBL/SyntheseBLPage.jsx` |
-| `/dash/fournisseurs/Synthese_Remboursement` | `biblio/src/pages/Fournisseurs/SyntheseRemboursement/SyntheseRemboursementPage.jsx` |
-| `/dash/representant/Representants_disponibles` | `biblio/src/pages/Représentant/ReprésentantDisponibles/ReprésentantDisponibles.jsx` |
-| `/dash/representant/Saisir_un_BL` | `biblio/src/pages/Représentant/ReprésentantSaisirBl/ReprésentantSaisirBl.jsx` |
-| `/dash/representant/Remboursement` | `biblio/src/pages/Représentant/ReprésentantRemboursement/ReprésentantRemboursement.jsx` |
-| `/dash/representant/Demande_facturation` | `biblio/src/pages/Représentant/DemandeFacturation/DemandeFacturationPage.jsx` |
-| `/dash/representant/Factures` | `biblio/src/pages/Représentant/Factures/FacturesPage.jsx` |
-| `/dash/representant/Remboursement_Factures` | `biblio/src/pages/Représentant/RembourserFacture/RembourserFacturePage.jsx` |
-| `/dash/representant/Declaration_Depot` | `biblio/src/pages/Représentant/DeclarationDepot/DeclarationDepotPage.jsx` |
-| `/dash/representant/Cahier_texte` | `biblio/src/pages/Représentant/CahierTexte/CahierTextePage.jsx` |
-| `/dash/representant/Cartes_Visite` | `biblio/src/pages/Représentant/CartesVisite/CartesVisitePage.jsx` |
-| `/dash/representant/Synthese_BL` | `biblio/src/pages/Représentant/SyntheseBL/SyntheseBLPage.jsx` |
-| `/dash/representant/Synthese_Remboursement` | `biblio/src/pages/Représentant/SyntheseRemboursement/SyntheseRemboursementPage.jsx` |
+| `/dash/fournisseurs/fournisseurs_disponibles` | `biblio/src/pages/Fournisseurs/fourniseur_disp/FornisseurDispoPage.jsx` |
+| `/dash/fournisseurs/saisir_un_bl` | `biblio/src/pages/Fournisseurs/BL/SaisirBlPage.jsx` |
+| `/dash/fournisseurs/remboursement` | `biblio/src/pages/Fournisseurs/Remboursement/Remboursement.jsx` |
+| `/dash/fournisseurs/synthese_bl` | `biblio/src/pages/Fournisseurs/SyntheseBL/SyntheseBLPage.jsx` |
+| `/dash/fournisseurs/synthese_remboursement` | `biblio/src/pages/Fournisseurs/SyntheseRemboursement/SyntheseRemboursementPage.jsx` |
+| `/dash/representant/representants_disponibles` | `biblio/src/pages/Représentant/ReprésentantDisponibles/ReprésentantDisponibles.jsx` |
+| `/dash/representant/saisir_un_bl` | `biblio/src/pages/Représentant/ReprésentantSaisirBl/ReprésentantSaisirBl.jsx` |
+| `/dash/representant/remboursement` | `biblio/src/pages/Représentant/ReprésentantRemboursement/ReprésentantRemboursement.jsx` |
+| `/dash/representant/demande_facturation` | `biblio/src/pages/Représentant/DemandeFacturation/DemandeFacturationPage.jsx` |
+| `/dash/representant/factures` | `biblio/src/pages/Représentant/Factures/FacturesPage.jsx` |
+| `/dash/representant/remboursement_factures` | `biblio/src/pages/Représentant/RembourserFacture/RembourserFacturePage.jsx` |
+| `/dash/representant/declaration_depot` | `biblio/src/pages/Représentant/DeclarationDepot/DeclarationDepotPage.jsx` |
+| `/dash/representant/cahier_texte` | `biblio/src/pages/Représentant/CahierTexte/CahierTextePage.jsx` |
+| `/dash/representant/cartes_visite` | `biblio/src/pages/Représentant/CartesVisite/CartesVisitePage.jsx` |
+| `/dash/representant/synthese_bl` | `biblio/src/pages/Représentant/SyntheseBL/SyntheseBLPage.jsx` |
+| `/dash/representant/synthese_remboursement` | `biblio/src/pages/Représentant/SyntheseRemboursement/SyntheseRemboursementPage.jsx` |
 | `/dash/robots` | `biblio/src/pages/Robots/RobotsPage.jsx` |
 | `/dash/tracabilite/clients` | `biblio/src/pages/Traçabilité/Clients/ClientsPage.jsx` |
-| `/dash/tracabilite/BL_Clients` | `biblio/src/pages/Traçabilité/BLClients/BLClientsPage.jsx` |
-| `/dash/tracabilite/Remboursement_Client` | `biblio/src/pages/Traçabilité/RemboursementClient/RemboursementClientPage.jsx` |
-| `/dash/tracabilite/Synthese` | `biblio/src/pages/Traçabilité/Synthèse/SynthesePage.jsx` |
-| `/dash/syntheses_globales/Livraison_Fournisseurs` | `biblio/src/pages/SynthèsesGlobales/LivraisonFournisseurs/LivraisonFournisseursPage.jsx` |
-| `/dash/syntheses_globales/Livraison_REP` | `biblio/src/pages/SynthèsesGlobales/LivraisonREP/LivraisonREPPage.jsx` |
-| `/dash/syntheses_globales/Ventes` | `biblio/src/pages/SynthèsesGlobales/Ventes/VentesPage.jsx` |
-| `/dash/syntheses_globales/Depot` | `biblio/src/pages/SynthèsesGlobales/Dépôt/DepotPage.jsx` |
-| `/dash/syntheses_globales/Remboursement_Fournisseurs` | `biblio/src/pages/SynthèsesGlobales/RemboursementFournisseurs/RemboursementFournisseursPage.jsx` |
-| `/dash/syntheses_globales/Remboursement_REP` | `biblio/src/pages/SynthèsesGlobales/RemboursementREP/RemboursementREPPage.jsx` |
-| `/dash/syntheses_globales/Balance` | `biblio/src/pages/SynthèsesGlobales/Balance/BalancePage.jsx` |
-| `/dash/emailing/Simple_Email` | `biblio/src/pages/Emailing/SimpleEmail/SimpleEmailPage.jsx` |
-| `/dash/emailing/Invitation` | `biblio/src/pages/Emailing/Invitation/InvitationPage.jsx` |
-| `/dash/reglages/Season_travail` | `biblio/src/pages/Réglages/SaisonTravail/SaisonTravailPage.jsx` |
-| `/dash/reglages/Pied_de_facture` | `biblio/src/pages/Réglages/PiedDeFacture/PiedDeFacturePage.jsx` |
-| `/dash/reglages/Modeles_Cahier_texte` | `biblio/src/pages/Réglages/ModelesCahierTexte/ModelesCahierTextePage.jsx` |
+| `/dash/tracabilite/bl_clients` | `biblio/src/pages/Traçabilité/BLClients/BLClientsPage.jsx` |
+| `/dash/tracabilite/remboursement_client` | `biblio/src/pages/Traçabilité/RemboursementClient/RemboursementClientPage.jsx` |
+| `/dash/tracabilite/synthese` | `biblio/src/pages/Traçabilité/Synthèse/SynthesePage.jsx` |
+| `/dash/syntheses_globales/livraison_fournisseurs` | `biblio/src/pages/SynthèsesGlobales/LivraisonFournisseurs/LivraisonFournisseursPage.jsx` |
+| `/dash/syntheses_globales/livraison_rep` | `biblio/src/pages/SynthèsesGlobales/LivraisonREP/LivraisonREPPage.jsx` |
+| `/dash/syntheses_globales/ventes` | `biblio/src/pages/SynthèsesGlobales/Ventes/VentesPage.jsx` |
+| `/dash/syntheses_globales/depot` | `biblio/src/pages/SynthèsesGlobales/Dépôt/DepotPage.jsx` |
+| `/dash/syntheses_globales/remboursement_fournisseurs` | `biblio/src/pages/SynthèsesGlobales/RemboursementFournisseurs/RemboursementFournisseursPage.jsx` |
+| `/dash/syntheses_globales/remboursement_rep` | `biblio/src/pages/SynthèsesGlobales/RemboursementREP/RemboursementREPPage.jsx` |
+| `/dash/syntheses_globales/balance` | `biblio/src/pages/SynthèsesGlobales/Balance/BalancePage.jsx` |
+| `/dash/emailing/simple_email` | `biblio/src/pages/Emailing/SimpleEmail/SimpleEmailPage.jsx` |
+| `/dash/emailing/invitation` | `biblio/src/pages/Emailing/Invitation/InvitationPage.jsx` |
+| `/dash/reglages/saison_travail` | `biblio/src/pages/Réglages/SaisonTravail/SaisonTravailPage.jsx` |
+| `/dash/reglages/pied_de_facture` | `biblio/src/pages/Réglages/PiedDeFacture/PiedDeFacturePage.jsx` |
+| `/dash/reglages/modeles_cahier_texte` | `biblio/src/pages/Réglages/ModelesCahierTexte/ModelesCahierTextePage.jsx` |
 | `/REP/dash/home` | `biblio/src/pages/REP/home/home.jsx` |
-| `/REP/dash/bl/BL` | inline `<div>/REP/dash/bl/BL</div>` placeholder |
-| `/REP/dash/bl/Remb` | inline `<div>/REP/dash/bl/Remb</div>` placeholder |
-| `/REP/dash/bl/SBl` | inline `<div>/REP/dash/bl/SBl</div>` placeholder |
+| `/REP/dash/bl/bl` | inline `<div>/REP/dash/bl/bl</div>` placeholder |
+| `/REP/dash/bl/remb` | inline `<div>/REP/dash/bl/remb</div>` placeholder |
+| `/REP/dash/bl/sbl` | inline `<div>/REP/dash/bl/sbl</div>` placeholder |
 | `/REP/dash/factures/msm` | inline placeholder |
 | `/REP/dash/factures/wataniya` | inline placeholder |
-| `/REP/dash/Clients/ajouter_client` | inline placeholder |
-| `/REP/dash/Clients/Saisir_un_BL` | inline placeholder |
-| `/REP/dash/Clients/Remboursement` | inline placeholder |
-| `/REP/dash/Clients/Synthese_BL` | inline placeholder |
-| `/REP/dash/Clients/Synthese_Remboursement` | inline placeholder |
-| `/REP/dash/Clients/syntheses_globales/Livraison_clients` | inline placeholder |
-| `/REP/dash/Clients/syntheses_globales/Remboursement_clients` | inline placeholder |
+| `/REP/dash/clients/ajouter_client` | inline placeholder |
+| `/REP/dash/clients/saisir_un_bl` | inline placeholder |
+| `/REP/dash/clients/remboursement` | inline placeholder |
+| `/REP/dash/clients/synthese_bl` | inline placeholder |
+| `/REP/dash/clients/synthese_remboursement` | inline placeholder |
+| `/REP/dash/clients/syntheses_globales/livraison_clients` | inline placeholder |
+| `/REP/dash/clients/syntheses_globales/remboursement_clients` | inline placeholder |
 | `/REP/dash/depot` | inline placeholder |
 | `/REP/dash/cahier_texte/commander` | inline placeholder |
 | `/REP/dash/cahier_texte/suivi` | inline placeholder |
@@ -78,9 +78,9 @@
 
 | Page | Ajial template | React file | Status | What's missing |
 |---|---|---|---|---|
-| Login | No Ajial login template in requested folders | `biblio/src/pages/loginPage/login.jsx` | ⚠️ partial | Calls `/login` with `username`, `password`, and `annee`, then stores the returned user/profile/token. Bug: non-admin login navigates to lowercase `/rep/dash/home`, but the configured route is uppercase `/REP/dash/home`. The page also calls a hardcoded CSRF URL `http://localhost:8000/sanctum/csrf-cookie`, which will not respect deployed API configuration. |
-| Logout | No Ajial template | inline `Logout` in `routes.jsx`; store logic in `biblio/src/store/useAppStore.js` | ⚠️ partial | Backend logout is called, but `useAppStore.logout` prints backend debug data to the console and table. |
-| Admin route guard | No Ajial template | `biblio/src/routes/protectedRoute.jsx` | ⚠️ partial | `/dash/*` is protected and admin-only. `/REP/dash/*` is not wrapped in `ProtectedRoute`, so representative pages are not guarded by React routing. |
+| Login | No Ajial login template in requested folders | `biblio/src/pages/loginPage/login.jsx` | ⚠️ partial | Calls `/login` with `username`, `password`, and `annee`, then stores the returned user/profile/token. CSRF URL now derives from `process.env.REACT_APP_API_URL` to respect deployed configuration. Non-admin login correctly navigates to `/REP/dash/home`. |
+| Logout | No Ajial template | inline `Logout` in `routes.jsx`; store logic in `biblio/src/store/useAppStore.js` | ⚠️ partial | Backend logout is called; store logout clears all state silently without console output. |
+| Admin route guard | No Ajial template | `biblio/src/routes/protectedRoute.jsx` | ⚠️ partial | `/dash/*` is protected and admin-only. `/REP/dash/*` is now wrapped in `ProtectedRoute` with `role="rep"` in `routes.jsx`, but there is no explicit representative auth guard file for shared/non-admin roles. |
 | Unauthorized | No Ajial template | `biblio/src/pages/UnauthorizedPage.jsx` | ✅ complete | Static unauthorized screen is present. |
 
 ---
@@ -117,7 +117,7 @@
 | Représentants disponibles | `Ajial/safe/representant/representant.html` | `biblio/src/pages/Représentant/ReprésentantDisponibles/ReprésentantDisponibles.jsx` | ⚠️ partial | Uses `representantService.getAll/create/update/delete/active_compte`, but contains console logging/error output and does not map every Ajial field visibly (e.g. full commercial/profile fields). |
 | Saisir BL représentant | `Ajial/safe/representant/BL-representant.html`; print/detail templates `BL-representant/Imprimer.html` and `details.html` | `biblio/src/pages/Représentant/ReprésentantSaisirBl/ReprésentantSaisirBl.jsx` | ⚠️ partial | Uses real BL, item, representative, category, and book services with create/update/delete and Vu/Reçu actions. Missing active season: initial and reset form hardcode `annee: "2627"`. Print/detail Ajial pages are not separate routed React pages. Contains `console.log(blRes)` and `console.log("stopped")`. |
 | Remboursement représentant | `Ajial/safe/representant/Remboursement.html` | `biblio/src/pages/Représentant/ReprésentantRemboursement/ReprésentantRemboursement.jsx` | ⚠️ partial | Uses real representative reimbursement and bank services with CRUD, and has totals for credit/advance/rest. Ajial has a large cheque-entry workflow with more fields/status sections; React is service-backed but not season-aware. |
-| Demande facturation | `Ajial/safe/representant/fact-rep.html` | `biblio/src/pages/Représentant/DemandeFacturation/DemandeFacturationPage.jsx` | ⚠️ partial | Lists and deletes `demande-f` records and has a `handleTransform` UI action, but the page does not call the backend `/demande-f/{id}/transform` endpoint. The Ajial page separates MSM-MEDIAS and Wataniya facture blocks; React is a generic demand list. |
+| Demande facturation | `Ajial/safe/representant/fact-rep.html` | `biblio/src/pages/Représentant/DemandeFacturation/DemandeFacturationPage.jsx` | ⚠️ partial | Lists and deletes `demande-f` records. `handleTransform` calls `demandeFService.validateAndTransform(row.id)` which hits `POST /api/demande-f/{id}/transform`. Data is grouped by type (MSM-MEDIAS / WATANIYA). Missing active-season scope. |
 | Factures | `Ajial/safe/representant/factures.html` | `biblio/src/pages/Représentant/Factures/FacturesPage.jsx` | ⚠️ partial | Uses real factures and representatives for listing and save-all logic, but Ajial has six forms/eight tables for delivered quantities, invoice balances, reimbursements, accepted MSM and Wataniya factures. React is not a full match and contains `console.log(isRepSelected)`. |
 | Remboursement factures | `Ajial/safe/representant/remb-fact.html` | `biblio/src/pages/Représentant/RembourserFacture/RembourserFacturePage.jsx` | ⚠️ partial | Uses `repRemboursementService` rather than the separate `rembFactureService` file. Covers facture reimbursement form/table basics, but backend has no `remboursement-factures` route and Ajial-specific reimbursement-facture semantics are not clearly separated. |
 | Déclaration dépôt | `Ajial/safe/representant/depot.html` | `biblio/src/pages/Représentant/DeclarationDepot/DeclarationDepotPage.jsx` | ⚠️ partial | Uses depot and representative services and validates depot rows. Ajial shows MSM depot list and representative depot list; React centers on selecting a representative and validating deposits. No active-season filter. |
@@ -177,20 +177,20 @@
 `biblio/src/pages/REP/` contains only `home/home.jsx` and an empty one-line file `BL/BL/bl.jsx`; the route config does not import the BL file. Every representative route except `/REP/dash/home` is an inline placeholder `<div>` in `routes.jsx`.
 
 | Page | Ajial template | React file | Status | What's missing |
-|---|---|---|---|---|
+|---|---|---|---|---|---|
 | REP dashboard | `Ajial/representant/Accueil.html` | `biblio/src/pages/REP/home/home.jsx` | ❌ missing functionality | Only renders an accordion title with empty content. Ajial dashboard has welcome text and delivery/sales/stock/category dashboard content. |
-| REP BL list | `Ajial/representant/bon de livraison/BL.html` | inline placeholder `/REP/dash/bl/BL` | ❌ missing | No service calls, no BL list table, no totals, no details/print. |
-| REP reimbursement | `Ajial/representant/bon de livraison/Renboursement.html` | inline placeholder `/REP/dash/bl/Remb` | ❌ missing | No credit/avance/reste summary, no cheque form, no reimbursement list/status handling. |
-| REP BL synthesis | `Ajial/representant/bon de livraison/synthese-bl-rep.html` | inline placeholder `/REP/dash/bl/SBl` | ❌ missing | No synthesis tables, no representative totals, no season/year awareness. |
+| REP BL list | `Ajial/representant/bon de livraison/BL.html` | inline placeholder `/REP/dash/bl/bl` | ❌ missing | No service calls, no BL list table, no totals, no details/print. |
+| REP reimbursement | `Ajial/representant/bon de livraison/Renboursement.html` | inline placeholder `/REP/dash/bl/remb` | ❌ missing | No credit/avance/reste summary, no cheque form, no reimbursement list/status handling. |
+| REP BL synthesis | `Ajial/representant/bon de livraison/synthese-bl-rep.html` | inline placeholder `/REP/dash/bl/sbl` | ❌ missing | No synthesis tables, no representative totals, no season/year awareness. |
 | REP facturation MSM | `Ajial/representant/facture/facturation-msm.html` | inline placeholder `/REP/dash/factures/msm` | ❌ missing | No facture request form/list/print preview. |
 | REP facturation Wataniya | `Ajial/representant/facture/facturation-wataniya.html` | inline placeholder `/REP/dash/factures/wataniya` | ❌ missing | No Wataniya facture request form/list/print preview. |
-| REP clients | `Ajial/representant/client/client.html` | inline placeholder `/REP/dash/Clients/ajouter_client` | ❌ missing | No client list and add-client form. |
-| REP client BL | `Ajial/representant/client/bl-client.html` | inline placeholder `/REP/dash/Clients/Saisir_un_BL` | ❌ missing | No client BL list/add form, no items table. |
-| REP client reimbursement | `Ajial/representant/client/remb-client.html` | inline placeholder `/REP/dash/Clients/Remboursement` | ❌ missing | No reimbursement form/list. |
-| REP client BL synthesis | `Ajial/representant/client/synthese-bl.html` | inline placeholder `/REP/dash/Clients/Synthese_BL` | ❌ missing | No client selector or detailed BL synthesis. |
-| REP client reimbursement synthesis | `Ajial/representant/client/synthese-remb.html` and `Historique.html` | inline placeholder `/REP/dash/Clients/Synthese_Remboursement` | ❌ missing | No reimbursement synthesis/historical operations view. |
-| REP global client delivery synthesis | `Ajial/representant/client/Synthèse Global/Livraison-global.html` | inline placeholder `/REP/dash/Clients/syntheses_globales/Livraison_clients` | ❌ missing | No category/global delivery tables. |
-| REP global client reimbursement synthesis | `Ajial/representant/client/Synthèse Global/remb-global.html` | inline placeholder `/REP/dash/Clients/syntheses_globales/Remboursement_clients` | ❌ missing | No global reimbursement tables. |
+| REP clients | `Ajial/representant/client/client.html` | inline placeholder `/REP/dash/clients/ajouter_client` | ❌ missing | No client list and add-client form. |
+| REP client BL | `Ajial/representant/client/bl-client.html` | inline placeholder `/REP/dash/clients/saisir_un_bl` | ❌ missing | No client BL list/add form, no items table. |
+| REP client reimbursement | `Ajial/representant/client/remb-client.html` | inline placeholder `/REP/dash/clients/remboursement` | ❌ missing | No reimbursement form/list. |
+| REP client BL synthesis | `Ajial/representant/client/synthese-bl.html` | inline placeholder `/REP/dash/clients/synthese_bl` | ❌ missing | No client selector or detailed BL synthesis. |
+| REP client reimbursement synthesis | `Ajial/representant/client/synthese-remb.html` and `Historique.html` | inline placeholder `/REP/dash/clients/synthese_remboursement` | ❌ missing | No reimbursement synthesis/historical operations view. |
+| REP global client delivery synthesis | `Ajial/representant/client/Synthèse Global/Livraison-global.html` | inline placeholder `/REP/dash/clients/syntheses_globales/livraison_clients` | ❌ missing | No category/global delivery tables. |
+| REP global client reimbursement synthesis | `Ajial/representant/client/Synthèse Global/remb-global.html` | inline placeholder `/REP/dash/clients/syntheses_globales/remboursement_clients` | ❌ missing | No global reimbursement tables. |
 | REP dépôt | `Ajial/representant/depot.html` | inline placeholder `/REP/dash/depot` | ❌ missing | No list of books in depot and no depot declaration form. |
 | REP cahier command | `Ajial/representant/cahier de texte/demande_cahier.html` | inline placeholder `/REP/dash/cahier_texte/commander` | ❌ missing | No cahier model/type selection, institution fields, Arabic/French form sections, or submit action. |
 | REP cahier follow-up | `Ajial/representant/cahier de texte/suivi_cahier.html` | inline placeholder `/REP/dash/cahier_texte/suivi` | ❌ missing | No demand follow-up table. |
@@ -281,8 +281,8 @@
 | `/api/activity-logs` and `/api/activity-logs/subject/{type}/{id}` | `activityLogService.js` calls these endpoints and `ActivitePage.jsx` exists, but `api.php` has no activity-log routes. |
 | `/api/remboursement-factures` | `rembFactureService.js` calls it, but `api.php` has no route. Also the service imports `../api/axios`, which is the wrong relative path from `src/api/services`. |
 | `/api/settings/pied-de-facture` | `PiedDeFacturePage.jsx` says this key-specific endpoint is required, but the backend only exposes generic `/settings` and `/settings/{key}`. The page does not call either. |
-| `GET /api/seasons/active` service mismatch | Backend defines GET `/seasons/active`, but `seasonsService.active` uses `api.post('/seasons/active', ...)`; current page does not call it, but the service method is wrong. |
-| `POST /api/demande-f/{id}/transform` not used | Backend route exists, but `DemandeFacturationPage.jsx` defines transform UI behavior without calling the route. |
+| `GET /api/seasons/active` service mismatch | (Resolved) `seasonsService.isActive` now correctly uses `api.get('/seasons/active', { params })`. `loadActiveSeason` in `useAppStore.js` calls it on app start and `routes.jsx` invokes it on mount. |
+| `POST /api/demande-f/{id}/transform` not used | (Resolved) `DemandeFacturationPage.jsx` now calls `demandeFService.validateAndTransform(row.id)` which hits this endpoint. |
 | Season filtering endpoints/query contract | Many synthesis/BL pages need active-season filtering, but `api.php` only exposes active season management; there are no explicit season-scoped summary endpoints. Existing pages fetch broad resources and filter client-side or not at all. |
 
 ---
@@ -291,12 +291,12 @@
 
 | Concern | Status | Details |
 |---|---|---|
-| Active season in global state | ⚠️ partial | `useAppStore.js` persists `school_annee` from login response, but does not store an active season object/id from `SeasonController.active` or `SaisonTravailPage`. The settings page stores active season only locally. |
-| Season CRUD/settings | ⚠️ partial | Season page implements list/add/delete and active toggle via `/seasons/set-active`; update/edit is absent. The unused `handleSetActiveSeason` sends `{ annee: activeSeason }`, while row toggling sends `{ season_id, is_active }`; this suggests an inconsistent request contract. |
+| Active season in global state | ⚠️ partial | `useAppStore.js` persists `school_annee` from login response and stores `activeSeason` normalized. `loadActiveSeason` (calls `GET /api/seasons/active`) is invoked on app start from `routes.jsx`. However, `SaisonTravailPage` manages its own local state and does not update the global store's `setActiveSeason`. |
+| Season CRUD/settings | ⚠️ partial | Season page implements list/add/delete and active toggle via `/seasons/set-active`; update/edit is absent. `handleSetActiveSeason` is defined with a correct `{ season_id, is_active }` contract matching row toggle, but no visible UI element triggers it (activation occurs through boolean table cell toggling). |
 | Season-aware data pages | ⚠️ partial | BL creation pages hardcode `annee: "2627"`; book publication defaults hardcode `2627`; supplier syntheses use hardcoded year options; most global synthesis and traceability pages do not consume active season. |
 | Mock/static pages | ❌ missing | Emailing, invitation, invoice footer, and representative portal routes are static placeholders or forms without service calls. `EmailingPage.jsx` is not routed and uses sample/mock data. |
-| Auth guards | ⚠️ partial | Admin `/dash/*` is guarded; representative `/REP/dash/*` is not. Login redirects reps to `/rep/dash/home` even though the route is `/REP/dash/home`. |
-| Console/debug output | ⚠️ partial | Console output remains in store logout, login error handling, `LivresPage`, supplier reimbursement, representative list, representative BL, `FacturesPage`, and `useStockReport`. Some are commented, some active. |
+| Auth guards | ⚠️ partial | Admin `/dash/*` is guarded (admin-only). Representative `/REP/dash/*` is now also wrapped in `ProtectedRoute` with `role="rep"`. Login redirects reps to `/REP/dash/home`. No explicit representative auth guard file exists for shared/non-admin role checks. |
+| Console/debug output | ⚠️ partial | Most pages use an environment-guarded `logger` (only logs in development). Bare `console.error` calls remain in `useStockReport.js:28` and `Fournisseurs/Remboursement/Remboursement.jsx:77`. Store logout and store errors use try/catch silently. |
 | Pagination | ⚠️ partial | Several synthesis pages use `fetchAllPaginated`, but many CRUD pages call `getAll()` directly and table pagination is client-side. Backend pagination contract is not consistently reflected in pages. |
 | House style | ⚠️ partial | CRUD pages increasingly follow the `LivresPage.jsx` pattern: service-backed `fetchData`, `UniversalDialog`, `MyTable`, toast/logger usage. Older/static/placeholder pages and representative portal pages do not follow this style. |
 | Ajial print/detail parity | ⚠️ partial | Several Ajial templates are print/detail pages (`BL-representant/Imprimer.html`, `details.html`, facture previews). React often has no separate routes for those states. |
@@ -327,4 +327,4 @@
 2. Add/align missing backend endpoints for emailing, invitations, cahier templates, activity logs, and reimbursement factures, or remove unused frontend services.
 3. Make active season global and consistently apply it to BL creation, books, syntheses, traceability, depot, and reports.
 4. Finish settings pages: edit seasons, wire invoice footer to settings, and connect cahier templates to a real backend resource.
-5. Remove console/debug output and hardcoded local URLs/season IDs before production.
+5. Remove remaining bare `console.error` calls and hardcoded season IDs (`annee: "2627"` in BL forms and defaults) before production. Console output is mostly environment-guarded via the `logger` utility.

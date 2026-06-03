@@ -10,11 +10,27 @@ use App\Http\Resources\CahierCommunicationResource;
 
 class CahierCommunicationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $cahierCommunications = CahierCommunication::with('representant')->latest()
+        $query = CahierCommunication::with('representant')
             ->where('is_deleted', false)
-            ->paginate(1000);
+            ->latest();
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->paginate($perPage);
+            return response()->json([
+                'data' => CahierCommunicationResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $cahierCommunications = $query->paginate(1000);
         return CahierCommunicationResource::collection($cahierCommunications);
     }
 

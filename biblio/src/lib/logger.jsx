@@ -1,7 +1,8 @@
 function logger(message, type = "log") {
   if (process.env.REACT_APP_ENV === "Development") {
     // We fetch the correct native console function
-    const nativeConsoleFunc = console[type] || console.log;
+    /* eslint-disable-next-line no-console */
+    const nativeConsoleFunc = console[type] || console.warn;
 
     // We use .bind() to pass the arguments without executing it here.
     // This hands execution back to the caller file, preserving the stack trace!

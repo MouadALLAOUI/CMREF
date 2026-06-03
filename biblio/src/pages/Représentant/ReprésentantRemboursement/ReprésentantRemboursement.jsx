@@ -8,14 +8,13 @@ import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
 import repRemboursementService from "../../../api/services/repRemboursementService";
 import representantService from "../../../api/services/representantService";
 import banqueService from "../../../api/services/banqueService";
-import { formatMoney, calculateFinancialSummary } from "../../../utils/helpers";
-import { TrendingDown, Wallet, CreditCard } from "lucide-react";
 
 function ReprésentantRemboursement() {
     const [rows, setRows] = useState([]);
     const [representants, setRepresentants] = useState([]);
     const [banques, setBanques] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedRep, setSelectedRep] = useState("all");
 
     const [dialogMode, setDialogMode] = useState("add");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -37,13 +36,6 @@ function ReprésentantRemboursement() {
         remarks: "",
     });
 
-    // Financial summary state
-    const [financialSummary, setFinancialSummary] = useState({
-        totalCredit: 0,
-        totalAvance: 0,
-        totalReste: 0,
-    });
-
     const fetchData = async () => {
         setIsLoading(true);
         try {
@@ -55,10 +47,6 @@ function ReprésentantRemboursement() {
             setRows(res);
             setRepresentants(reps);
             setBanques(bq);
-
-            // Calculate financial summary
-            const summary = calculateFinancialSummary(res);
-            setFinancialSummary(summary);
         } catch (error) {
             logger("Error fetching rep remboursements:", error);
             toast.error("Erreur lors du chargement des données");
@@ -95,6 +83,16 @@ function ReprésentantRemboursement() {
         if (!isDialogOpen) resetForm();
     }, [isDialogOpen]);
 
+    const filteredRows = useMemo(() => {
+        if (selectedRep === "all") return rows;
+        return rows.filter(r => r.rep_id === selectedRep);
+    }, [rows, selectedRep]);
+
+    const repOptions = useMemo(() => [
+        { label: "Tous les représentants", value: "all" },
+        ...representants.map((r) => ({ label: r.nom, value: r.id })),
+    ], [representants]);
+
     const actionsDetaille = {
         delete: {
             title: "Supprimer",
@@ -122,11 +120,11 @@ function ReprésentantRemboursement() {
         { header: "Banque", accessor: "banque.nom || banque_nom" },
         { header: "Chèque N°", accessor: "cheque_number" },
         { header: "Titulaire", accessor: "compte" },
-        { header: "Type de vérssement", accessor: "type_versement" },
-        { header: "A l'ordre de", accessor: "imp" }, // pour les fornisseur ??
+        { header: "Type de versement", accessor: "type_versement" },
+        { header: "A l'ordre de", accessor: "imp" },
         { header: "Montant (DH)", accessor: "montant", type: "money" },
-        { header: "Date (prévue) de vérssement", accessor: "date_prevue", type: "date" },
-        { header: "Date de vérssement", accessor: "date_versement", type: "date" },
+        { header: "Date (prévue) de versement", accessor: "date_prevue", type: "date" },
+        { header: "Date de versement", accessor: "date_versement", type: "date" },
         { header: "Reçu", accessor: "statut_recu", type: "bool" },
         { header: "Rejeté", accessor: "statut_rejete", type: "bool" },
         { header: "Accepté", accessor: "statut_accepte", type: "bool" },
@@ -162,7 +160,7 @@ function ReprésentantRemboursement() {
             compte: "Titulaire",
             montant: "Montant (DH)",
             date_prevue: "Date prévue",
-            date_versement: "Date de vérssement",
+            date_versement: "Date de versement",
             statut_recu: "Reçu",
             statut_rejete: "Rejeté",
             statut_accepte: "Accepté",
@@ -273,37 +271,6 @@ function ReprésentantRemboursement() {
 
     return (
         <div className="space-y-3">
-            {/* Financial Summary Bar */}
-            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-4">
-                    <div className="p-3 bg-emerald-100 rounded-full text-emerald-600">
-                        <CreditCard size={24} />
-                    </div>
-                    <div>
-                        <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest">Crédit Total</p>
-                        <p className="text-2xl font-black text-emerald-900">{formatMoney(financialSummary.totalCredit)}</p>
-                    </div>
-                </div>
-                <div className="p-6 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-4">
-                    <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-                        <Wallet size={24} />
-                    </div>
-                    <div>
-                        <p className="text-xs text-blue-600 font-bold uppercase tracking-widest">Avance Totale</p>
-                        <p className="text-2xl font-black text-blue-900">{formatMoney(financialSummary.totalAvance)}</p>
-                    </div>
-                </div>
-                <div className="p-6 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-4">
-                    <div className="p-3 bg-amber-100 rounded-full text-amber-600">
-                        <TrendingDown size={24} />
-                    </div>
-                    <div>
-                        <p className="text-xs text-amber-600 font-bold uppercase tracking-widest">Reste à Payer</p>
-                        <p className="text-2xl font-black text-amber-900">{formatMoney(financialSummary.totalReste)}</p>
-                    </div>
-                </div>
-            </div> */}
-
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Remboursements (Représentant)</h1>
                 <UniversalDialog
@@ -328,9 +295,22 @@ function ReprésentantRemboursement() {
                 />
             </div>
 
+            <div className="flex items-center gap-4 mb-2">
+                <label className="text-sm font-semibold text-slate-700">Filtrer par représentant:</label>
+                <select
+                    value={selectedRep}
+                    onChange={(e) => setSelectedRep(e.target.value)}
+                    className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                    {repOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                </select>
+            </div>
+
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <MyTable
-                    data={rows}
+                    data={filteredRows}
                     columns={columns}
                     pageSize={5}
                     actions={["view", "edit", "delete"]}

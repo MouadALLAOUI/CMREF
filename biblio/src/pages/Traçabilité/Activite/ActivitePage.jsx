@@ -10,7 +10,7 @@ import { formatMoney, dateFormat } from "../../../utils/helpers";
 
 const fetchAllPaginated = async (serviceGetAll, params = {}) => {
     const first = await serviceGetAll({ ...params, page: 1 });
-    const firstData = first;
+    const firstData = Array.isArray(first) ? first : first?.data || [];
     const meta = first?.meta;
     if (!meta?.last_page) return firstData;
 
@@ -20,7 +20,8 @@ const fetchAllPaginated = async (serviceGetAll, params = {}) => {
         pages.push(serviceGetAll({ ...params, page }));
     }
     const rest = await Promise.all(pages);
-    return [...firstData, ...rest.flatMap((r) => r)];
+    const restData = rest.flatMap((r) => Array.isArray(r) ? r : r?.data || []);
+    return [...firstData, ...restData];
 };
 
 const ActivityLogPage = () => {

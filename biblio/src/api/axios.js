@@ -24,27 +24,32 @@ instance.fetchCsrfCookie = async () => {
 };
 
 instance.interceptors.request.use((config) => {
-    // Get token from your Zustand store or localStorage
     const token = useAppStore.getState().token;
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    useAppStore.getState().startApiCall();
     return config;
 });
 
 // Interceptor to handle global errors
 instance.interceptors.response.use(
     (response) => {
-        /**
-         * Logic to simplify data extraction:
-         * 1. Check if the response is successful (already implied here)
-         * 2. Return response.data.data (standard Laravel/API nesting)
-         * 3. Fallback to response.data (if not nested)
-         * 4. Final fallback to empty array (to prevent .map() errors)
-         */
-        return response.data?.data || response.data || [];
+        useAppStore.getState().endApiCall();
+        const body = response.data;
+        const hasPageParam = response.config?.params?.page !== undefined;
+        // Paginated request (has ?page=): return full { data, meta } for fetchAllPaginated
+        if (hasPageParam && body && typeof body === 'object' && body.meta && Array.isArray(body.data)) {
+            return body;
+        }
+        // Default: unwrap to array for backward compatibility with MyTable
+        if (body && typeof body === 'object' && body.meta && Array.isArray(body.data)) {
+            return body.data;
+        }
+        return body?.data || body || [];
     },
     (error) => {
+        useAppStore.getState().endApiCall();
         logger({ "Axios Interceptor Error": error }, "error")();
         const { response, config } = error;
         if (response) {

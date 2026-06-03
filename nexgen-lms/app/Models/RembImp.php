@@ -22,7 +22,8 @@ class RembImp extends Model
         'montant',
         'statut_recu',
         'statut_rejete',
-        'remarks'
+        'remarks',
+        'annee'
     ];
 
     protected $casts = [

@@ -11,10 +11,29 @@ use Illuminate\Support\Facades\DB;
 
 class BLivraisonImpController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $bLivraisonImps = BLivraisonImp::with(['imprimeur', 'items.livre'])->latest()->get();
-        return BLivraisonImpResource::collection($bLivraisonImps);
+        $query = BLivraisonImp::with(['imprimeur', 'items.livre'])->latest();
+
+        if ($request->filled('annee')) {
+            $query->where('annee', $request->annee);
+        }
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->paginate($perPage);
+            return response()->json([
+                'data' => BLivraisonImpResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        return BLivraisonImpResource::collection($query->get());
     }
 
     public function store(Request $request)

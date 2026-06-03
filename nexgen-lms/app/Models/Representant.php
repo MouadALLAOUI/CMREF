@@ -66,4 +66,9 @@ class Representant extends Authenticatable
     {
         return $this->hasMany(Depot::class, 'rep_id');
     }
+
+    public function robots()
+    {
+        return $this->hasMany(Robot::class, 'rep_id');
+    }
 }

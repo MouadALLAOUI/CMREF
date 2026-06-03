@@ -4,16 +4,18 @@ import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
 import factService from "../../../api/services/factService";
-import factSequenceService from "../../../api/services/factSequenceService";
 import representantService from "../../../api/services/representantService";
-import { cn } from "../../../lib/utils";
+import repRemboursementService from "../../../api/services/repRemboursementService";
+import useAppStore from "../../../store/useAppStore";
 import { FileText, Save } from "lucide-react";
 import FormInputRow from "../../../components/ui/FormInputRaw";
 import SectionContainer from "../../../components/ui/SectionContainer";
 
 function FacturesPage() {
+    const { activeSeason } = useAppStore();
     const [rows, setRows] = useState([]);
     const [representants, setRepresentants] = useState([]);
+    const [repRemboursements, setRepRemboursements] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedRepId, setSelectedRepId] = useState("");
 
@@ -24,7 +26,6 @@ function FacturesPage() {
 
     // 1. Définition de la source de données filtrée (ou non)
     const filteredData = useMemo(() => {
-        console.log(isRepSelected);
         if (!isRepSelected) return rows; // Si aucun rep n'est sélectionné, on retourne tout
         return rows.filter(row => row.rep_id === selectedRepId);
     }, [rows, selectedRepId, isRepSelected]);
@@ -32,93 +33,16 @@ function FacturesPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const [res, reps] = await Promise.all([
-                factService.getAll(),
+            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+            const [res, reps, rembRes] = await Promise.all([
+                factService.getAll(seasonParams),
                 representantService.getAll(),
+                repRemboursementService.getAll(seasonParams),
             ]);
 
-            logger({ res });
-
-            //             {
-            //     "id": "019d972f-fb06-7022-8b04-5615d3916e50",
-            //     "rep_id": "019d972f-7a6a-73fd-b014-5abb8b38c62c",
-            //     "sequence_id": "019d972f-615f-7054-8a42-fc55b549ca2d",
-            //     "year_session": "2012",
-            //     "number": 3411,
-            //     "fact_number": "FACT-7332",
-            //     "date_facture": "2022-03-07",
-            //     "total_ht": "4594.04",
-            //     "tva_rate": "20.00",
-            //     "total_ttc": "5512.85",
-            //     "reste_a_payer": "0.00",
-            //     "status": "Annulée",
-            //     "remarques": "Doloribus asperiores aut consequuntur iure.",
-            //     "created_at": "2026-04-16T16:46:37.000000Z",
-            //     "updated_at": "2026-04-16T16:46:37.000000Z",
-            //     "type": "MSM",
-            //     "representant": {
-            //         "id": "019d972f-7a6a-73fd-b014-5abb8b38c62c",
-            //         "destination_id": "019d972f-56b2-72a0-9247-d4d30433295e",
-            //         "nom": "Étienne Huet",
-            //         "cin": "hd619060",
-            //         "tel": "07 88 47 67 95",
-            //         "email": "cmorvan@example.com",
-            //         "adresse": "15, chemin Thomas Jourdan\n65486 De Oliveira-sur-Lelievre",
-            //         "code_postale": "20695",
-            //         "ville": "Blanc",
-            //         "lieu_de_travail": "Etienne Samson SA",
-            //         "login": "nicolas.olivie",
-            //         "bl_count": 0,
-            //         "remb_count": 0,
-            //         "created_at": "2026-04-16T16:46:04.000000Z",
-            //         "updated_at": "2026-04-16T16:46:04.000000Z"
-            //     },
-            //     "sequence": {
-            //         "id": "019d972f-615f-7054-8a42-fc55b549ca2d",
-            //         "nom": "4233-3656",
-            //         "dernier_numero": 0,
-            //         "est_active": 1,
-            //         "created_at": "2026-04-16T16:45:57.000000Z",
-            //         "updated_at": "2026-04-16T16:45:57.000000Z"
-            //     },
-            //     "details": [
-            //         {
-            //             "id": "019d9730-0167-70ae-8f8a-1fb0efdb2ad0",
-            //             "fact_id": "019d972f-fb06-7022-8b04-5615d3916e50",
-            //             "livre_id": "019d972f-572f-736a-9d5f-08dea5f75d89",
-            //             "quantite": 100,
-            //             "prix_unitaire_ht": "27.32",
-            //             "remise": "10.85",
-            //             "total_ligne_ht": "2435.58",
-            //             "created_at": "2026-04-16T16:46:38.000000Z",
-            //             "updated_at": "2026-04-16T16:46:38.000000Z",
-            //             "livre": {
-            //                 "id": "019d972f-572f-736a-9d5f-08dea5f75d89",
-            //                 "titre": "Vel rerum aspernatur.",
-            //                 "code": "82324742",
-            //                 "categorie_id": "019d972f-5422-73a0-a771-1f31ee334a50",
-            //                 "prix_achat": "24.53",
-            //                 "prix_vente": "172.13",
-            //                 "prix_public": "103.81",
-            //                 "nb_pages": 288,
-            //                 "color_code": "#b78c9e",
-            //                 "description": "Maxime unde ea ea aut. Iste aperiam doloremque sed in necessitatibus deleniti quia. Eius aliquam qui aut voluptate ipsam iusto illum. Minus eos ullam vitae ut maiores alias accusantium. Corporis sed aspernatur at recusandae iste nam ut.",
-            //                 "annee_publication": "2005",
-            //                 "created_at": "2026-04-16T16:45:55.000000Z",
-            //                 "updated_at": "2026-04-16T16:45:55.000000Z",
-            //                 "category": {
-            //                     "id": "019d972f-5422-73a0-a771-1f31ee334a50",
-            //                     "libelle": "Robotos",
-            //                     "description": "Matériel de robotique et informatique",
-            //                     "created_at": "2026-04-16T16:45:54.000000Z",
-            //                     "updated_at": "2026-04-16T16:45:54.000000Z"
-            //                 }
-            //             }
-            //         }
-            //     ]
-            // }
             setRows(res);
             setRepresentants(reps);
+            setRepRemboursements(rembRes);
         } catch (error) {
             logger("Error fetching factures:", error);
             toast.error("Erreur lors du chargement des données");
@@ -129,7 +53,7 @@ function FacturesPage() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [activeSeason?.name]);
 
     // 4. Handle action click
     const handleAction = (action, row) => {
@@ -165,11 +89,15 @@ function FacturesPage() {
     const balance = useMemo(() => {
         const msmRows = filteredData.filter(f => f.type === 'MSM');
         const netTotal = msmRows.reduce((acc, curr) => acc + parseFloat(curr.total_ttc || 0), 0);
+        const filteredRepIds = isRepSelected ? [selectedRepId] : representants.map(r => r.id);
+        const totalRepayments = repRemboursements
+            .filter(r => filteredRepIds.includes(r.rep_id))
+            .reduce((acc, curr) => acc + parseFloat(curr.montant || 0), 0);
         return {
             netTotal,
-            repayments: 2000,
+            repayments: totalRepayments,
         };
-    }, [filteredData]);
+    }, [filteredData, repRemboursements, representants, isRepSelected, selectedRepId]);
 
     // 3. Filtered rows for Section C
     // 4. Filtrage par type pour les tableaux MSM et Wataniya
@@ -195,7 +123,6 @@ function FacturesPage() {
         { header: "Montant (DH)", accessor: "total_ht", type: "money" },
         { header: "Remise", accessor: "tva_rate", type: "rate" }, // Ensure remise is in data
         { header: "Net (DH)", accessor: "total_ttc", type: "money" },
-        // { header: "Imprimer", accessor: "id", type: "action", action: "print" },
         { header: "Livrée", accessor: "status", type: "status" },
     ];
 

@@ -3,8 +3,9 @@ import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
-import { Printer, Download, Landmark, FileText } from "lucide-react";
+import { Printer, Landmark, FileText } from "lucide-react";
 import rembImpService from "../../../api/services/rembImpService";
+import seasonsService from "../../../api/services/seasonsService";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
 import { currencyFormat, getSchoolYearFromDate } from "../../../lib/utilities";
 import SyntheseRembPdf from "../../../components/pdfs/fornisseurs/SyntheseRembPdf";
@@ -31,7 +32,26 @@ const pickMainMode = (ops = []) => {
 const SyntheseRemboursementPage = () => {
     const [rows, setRows] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedAnnee, setSelectedAnnee] = useState("2627");
+    const [seasons, setSeasons] = useState([]);
+    const [selectedAnnee, setSelectedAnnee] = useState("");
+
+    useEffect(() => {
+        seasonsService.getAll().then(setSeasons).catch(() => {});
+    }, []);
+
+    const seasonOptions = useMemo(() => {
+        return seasons.map(s => ({
+            value: s.name,
+            label: `${new Date(s.start_date).getFullYear()} / ${new Date(s.end_date).getFullYear()}`
+        }));
+    }, [seasons]);
+
+    useEffect(() => {
+        if (seasons.length > 0 && !selectedAnnee) {
+            const active = seasons.find(s => s.is_active);
+            setSelectedAnnee(active?.name || seasons[0]?.name || "");
+        }
+    }, [seasons]);
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
@@ -92,7 +112,7 @@ const SyntheseRemboursementPage = () => {
     const stats = useMemo(() => {
         return filteredRows.reduce((acc, r) => {
             acc.total += r.totalRemb;
-            acc.count += r.operations;
+            acc.count += r.rawOps?.length || 0;
             return acc;
         }, { total: 0, count: 0, suppliers: filteredRows.length });
     }, [filteredRows]);
@@ -120,8 +140,9 @@ const SyntheseRemboursementPage = () => {
                             className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
                         >
                             <option value="all">Toutes les années</option>
-                            <option value="2526">2025 / 2026</option>
-                            <option value="2627">2026 / 2027</option>
+                            {seasonOptions.map(opt => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
                         </select>
                     </div>
                 </div>

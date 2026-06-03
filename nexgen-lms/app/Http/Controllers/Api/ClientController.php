@@ -10,9 +10,25 @@ use App\Http\Resources\ClientResource;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clients = Client::with('representant')->paginate(1000);
+        $query = Client::with('representant');
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => ClientResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $clients = $query->paginate(1000);
         return ClientResource::collection($clients);
     }
 

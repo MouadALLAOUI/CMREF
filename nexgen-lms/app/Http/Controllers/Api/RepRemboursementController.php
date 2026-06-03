@@ -10,10 +10,25 @@ use App\Http\Resources\RepRemboursementResource;
 
 class RepRemboursementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $repRemboursements = RepRemboursement::with(['representant', 'banque', 'facture'])->get();
-        return RepRemboursementResource::collection($repRemboursements);
+        $query = RepRemboursement::with(['representant', 'banque', 'facture']);
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => RepRemboursementResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        return RepRemboursementResource::collection($query->get());
     }
 
     public function store(Request $request)

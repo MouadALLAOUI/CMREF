@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
@@ -9,13 +9,21 @@ import clientRemboursementService from "../../../api/services/clientRemboursemen
 import representantService from "../../../api/services/representantService";
 import clientService from "../../../api/services/clientService";
 import banqueService from "../../../api/services/banqueService";
+import useAppStore from "../../../store/useAppStore";
+import { Printer } from "lucide-react";
+import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
+import RembClientPdf from "../../../components/pdfs/syntheses/RembClientPdf";
 
 function RemboursementClientPage() {
+    const { activeSeason } = useAppStore();
     const [rows, setRows] = useState([]);
     const [representants, setRepresentants] = useState([]);
     const [clients, setClients] = useState([]);
     const [banques, setBanques] = useState([]);
+    const [selectedRep, setSelectedRep] = useState("all");
     const [isLoading, setIsLoading] = useState(true);
+    const [pdfOpen, setPdfOpen] = useState(false);
+    const printRef = useRef(null);
 
     const [dialogMode, setDialogMode] = useState("add");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -38,8 +46,9 @@ function RemboursementClientPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
+            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
             const [res, reps, cls, bq] = await Promise.all([
-                clientRemboursementService.getAll(),
+                clientRemboursementService.getAll(seasonParams),
                 representantService.getAll(),
                 clientService.getAll(),
                 banqueService.getAll(),
@@ -58,7 +67,21 @@ function RemboursementClientPage() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [activeSeason?.name]);
+
+    const filteredRows = useMemo(() => {
+        if (selectedRep === "all") return rows;
+        return rows.filter(r => r.rep_id === selectedRep);
+    }, [rows, selectedRep]);
+
+    const repOptions = useMemo(() => [
+        { label: "Tous les représentants", value: "all" },
+        ...representants.map((r) => ({ label: r.nom, value: r.id })),
+    ], [representants]);
+
+    const repLabel = selectedRep === "all"
+        ? "Tous"
+        : representants.find(r => r.id === selectedRep)?.nom || "";
 
     const resetForm = () => {
         setFormData({
@@ -222,8 +245,25 @@ function RemboursementClientPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Remboursements clients</h1>
-                    <p className="text-sm text-slate-500">Suivi des règlements et des remboursements par client.</p>
+                    <p className="text-sm text-slate-500 mb-2">Suivi des règlements et des remboursements par client.</p>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-500 uppercase">Représentant:</span>
+                    <select
+                        value={selectedRep}
+                        onChange={(e) => setSelectedRep(e.target.value)}
+                        className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
+                    >
+                        {repOptions.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                    </select>
                 </div>
+            </div>
+            <div className="flex gap-2">
+                <Button onClick={() => setPdfOpen(true)} className="bg-slate-900 text-white flex items-center gap-2 hover:bg-black">
+                    <Printer size={16} /> Imprimer
+                </Button>
+            </div>
                 <UniversalDialog
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
@@ -246,20 +286,32 @@ function RemboursementClientPage() {
                 />
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <MyTable
-                    data={rows}
-                    columns={columns}
-                    pageSize={10}
-                    actions={["view", "edit", "delete"]}
-                    onAction={handleAction}
-                    variant="slate"
-                    isLoading={isLoading}
-                    actionsDetaille={actionsDetaille}
-                    enableSearch
-                    enableSorting
-                />
+            <div ref={printRef}>
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <MyTable
+                        data={filteredRows}
+                        columns={columns}
+                        pageSize={15}
+                        variant="slate"
+                        isLoading={isLoading}
+                        enableSearch
+                        enableSorting
+                    />
+                </div>
             </div>
+
+            <PdfDialogViewer
+                open={pdfOpen}
+                onOpenChange={setPdfOpen}
+                title="Remboursements Clients"
+                document={
+                    <RembClientPdf
+                        rows={filteredRows}
+                        totalMontant={filteredRows.reduce((s, r) => s + (r.montant || 0), 0)}
+                        repLabel={repLabel}
+                    />
+                }
+            />
         </div>
     );
 }

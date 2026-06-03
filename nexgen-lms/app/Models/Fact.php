@@ -5,15 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\ScopedByRepresentant;
+use App\Models\Traits\FilterBySeason;
 
 class Fact extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, ScopedByRepresentant, FilterBySeason;
 
     protected $table = 'fact'; // Forces Laravel to use 'fact' instead of 'facts'
 
     protected $fillable = [
         'rep_id',
+        'season_id',
+        'entity_type',
         'sequence_id',
         'demande_id',
         'year_session',

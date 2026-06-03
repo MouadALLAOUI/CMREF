@@ -10,9 +10,25 @@ use App\Http\Resources\RobotResource;
 
 class RobotController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $robots = Robot::with('representant')->paginate(1000);
+        $query = Robot::with('representant');
+
+        if ($request->has('page')) {
+            $perPage = min((int) $request->query('per_page', 15), 100);
+            $paginator = $query->latest()->paginate($perPage);
+            return response()->json([
+                'data' => RobotResource::collection($paginator->items()),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                ],
+            ]);
+        }
+
+        $robots = $query->paginate(1000);
         return RobotResource::collection($robots);
     }
 

@@ -6,12 +6,16 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\Traits\FilterBySeason;
+
 class BLivraisonImp extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, FilterBySeason;
 
     protected $fillable = [
         'imprimeur_id',
+        'season_id',
+        'entity_type',
         'date_reception',
         'b_livraison_number',
         'annee',

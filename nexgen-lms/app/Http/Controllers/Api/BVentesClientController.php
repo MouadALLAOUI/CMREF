@@ -28,7 +28,7 @@ class BVentesClientController extends Controller
             ]);
         }
 
-        $bVentesClients = $query->paginate(1000);
+        $bVentesClients = $query->latest()->get();
         return BVentesClientResource::collection($bVentesClients);
     }
 

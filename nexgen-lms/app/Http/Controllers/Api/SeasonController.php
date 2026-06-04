@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SeasonResource;
 use App\Models\Season;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ class SeasonController extends Controller
         $seasons = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
             return Season::orderBy('name', 'asc')->get();
         });
-        return response()->json($seasons);
+        return SeasonResource::collection($seasons);
     }
 
     public function store(Request $request)
@@ -38,13 +39,13 @@ class SeasonController extends Controller
 
         $season = Season::create($validated);
         Cache::forget(self::CACHE_KEY);
-        return response()->json($season, 201);
+        return response()->json(new SeasonResource($season), 201);
     }
 
     public function show($id)
     {
         $season = Season::findOrFail($id);
-        return response()->json($season);
+        return new SeasonResource($season);
     }
 
     public function update(Request $request, $id)
@@ -64,7 +65,6 @@ class SeasonController extends Controller
             if ($validated['is_active']) {
                 Season::where('id', '!=', $id)->where('is_active', true)->update(['is_active' => false]);
             } else {
-                // Deactivating
                 $activeCount = Season::where('is_active', true)->count();
                 if ($season->is_active && $activeCount <= 1) {
                     return response()->json(['message' => 'Impossible de désactiver la seule saison active. Veuillez d\'abord activer une autre saison.'], 422);
@@ -74,7 +74,7 @@ class SeasonController extends Controller
 
         $season->update($validated);
         Cache::forget(self::CACHE_KEY);
-        return response()->json($season);
+        return new SeasonResource($season);
     }
 
     public function destroy($id)
@@ -91,12 +91,11 @@ class SeasonController extends Controller
     public function active()
     {
         $activeSeason = Season::getActiveSeason();
-        return response()->json($activeSeason);
+        return new SeasonResource($activeSeason);
     }
 
     public function setActive(Request $request)
     {
-        // Validate both the season ID and the boolean state you want to apply
         $validated = $request->validate([
             'season_id' => 'required|uuid|exists:seasons,id',
             'is_active' => 'required|boolean',
@@ -106,11 +105,9 @@ class SeasonController extends Controller
         $nextActive = $validated['is_active'];
 
         if ($nextActive) {
-            // Activate target, deactivate others
             Season::where('id', '!=', $seasonId)->update(['is_active' => false]);
             Season::where('id', $seasonId)->update(['is_active' => true]);
         } else {
-            // Deactivating
             $season = Season::findOrFail($seasonId);
             $activeCount = Season::where('is_active', true)->count();
             if ($season->is_active && $activeCount <= 1) {

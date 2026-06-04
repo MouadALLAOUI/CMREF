@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SettingResource;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 
@@ -11,13 +12,13 @@ class SettingController extends Controller
     public function index()
     {
         $settings = Setting::all()->keyBy('key');
-        return response()->json($settings);
+        return SettingResource::collection($settings->values());
     }
 
     public function show($key)
     {
         $setting = Setting::where('key', $key)->firstOrFail();
-        return response()->json($setting);
+        return new SettingResource($setting);
     }
 
     public function update(Request $request)
@@ -52,6 +53,6 @@ class SettingController extends Controller
         ]);
 
         $setting = Setting::create($validated);
-        return response()->json($setting, 201);
+        return response()->json(new SettingResource($setting), 201);
     }
 }

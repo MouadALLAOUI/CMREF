@@ -46,4 +46,10 @@ class BVentesClient extends Model
     {
         return $this->belongsTo(Livre::class, 'livre_id');
     }
+
+    // Relation: Each sale belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
 }

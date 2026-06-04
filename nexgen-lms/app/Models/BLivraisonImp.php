@@ -31,6 +31,12 @@ class BLivraisonImp extends Model
         return $this->belongsTo(Imprimeur::class, 'imprimeur_id');
     }
 
+    // Relation: Each BLImp belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
+
     public function items()
     {
         return $this->morphMany(BLivraisonItem::class, 'deliverable');

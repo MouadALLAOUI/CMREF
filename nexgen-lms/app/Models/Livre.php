@@ -31,4 +31,28 @@ class Livre extends Model
     {
         return $this->belongsTo(Category::class, 'categorie_id');
     }
+
+    // Relation: A book can be in many delivery note items
+    public function blivraisonItems()
+    {
+        return $this->hasMany(BLivraisonItem::class, 'livre_id');
+    }
+
+    // Relation: A book can be sold to many clients
+    public function ventesClients()
+    {
+        return $this->hasMany(BVentesClient::class, 'livre_id');
+    }
+
+    // Relation: A book can appear in many invoice details
+    public function detFacts()
+    {
+        return $this->hasMany(DetFact::class, 'livre_id');
+    }
+
+    // Relation: A book can have many depots
+    public function depots()
+    {
+        return $this->hasMany(Depot::class, 'livre_id');
+    }
 }

@@ -52,4 +52,10 @@ class Robot extends Model
     {
         return $this->belongsTo(Representant::class, 'rep_id');
     }
+
+    // Relation: Every robot belongs to a destination
+    public function destination()
+    {
+        return $this->belongsTo(Destination::class, 'destination_id');
+    }
 }

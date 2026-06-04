@@ -58,4 +58,10 @@ class ClientRemboursement extends Model
     {
         return $this->belongsTo(Banque::class, 'banque_id');
     }
+
+    // Relation: Each refund belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
 }

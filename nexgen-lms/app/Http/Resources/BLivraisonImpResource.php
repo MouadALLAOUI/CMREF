@@ -7,13 +7,21 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class BLivraisonImpResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'imprimeur_id' => $this->imprimeur_id,
+            'season_id' => $this->season_id,
+            'entity_type' => $this->entity_type,
+            'date_reception' => $this->date_reception,
+            'b_livraison_number' => $this->b_livraison_number,
+            'annee' => $this->annee,
+            'remarks' => $this->remarks,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'imprimeur' => new ImprimeurResource($this->whenLoaded('imprimeur')),
+            'items' => BLivraisonItemResource::collection($this->whenLoaded('items')),
+        ];
     }
 }

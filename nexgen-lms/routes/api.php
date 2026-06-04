@@ -95,9 +95,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Facturation transformation
     Route::post('/demande-f/{id}/transform', [FacturationController::class, 'transform']);
 
-    // Route alias: remboursement-factures → RepRemboursementController
-    Route::apiResource('remboursement-factures', RepRemboursementController::class);
-
     // Active season (read-only for all auth users)
     Route::get('/seasons/active', [SeasonController::class, 'active']);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ActivityLogResource;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
 
@@ -35,13 +36,13 @@ class ActivityLogController extends Controller
         $perPage = $request->input('per_page', 50);
         $logs = $query->latest()->paginate($perPage);
 
-        return response()->json($logs);
+        return ActivityLogResource::collection($logs);
     }
 
     public function show($id)
     {
         $log = Activity::with('causer')->findOrFail($id);
-        return response()->json($log);
+        return new ActivityLogResource($log);
     }
 
     public function getBySubject($type, $id)
@@ -52,6 +53,6 @@ class ActivityLogController extends Controller
             ->latest()
             ->get();
 
-        return response()->json($logs);
+        return ActivityLogResource::collection($logs);
     }
 }

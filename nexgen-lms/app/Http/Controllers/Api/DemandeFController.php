@@ -84,6 +84,6 @@ class DemandeFController extends Controller
         $demandeF = DemandeF::findOrFail($id);
         $demandeF->delete();
 
-        return response()->json(['message' => 'Deleted successfully'], 204);
+        return response()->json(null, 204);
     }
 }

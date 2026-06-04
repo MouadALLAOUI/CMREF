@@ -33,8 +33,7 @@ class RepRemboursement extends Model
         'remarks'
     ];
 
-    // This makes the 'cheque_url' visible when you send JSON to React
-    // protected $appends = ['cheque_url'];
+    protected $hidden = ['compte'];
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -60,5 +59,11 @@ class RepRemboursement extends Model
     public function facture()
     {
         return $this->belongsTo(Fact::class, 'fact_id');
+    }
+
+    // Relation: Each repayment belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
     }
 }

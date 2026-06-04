@@ -29,4 +29,10 @@ class Imprimeur extends Model
     {
         return $this->hasMany(BLivraisonImp::class, 'imprimeur_id');
     }
+
+    // Relation: An imprimeur has many payments
+    public function rembImps()
+    {
+        return $this->hasMany(RembImp::class, 'imprimeur_id');
+    }
 }

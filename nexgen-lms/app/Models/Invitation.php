@@ -23,6 +23,8 @@ class Invitation extends Model
         'emetteur_id',
     ];
 
+    protected $hidden = ['token'];
+
     protected $casts = [
         'expires_at' => 'datetime',
         'accepted_at' => 'datetime',

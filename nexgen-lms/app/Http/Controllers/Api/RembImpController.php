@@ -32,7 +32,7 @@ class RembImpController extends Controller
             ]);
         }
 
-        return RembImpResource::collection($query->paginate(1000));
+        return RembImpResource::collection($query->latest()->get());
     }
 
     public function store(Request $request)

@@ -28,7 +28,7 @@ class CatalogueController extends Controller
             ]);
         }
 
-        $catalogues = $query->paginate(1000);
+        $catalogues = $query->latest()->get();
         return CatalogueResource::collection($catalogues);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EmailResource;
 use App\Jobs\SendEmailJob;
 use Illuminate\Http\Request;
 
@@ -36,6 +37,6 @@ class EmailController extends Controller
         $logs = \App\Models\EmailLog::orderBy('created_at', 'desc')
             ->paginate(25);
 
-        return response()->json($logs);
+        return EmailResource::collection($logs);
     }
 }

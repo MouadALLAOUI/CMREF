@@ -57,6 +57,18 @@ class Fact extends Model
         return $this->belongsTo(FactSequence::class, 'sequence_id');
     }
 
+    // Relation: Each invoice belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
+
+    // Relation: An invoice has many repayments
+    public function repRemboursements()
+    {
+        return $this->hasMany(RepRemboursement::class, 'fact_id');
+    }
+
     /**
      * Virtual attribute for the type of invoice (MSM-MEDIAS or Wataniya)
      */

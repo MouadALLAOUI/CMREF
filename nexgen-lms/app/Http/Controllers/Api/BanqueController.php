@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-use App\Http\Resources\BanqueRequest;
+use App\Http\Resources\BanqueResource;
 
 class BanqueController extends Controller
 {
@@ -21,13 +21,13 @@ class BanqueController extends Controller
             return Banque::orderBy('nom', 'asc')->get();
         });
 
-        return response()->json($banques);
+        return BanqueResource::collection($banques);
     }
 
     public function show($id)
     {
         $banque = Banque::findOrFail($id);
-        return new BanqueRequest($banque);
+        return new BanqueResource($banque);
     }
 
     public function store(Request $request)
@@ -41,7 +41,7 @@ class BanqueController extends Controller
         try {
             $banque = Banque::create($validated);
             Cache::forget(self::CACHE_KEY);
-            return response()->json($banque, 201);
+            return response()->json(new BanqueResource($banque), 201);
         } catch (\Exception $e) {
             Log::error("Erreur création banque: " . $e->getMessage());
             return response()->json(['message' => "Erreur lors de l'enregistrement"], 500);
@@ -60,7 +60,7 @@ class BanqueController extends Controller
 
         $banque->update($validated);
         Cache::forget(self::CACHE_KEY);
-        return response()->json($banque);
+        return new BanqueResource($banque);
     }
 
     public function destroy($id)

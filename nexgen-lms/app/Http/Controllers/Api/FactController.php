@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fact;
+use App\Models\DetFact;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 use App\Http\Resources\FactResource;
 
@@ -85,9 +87,31 @@ class FactController extends Controller
             'remarques' => 'nullable|string',
         ]);
 
+        // Validate invoice amounts if any financial field is being updated
+        if (isset($validatedData['total_ht']) || isset($validatedData['total_ttc']) || isset($validatedData['tva_rate'])) {
+            $this->validateInvoiceAmounts($fact, $validatedData);
+        }
+
         $fact->update($validatedData);
 
         return new FactResource($fact);
+    }
+
+    private function validateInvoiceAmounts(Fact $fact, array $data): void
+    {
+        $totalHt = $data['total_ht'] ?? $fact->total_ht;
+        $tvaRate = $data['tva_rate'] ?? $fact->tva_rate;
+        $totalTtc = $data['total_ttc'] ?? $fact->total_ttc;
+
+        // Calculate expected total_ttc from total_ht and tva_rate
+        $expectedTtc = round($totalHt * (1 + $tvaRate / 100), 2);
+
+        // Allow small rounding differences (0.01)
+        if (abs($totalTtc - $expectedTtc) > 0.01) {
+            throw ValidationException::withMessages([
+                'total_ttc' => "Total TTC ({$totalTtc}) does not match calculated amount ({$expectedTtc}) from total_ht ({$totalHt}) and TVA rate ({$tvaRate}%).",
+            ]);
+        }
     }
 
     public function destroy($id)

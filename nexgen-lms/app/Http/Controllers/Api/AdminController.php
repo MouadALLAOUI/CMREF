@@ -14,7 +14,7 @@ class AdminController extends Controller
 {
     public function index()
     {
-        $admins = Admin::paginate(1000);
+        $admins = Admin::all();
         return AdminResource::collection($admins);
     }
 
@@ -50,9 +50,6 @@ class AdminController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-
-        $admin = Admin::create($validatedData);
-        return new AdminResource($admin);
     }
 
     public function show($id)

@@ -36,6 +36,12 @@ class BLivraison extends Model
         return $this->belongsTo(Representant::class, 'rep_id');
     }
 
+    // Relation: Each BL belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
+
     // Relation: One BL can have many books (Items)
     public function items()
     {

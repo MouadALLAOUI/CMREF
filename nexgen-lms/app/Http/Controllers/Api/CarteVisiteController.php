@@ -81,7 +81,7 @@ class CarteVisiteController extends Controller
 
     public function show($id)
     {
-        $carteVisite = CarteVisite::findOrFail($id)->where('is_deleted', false);
+        $carteVisite = CarteVisite::where('is_deleted', false)->findOrFail($id);
         return new CarteVisiteResource($carteVisite);
     }
 
@@ -133,6 +133,7 @@ class CarteVisiteController extends Controller
     {
         $carteVisite = CarteVisite::findOrFail($id);
         $carteVisite->update(['is_deleted' => true]);
-        return response()->json(['message' => 'Marqué supprimé'], 200);
+
+        return response()->json(null, 204);
     }
 }

@@ -109,7 +109,7 @@ class BLivraisonController extends Controller
         return DB::transaction(function () use ($bLivraison) {
             $bLivraison->items()->delete();
             $bLivraison->delete();
-            return response()->json(['message' => "BL supprimé"]);
+            return response()->json(null, 204);
         });
     }
 }

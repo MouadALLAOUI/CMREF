@@ -28,7 +28,7 @@ class ClientController extends Controller
             ]);
         }
 
-        $clients = $query->paginate(1000);
+        $clients = $query->latest()->get();
         return ClientResource::collection($clients);
     }
 

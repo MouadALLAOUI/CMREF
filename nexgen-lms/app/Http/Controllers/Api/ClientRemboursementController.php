@@ -28,7 +28,7 @@ class ClientRemboursementController extends Controller
             ]);
         }
 
-        $clientRemboursements = $query->paginate(1000);
+        $clientRemboursements = $query->latest()->get();
         return ClientRemboursementResource::collection($clientRemboursements);
     }
 

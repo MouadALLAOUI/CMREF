@@ -9,7 +9,9 @@
 
 ## GIT workflow
 
-- if i asked you to push a PR, run this prompt `.agents\skills\git-workflow-agent\git-workflow-agent.md`
+- if i asked you to push to github, run this prompt `.agents\skills\git-workflow-agent\git-workflow-agent.md`
+- always create a new branch for push.
+- branch naming convention: `DEV{last_pr_number + 1}` for development branches, `DEV{last_pr_number}_{small_description}` for small changes (e.g., `DEV42_fix_login_bug`).
 
 ## Repo structure
 

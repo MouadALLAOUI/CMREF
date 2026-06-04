@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Depot;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 use App\Http\Resources\DepotResource;
 
@@ -29,7 +30,7 @@ class DepotController extends Controller
             ]);
         }
 
-        $depots = $query->paginate(1000);
+        $depots = $query->latest()->get();
         return DepotResource::collection($depots);
     }
 
@@ -74,6 +75,13 @@ class DepotController extends Controller
             'status' => 'sometimes|in:Actif,Cloturé',
             'remarks' => 'nullable|string',
         ]);
+
+        // Prevent negative stock
+        if (isset($validatedData['quantite_balance']) && $validatedData['quantite_balance'] < 0) {
+            throw ValidationException::withMessages([
+                'quantite_balance' => 'Stock balance cannot be negative.',
+            ]);
+        }
 
         $depot->update($validatedData);
 

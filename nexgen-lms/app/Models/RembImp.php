@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\FilterBySeason;
 
 class RembImp extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, FilterBySeason;
 
     protected $table = 'remb_imp'; // Keeping requested legacy name
 
     protected $fillable = [
+        'season_id',
         'imprimeur_id',
         'date_payment',
         'banque_id',

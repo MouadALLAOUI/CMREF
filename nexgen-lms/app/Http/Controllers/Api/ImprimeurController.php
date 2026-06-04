@@ -28,7 +28,7 @@ class ImprimeurController extends Controller
             ]);
         }
 
-        $imprimeurs = $query->paginate(1000);
+        $imprimeurs = $query->latest()->get();
         return ImprimeurResource::collection($imprimeurs);
     }
 

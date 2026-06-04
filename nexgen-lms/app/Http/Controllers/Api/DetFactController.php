@@ -28,7 +28,7 @@ class DetFactController extends Controller
             ]);
         }
 
-        $detFacts = $query->paginate(1000);
+        $detFacts = $query->latest()->get();
         return DetFactResource::collection($detFacts);
     }
 

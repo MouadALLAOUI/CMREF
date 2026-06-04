@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\InvitationResource;
 use App\Mail\InvitationMail;
 use App\Models\EmailLog;
 use App\Models\Invitation;
@@ -47,16 +48,7 @@ class InvitationController extends Controller
                 'emetteur_id' => $request->user()->id,
             ]);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Invitation envoyée avec succès.',
-                'data' => [
-                    'id' => $invitation->id,
-                    'email' => $invitation->email,
-                    'role' => $invitation->role,
-                    'expires_at' => $invitation->expires_at,
-                ],
-            ]);
+            return response()->json(new InvitationResource($invitation), 201);
         } catch (\Exception $e) {
             EmailLog::create([
                 'destinataire' => $validated['email'],
@@ -81,7 +73,7 @@ class InvitationController extends Controller
         $invitations = Invitation::orderBy('created_at', 'desc')
             ->paginate(25);
 
-        return response()->json($invitations);
+        return InvitationResource::collection($invitations);
     }
 
     public function accept(Request $request)

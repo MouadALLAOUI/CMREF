@@ -31,7 +31,7 @@ class RepresentantController extends Controller
             ]);
         }
 
-        $representants = $query->paginate(1000);
+        $representants = $query->latest()->get();
         return RepresentantResource::collection($representants);
     }
 
@@ -58,11 +58,10 @@ class RepresentantController extends Controller
         try {
             $representant = DB::transaction(function () use ($validatedData) {
                 $hashedPassword = Hash::make($validatedData['password']);
-                // 1. Create Representant (contains password/login duplicate if you keep those columns)
-                $data = $validatedData;
-                $data['password'] = $hashedPassword;
+                // 1. Create Representant (without password - Login is source of truth)
+                $data = collect($validatedData)->except('password')->toArray();
                 $representant = Representant::create($data);
-                // 3. Create the central login record
+                // 2. Create the central login record
                 $representant->login()->create([
                     'username' => $validatedData['login'],
                     'password' => $hashedPassword,
@@ -77,9 +76,6 @@ class RepresentantController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur serveur', 'error' => $e->getMessage()], 500);
         }
-
-        // $representant = Representant::create($validatedData);
-        // return new RepresentantResource($representant);
     }
 
     public function show($id)
@@ -111,25 +107,21 @@ class RepresentantController extends Controller
 
         try {
             DB::transaction(function () use ($representant, $validatedData) {
-                // Update Password if provided (allow empty to skip)
-                if (isset($validatedData['password']) && !empty($validatedData['password'])) {
-                    $validatedData['password'] = Hash::make($validatedData['password']);
-                } else {
-                    unset($validatedData['password']);
+                // 1. Update Representant Table (without password)
+                $representant->update(collect($validatedData)->except('password')->toArray());
+
+                // 2. Sync password with Login Table if provided
+                if (isset($validatedData['password']) && !empty($validatedData['password']) && $representant->login) {
+                    $representant->login->update([
+                        'password' => Hash::make($validatedData['password']),
+                    ]);
                 }
 
-                // 1. Update Representant Table
-                $representant->update($validatedData);
-
-                // 2. Sync with Login Table
-                if ($representant->login) {
-                    $loginUpdate = [];
-                    if (isset($validatedData['login'])) $loginUpdate['username'] = $validatedData['login'];
-                    if (isset($validatedData['password'])) $loginUpdate['password'] = $validatedData['password'];
-
-                    if (!empty($loginUpdate)) {
-                        $representant->login->update($loginUpdate);
-                    }
+                // 3. Sync login username with Login Table if provided
+                if (isset($validatedData['login']) && $representant->login) {
+                    $representant->login->update([
+                        'username' => $validatedData['login'],
+                    ]);
                 }
             });
             event(new RepresentantUpdated($representant));

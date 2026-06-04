@@ -28,7 +28,7 @@ class LivreController extends Controller
             ]);
         }
 
-        $livres = $query->paginate(1000);
+        $livres = $query->latest()->get();
         return LivreResource::collection($livres);
     }
 

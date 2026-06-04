@@ -35,4 +35,10 @@ class BLivraisonItem extends Model
     {
         return $this->belongsTo(Livre::class, 'livre_id');
     }
+
+    // Relation: Each item belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
 }

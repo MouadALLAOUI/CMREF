@@ -39,4 +39,10 @@ class DetFact extends Model
     {
         return $this->belongsTo(Livre::class, 'livre_id');
     }
+
+    // Relation: Each detail belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
 }

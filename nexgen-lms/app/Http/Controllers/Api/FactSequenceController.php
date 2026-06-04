@@ -12,7 +12,7 @@ class FactSequenceController extends Controller
 {
     public function index()
     {
-        $factSequences = FactSequence::paginate(1000);
+        $factSequences = FactSequence::all();
         return FactSequenceResource::collection($factSequences);
     }
 

@@ -3,7 +3,14 @@
 namespace App\Providers;
 
 use App\Models\Fact;
+use App\Models\DemandeF;
+use App\Models\BLivraison;
+use App\Models\RembImp;
 use App\Observers\InvoiceObserver;
+use App\Observers\DemandeFObserver;
+use App\Observers\BLivraisonObserver;
+use App\Observers\FactObserver;
+use App\Observers\RembImpObserver;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,5 +35,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Register observers
         Fact::observe(InvoiceObserver::class);
+        Fact::observe(FactObserver::class);
+        DemandeF::observe(DemandeFObserver::class);
+        BLivraison::observe(BLivraisonObserver::class);
+        RembImp::observe(RembImpObserver::class);
     }
 }

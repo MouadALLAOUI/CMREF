@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\TransformDemandeRequest;
 use App\Models\DemandeF;
 use App\Models\DetFact;
 use App\Models\Fact;
@@ -16,7 +17,7 @@ class FacturationController extends Controller
     /**
      * Transform a billing request (DemandeF) into an invoice (Fact)
      */
-    public function transform($id)
+    public function transform(TransformDemandeRequest $request, $id)
     {
         $demande = DemandeF::findOrFail($id);
 

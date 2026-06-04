@@ -29,4 +29,10 @@ class Client extends Model
     {
         return $this->belongsTo(Representant::class, 'representant_id');
     }
+
+    // Relation: Every client belongs to a destination
+    public function destination()
+    {
+        return $this->belongsTo(Destination::class, 'destination_id');
+    }
 }

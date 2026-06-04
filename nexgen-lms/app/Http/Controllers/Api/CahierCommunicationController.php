@@ -54,7 +54,7 @@ class CahierCommunicationController extends Controller
 
     public function show($id)
     {
-        $cahierCommunication = CahierCommunication::findOrFail($id)->where('is_deleted', false);
+        $cahierCommunication = CahierCommunication::where('is_deleted', false)->findOrFail($id);
         return new CahierCommunicationResource($cahierCommunication);
     }
 
@@ -82,16 +82,8 @@ class CahierCommunicationController extends Controller
     public function destroy($id)
     {
         $cahierCommunication = CahierCommunication::findOrFail($id);
-        // $cahierCommunication->delete();
+        $cahierCommunication->update(['is_deleted' => true]);
 
-        // Set the flag to true
-        $cahierCommunication->is_deleted = true;
-        $cahierCommunication->save();
-
-        // 200 OK is better here since you are actually returning a modified resource
-        return response()->json([
-            'message' => 'Marqué supprimé',
-            'data' => $cahierCommunication
-        ], 200);
+        return response()->json(null, 204);
     }
 }

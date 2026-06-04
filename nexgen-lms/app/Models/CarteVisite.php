@@ -66,4 +66,10 @@ class CarteVisite extends Model
     {
         return $this->belongsTo(Representant::class, 'rep_id');
     }
+
+    // Relation: Each card belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
 }

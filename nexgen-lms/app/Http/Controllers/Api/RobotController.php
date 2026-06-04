@@ -28,7 +28,7 @@ class RobotController extends Controller
             ]);
         }
 
-        $robots = $query->paginate(1000);
+        $robots = $query->latest()->get();
         return RobotResource::collection($robots);
     }
 

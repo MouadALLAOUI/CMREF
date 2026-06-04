@@ -33,7 +33,7 @@ class CahierTemplateController extends Controller
 
         $template = CahierTemplate::create($validated);
         Cache::forget(self::CACHE_KEY);
-        return new CahierTemplateResource($template, 201);
+        return response()->json(new CahierTemplateResource($template), 201);
     }
 
     public function show($id)

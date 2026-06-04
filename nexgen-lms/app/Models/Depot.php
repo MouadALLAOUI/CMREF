@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\ScopedByRepresentant;
@@ -10,7 +10,7 @@ use App\Models\Traits\FilterBySeason;
 
 class Depot extends Model
 {
-    use HasFactory, HasUlids, ScopedByRepresentant, FilterBySeason;
+    use HasFactory, HasUuids, ScopedByRepresentant, FilterBySeason;
     protected $fillable = [
         'rep_id',
         'season_id',
@@ -36,5 +36,11 @@ class Depot extends Model
     public function livre()
     {
         return $this->belongsTo(Livre::class, 'livre_id');
+    }
+
+    // Relation: Each depot belongs to a season
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
     }
 }

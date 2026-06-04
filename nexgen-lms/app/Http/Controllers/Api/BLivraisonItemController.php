@@ -30,7 +30,7 @@ class BLivraisonItemController extends Controller
             ]);
         }
 
-        $bLivraisonItems = $query->paginate(1000);
+        $bLivraisonItems = $query->latest()->get();
         return BLivraisonItemResource::collection($bLivraisonItems);
     }
 

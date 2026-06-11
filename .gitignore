@@ -12,7 +12,6 @@ vendor/
 # generted_ai/
 
 package-lock.json
-composer.lock
 
 *.pdf
 *.tree

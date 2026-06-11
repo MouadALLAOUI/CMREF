@@ -16,7 +16,7 @@
             <h1>CMREF</h1>
         </div>
         <div class="content">
-            <p>{!! nl2br(e($message)) !!}</p>
+            <p>{!! nl2br(e($contentBody)) !!}</p>
         </div>
         <div class="footer">
             <p>Ce message a été envoyé depuis l'application CMREF.</p>

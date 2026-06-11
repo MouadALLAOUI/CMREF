@@ -11,15 +11,16 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RepRemboursementFactory extends Factory
 {
-    use HasSchoolYear;
     protected $model = RepRemboursement::class;
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
+
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'fact_id' => Fact::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'date_payment' => $this->faker->date(),
             'banque_id' => Banque::pluck('id')->random(),
             // 'banque_nom' => $this->faker->company() . ' Bank',
@@ -31,7 +32,6 @@ class RepRemboursementFactory extends Factory
             'statut_recu' => $this->faker->boolean(),
             'statut_rejete' => $this->faker->boolean(),
             'statut_accepte' => $this->faker->boolean(),
-            'annee' => $this->generateSchoolYear(5),
             'remarks' => $this->faker->sentence(),
         ];
     }

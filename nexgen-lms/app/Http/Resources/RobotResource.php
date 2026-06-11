@@ -25,8 +25,6 @@ class RobotResource extends JsonResource
             'image_urls' => $this->image_urls,
             'statut' => $this->statut,
             'remarques' => $this->remarques,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
             'destination' => new DestinationResource($this->whenLoaded('destination')),
         ];

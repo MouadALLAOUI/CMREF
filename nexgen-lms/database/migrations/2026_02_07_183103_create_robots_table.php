@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('robots', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
+            $table->uuid('rep_id')->nullable()->index();
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
             $table->foreignUuid('destination_id')->nullable()->constrained('destinations')->nullOnDelete();
 
             // Tracking & Logistics
@@ -34,7 +35,7 @@ return new class extends Migration
             $table->json('images')->nullable();
 
             // Status & Notes
-            $table->enum('statut', ['Placé', 'En Démonstration', 'Retourné', 'Vendu'])->default('Placé');
+            $table->enum('statut', ['Placé', 'En Démonstration', 'Retourné', 'Vendu'])->default('Placé')->index();
             $table->text('remarques')->nullable(); // Professional French for 'ann'
             $table->timestamps();
         });

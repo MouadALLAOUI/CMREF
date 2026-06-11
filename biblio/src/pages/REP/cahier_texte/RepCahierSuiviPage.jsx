@@ -16,7 +16,7 @@ function RepCahierSuiviPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const res = await cahierCommunicationService.getAll({ annee: activeSeason?.name });
+            const res = await cahierCommunicationService.getAll({ annee: activeSeason?.label });
             setRows(res?.data?.data || res?.data || []);
         } catch (error) {
             logger("Failed to load cahier commands", "error")();
@@ -26,8 +26,8 @@ function RepCahierSuiviPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const handleDelete = async (id) => {
         if (!window.confirm("Voulez-vous vraiment supprimer cette commande ?")) return;

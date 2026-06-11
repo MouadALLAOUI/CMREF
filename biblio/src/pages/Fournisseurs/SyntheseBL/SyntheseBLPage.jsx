@@ -1,3 +1,4 @@
+import useAppStore from "../../../store/useAppStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { MyTable } from "../../../components/ui/myTable";
@@ -5,9 +6,6 @@ import { Printer, Download, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import bLivraisonImpService from "../../../api/services/bLivraisonImpService";
-import livreService from "../../../api/services/livreService";
-import categoryService from "../../../api/services/categoryService";
-import seasonsService from "../../../api/services/seasonsService";
 import { currencyFormat } from "../../../lib/utilities";
 import SyntheseBlPdf from "../../../components/pdfs/fornisseurs/SyntheseBlPdf";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
@@ -19,30 +17,9 @@ const toNumber = (v) => {
 };
 
 const SyntheseBLPage = () => {
+    const { activeSeason } = useAppStore();
     const [rows, setRows] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [seasons, setSeasons] = useState([]);
-
-    const [selectedAnnee, setSelectedAnnee] = useState("");
-
-    useEffect(() => {
-        seasonsService.getAll().then(setSeasons).catch(() => {});
-    }, []);
-
-    const seasonOptions = useMemo(() => {
-        return seasons.map(s => ({
-            value: s.name,
-            label: `${new Date(s.start_date).getFullYear()} / ${new Date(s.end_date).getFullYear()}`
-        }));
-    }, [seasons]);
-
-    // Auto-select first season after loading
-    useEffect(() => {
-        if (seasons.length > 0 && !selectedAnnee) {
-            const active = seasons.find(s => s.is_active);
-            setSelectedAnnee(active?.name || seasons[0]?.name || "");
-        }
-    }, [seasons]);
 
     const [selectedForPrint, setSelectedForPrint] = useState(null);
     const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
@@ -50,21 +27,11 @@ const SyntheseBLPage = () => {
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [blResponse, livresResponse, catsResponse] = await Promise.all([
-                bLivraisonImpService.getAll(),
-                livreService.getAll(),
-                categoryService.getAll()
-            ]);
-            const allBLs = blResponse;
-            const allLivres = livresResponse;
-            const allCats = catsResponse?.data?.data || catsResponse?.data || catsResponse || [];
-            const livreById = new Map(allLivres.map((l) => [l.id, l]));
-            const catById = new Map(allCats.map((c) => [c.id, c]));
+            const blResponse = await bLivraisonImpService.getAll();
 
-            const processedRows = allBLs.map((bl) => {
-                // Calculate totals for this specific BL
+            const processedRows = blResponse.map((bl) => {
                 const stats = (bl.items || []).reduce((acc, item) => {
-                    const livre = livreById.get(item.livre_id);
+                    const livre = item.livre;
                     const unitPrice = toNumber(livre?.prix_achat ?? 0);
                     const qty = toNumber(item.quantite);
 
@@ -73,12 +40,10 @@ const SyntheseBLPage = () => {
                     return acc;
                 }, { qty: 0, total: 0 });
 
-                // Group items by category for this BL
                 const itemsByCategory = {};
                 (bl.items || []).forEach(item => {
-                    const livre = livreById.get(item.livre_id);
-                    const cat = catById.get(livre?.categorie_id);
-                    const catLabel = cat?.libelle || "Non classifié";
+                    const livre = item.livre;
+                    const catLabel = livre?.category?.libelle || "Non classifié";
                     if (!itemsByCategory[catLabel]) itemsByCategory[catLabel] = [];
                     itemsByCategory[catLabel].push({
                         ...item,
@@ -93,14 +58,12 @@ const SyntheseBLPage = () => {
                     bl_number: bl.b_livraison_number || "—",
                     date_reception: bl.date_reception || "",
                     lignes: (bl.items || []).length,
-                    annee: bl.annee,
                     quantite: stats.qty,
                     total_ht: stats.total,
                     rawItems: bl.items,
                     itemsByCategory
                 };
             });
-
             setRows(processedRows.sort((a, b) =>
                 String(b.date_reception).localeCompare(String(a.date_reception))
             ));
@@ -123,15 +86,11 @@ const SyntheseBLPage = () => {
         }
     };
 
-    const filteredRows = useMemo(() => {
-        if (!selectedAnnee || selectedAnnee === "all") return rows;
-        return rows.filter(row => row.annee === selectedAnnee);
-    }, [rows, selectedAnnee]);
     const totalMontant = useMemo(() =>
-        filteredRows.reduce((sum, item) => sum + toNumber(item.total_ht), 0),
-        [filteredRows]);
+        rows.reduce((sum, item) => sum + toNumber(item.total_ht), 0),
+        [rows]);
 
-    const totalBL = filteredRows.length;
+    const totalBL = rows.length;
 
     const columns = useMemo(
         () => [
@@ -145,39 +104,9 @@ const SyntheseBLPage = () => {
         []
     );
 
-    const categorySummary = useMemo(() => {
-        if (!filteredRows.length) return [];
-        const summary = {};
-        filteredRows.forEach(row => {
-            Object.entries(row.itemsByCategory || {}).forEach(([cat, items]) => {
-                if (!summary[cat]) summary[cat] = { qty: 0, total: 0, lignes: 0 };
-                items.forEach(item => {
-                    summary[cat].qty += toNumber(item.quantite);
-                    summary[cat].total += toNumber(item.total);
-                    summary[cat].lignes += 1;
-                });
-            });
-        });
-        return Object.entries(summary)
-            .map(([cat, data]) => ({ category: cat, ...data }))
-            .sort((a, b) => b.total - a.total);
-    }, [filteredRows]);
-
     return (
         <div className="space-y-6">
-            <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500 uppercase">Année Scolaire:</span>
-                <select
-                    value={selectedAnnee}
-                    onChange={(e) => setSelectedAnnee(e.target.value)}
-                    className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
-                >
-                    <option value="all">Toutes les années</option>
-                    {seasonOptions.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                </select>
-            </div>
+
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Fournisseurs - Synthèse BL</h1>
                 <div className="flex gap-3">
@@ -188,8 +117,8 @@ const SyntheseBLPage = () => {
                         title="Aperçu Synthèse BL"
                         document={
                             <SyntheseBlPdf
-                                data={filteredRows}
-                                annee={selectedAnnee}
+                                data={rows}
+                                annee={activeSeason?.label}
                                 totalMontant={totalMontant}
                             />
                         }
@@ -219,25 +148,7 @@ const SyntheseBLPage = () => {
                 </div>
             </div>
 
-            {categorySummary.length > 0 && (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="bg-slate-50 px-6 py-4 border-b border-slate-100">
-                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-wide">Synthèse par Catégorie</h3>
-                    </div>
-                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                        {categorySummary.map((cat) => (
-                            <div key={cat.category} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">{cat.category}</p>
-                                <p className="text-lg font-black text-slate-900">{cat.lignes} lignes</p>
-                                <p className="text-sm text-slate-600">{cat.qty} livres — <span className="font-bold">{currencyFormat(cat.total)}</span></p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                {/* Hidden PDF Viewer triggered by handleAction */}
                 {selectedForPrint && (
                     <PdfDialogViewer
                         key={selectedForPrint.id}
@@ -248,7 +159,7 @@ const SyntheseBLPage = () => {
                     />
                 )}
                 <MyTable
-                    data={filteredRows}
+                    data={rows}
                     columns={columns}
                     pageSize={10}
                     variant="slate"

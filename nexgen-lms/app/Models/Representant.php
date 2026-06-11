@@ -27,7 +27,7 @@ class Representant extends Authenticatable
     ];
 
 
-    protected $hidden = [];
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $casts = [
         'last_online_at' => 'datetime',
@@ -36,7 +36,7 @@ class Representant extends Authenticatable
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public function login()
+    public function loginRecord()
     {
         return $this->morphOne(Login::class, 'authenticatable');
     }

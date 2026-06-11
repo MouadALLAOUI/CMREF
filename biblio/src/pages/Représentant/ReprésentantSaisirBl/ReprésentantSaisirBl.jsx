@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { MyTable } from "../../../components/ui/myTable";
@@ -33,7 +34,7 @@ function ReprésentantSaisirBl() {
         statut_recu: false,
         statut_vu: false,
         status: "",
-        annee: activeSeason?.name || "",
+        annee: activeSeason?.label || "",
         details: []
     });
 
@@ -106,7 +107,7 @@ function ReprésentantSaisirBl() {
         setIsLoading(true);
         try {
             const [blRes, livreRes, catRes, repRes] = await Promise.all([
-                bLivraisonService.getAll({ annee: activeSeason?.name }),
+                bLivraisonService.getAll(),
                 livreService.getAll(),
                 categoryService.getAll(),
                 representantService.getAll()
@@ -124,7 +125,7 @@ function ReprésentantSaisirBl() {
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.name]);
+    }, [activeSeason?.label]);
 
     const updateDetail = (livreId, label, qte) => {
         setFormData(prev => {
@@ -190,7 +191,7 @@ function ReprésentantSaisirBl() {
             statut_recu: false,
             statut_vu: false,
             status: "",
-            annee: activeSeason?.name || "",
+            annee: activeSeason?.label || "",
             details: []
         });
     }
@@ -344,6 +345,8 @@ function ReprésentantSaisirBl() {
                     ))}
                 </select>
             </div>
+
+
 
             <MyTable
                 data={filteredBlData}

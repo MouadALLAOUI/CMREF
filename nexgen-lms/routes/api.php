@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +45,11 @@ use App\Http\Controllers\Api\InvitationController;
 
 // --- Public Routes ---
 Route::post('/login', [LoginController::class, 'login']);
+Route::get('/reverb-status', function () {
+    return response()->json([
+        'reverb_trigger' => config('broadcasting.reverb_trigger')
+    ]);
+});
 
 // 1. Allow public access ONLY to view all seasons (and optionally a single season)
 Route::get('/seasons', [SeasonController::class, 'index']);
@@ -62,31 +66,38 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return response()->json([
             'user' => $request->user(),
-            'profile' => $request->user()->profile
+            'profile' => $request->user()->profile,
+            'reverb_trigger' => config('broadcasting.reverb_trigger')
         ]);
     })->name('user');
+    Route::put('/user/password', [LoginController::class, 'updatePassword'])->name('user.password');
 
+    // ─── Non-season-scoped resources (reference / catalog / system) ───
     Route::apiResource('livres', LivreController::class)->middleware('read_only_rep');
     Route::apiResource('clients', ClientController::class);
-    Route::apiResource('b-livraisons', BLivraisonController::class);
-    Route::apiResource('b-livraison-items', BLivraisonItemController::class);
-    Route::apiResource('b-ventes-clients', BVentesClientController::class);
-    Route::apiResource('cahier-communications', CahierCommunicationController::class);
-    Route::apiResource('carte-visites', CarteVisiteController::class);
     Route::apiResource('catalogues', CatalogueController::class)->middleware('read_only_rep');
     Route::apiResource('categories', CategoryController::class)->middleware('read_only_rep');
-    Route::apiResource('client-remboursements', ClientRemboursementController::class);
     Route::apiResource('contents', ContentController::class)->middleware('read_only_rep');
-    Route::apiResource('demande-f', DemandeFController::class);
-    Route::apiResource('depots', DepotController::class);
-    Route::apiResource('det-fact', DetFactController::class);
     Route::apiResource('destinations', DestinationController::class)->middleware('read_only_rep');
-    Route::apiResource('factures', FactController::class);
     Route::apiResource('fact-sequences', FactSequenceController::class)->middleware('read_only_rep');
-    Route::apiResource('rep-remboursements', RepRemboursementController::class);
     Route::apiResource('robots', RobotController::class);
     Route::apiResource('banques', BanqueController::class)->middleware('read_only_rep');
     Route::apiResource('cahier-templates', CahierTemplateController::class)->middleware('read_only_rep');
+
+    // ─── Season-scoped resources (auto-filtered by FilterByActiveSeason middleware) ───
+    Route::middleware('season')->group(function () {
+        Route::apiResource('b-livraisons', BLivraisonController::class);
+        Route::apiResource('b-livraison-items', BLivraisonItemController::class);
+        Route::apiResource('b-ventes-clients', BVentesClientController::class);
+        Route::apiResource('cahier-communications', CahierCommunicationController::class);
+        Route::apiResource('carte-visites', CarteVisiteController::class);
+        Route::apiResource('client-remboursements', ClientRemboursementController::class);
+        Route::apiResource('demande-f', DemandeFController::class);
+        Route::apiResource('depots', DepotController::class);
+        Route::apiResource('det-fact', DetFactController::class);
+        Route::apiResource('factures', FactController::class);
+        Route::apiResource('rep-remboursements', RepRemboursementController::class);
+    });
 
     // Representative-specific shared routes
     Route::get('/representants/{id}/depot', [DepotController::class, 'byRepresentant']);
@@ -115,9 +126,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Supplier resources (admin only)
         Route::apiResource('imprimeurs', ImprimeurController::class);
-        Route::apiResource('remb-imps', RembImpController::class);
-        Route::apiResource('b-livraison-imps', BLivraisonImpController::class);
-        Route::delete('b-livraison-imps/bulk-delete/{id}', [BLivraisonImpController::class, 'destroyGroup']);
+        Route::middleware('season')->group(function () {
+            Route::apiResource('remb-imps', RembImpController::class);
+            Route::apiResource('b-livraison-imps', BLivraisonImpController::class);
+            Route::delete('b-livraison-imps/bulk-delete/{id}', [BLivraisonImpController::class, 'destroyGroup']);
+        });
 
         // Season CRUD (index/show are public; create/update/delete are admin-only)
         Route::apiResource('seasons', SeasonController::class)->except(['index', 'show']);

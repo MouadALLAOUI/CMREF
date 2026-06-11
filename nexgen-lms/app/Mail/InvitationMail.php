@@ -15,7 +15,7 @@ class InvitationMail extends Mailable
     public function __construct(
         public string $role,
         public string $token,
-        public ?string $message = null,
+        public ?string $customMessage = null,
     ) {}
 
     public function envelope(): Envelope

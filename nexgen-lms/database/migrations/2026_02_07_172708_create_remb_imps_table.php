@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('remb_imp', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
-            $table->foreignUuid('imprimeur_id')->constrained('imprimeurs')->onDelete('cascade'); // Link to Printer/Supplier
-            $table->date('date_payment'); // Actual payment date
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->foreignUuid('imprimeur_id')->index()->constrained('imprimeurs')->onDelete('cascade'); // Link to Printer/Supplier
+            $table->date('date_payment')->index(); // Actual payment date
             $table->string('banque_nom', 100)->nullable();
             $table->foreignUuid('banque_id')->nullable()->constrained('banques')->nullOnDelete(); //
             $table->string('cheque_number', 50)->nullable(); // Renamed from n_cheque

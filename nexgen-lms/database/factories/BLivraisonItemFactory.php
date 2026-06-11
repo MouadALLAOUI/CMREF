@@ -15,10 +15,11 @@ class BLivraisonItemFactory extends Factory
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
         $deliverableType = $this->faker->randomElement([BLivraison::class, BLivraisonImp::class]);
         return [
             'deliverable_id' => $deliverableType::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'deliverable_type' => $deliverableType,
             'livre_id' => Livre::pluck('id')->random(),
             'quantite' => $this->faker->numberBetween(1, 100),

@@ -27,8 +27,8 @@ class FacturationController extends Controller
         }
 
         return DB::transaction(function () use ($demande) {
-            // 1. Get current session (using school year from demande or default)
-            $session = $demande->annee_scolaire ?? date('Y') . '-' . (date('Y') + 1);
+            // 1. Get current session from the demande's season relationship
+            $session = $demande->season ? $demande->season->name : date('Y') . '-' . (date('Y') + 1);
 
             // 2. Generate next number from sequence
             // Note: FactSequence::getNextNumber should return the raw integer

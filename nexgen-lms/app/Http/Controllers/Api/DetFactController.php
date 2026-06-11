@@ -12,23 +12,7 @@ class DetFactController extends Controller
 {
     public function index(Request $request)
     {
-        $query = DetFact::with(['fact', 'livre']);
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->latest()->paginate($perPage);
-            return response()->json([
-                'data' => DetFactResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $detFacts = $query->latest()->get();
+        $detFacts = DetFact::with(['fact', 'livre'])->latest()->get();
         return DetFactResource::collection($detFacts);
     }
 

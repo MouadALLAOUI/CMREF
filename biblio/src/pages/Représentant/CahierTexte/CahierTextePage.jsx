@@ -37,7 +37,7 @@ function CahierTextePage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+      const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
       const [res, reps] = await Promise.all([
         cahierCommunicationService.getAll(seasonParams),
         representantService.getAll(),
@@ -54,7 +54,7 @@ function CahierTextePage() {
 
   useEffect(() => {
     fetchData();
-  }, [activeSeason?.name]);
+  }, [activeSeason?.label]);
 
   const resetForm = () => {
     setFormData({

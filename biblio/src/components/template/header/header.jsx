@@ -9,8 +9,8 @@ export const HeaderComponent = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const timeoutRef = useRef(null);
 
-    const seasonLabel = activeSeason?.name
-        ? `SAISON : ${activeSeason.name.slice(0, 2)} / ${activeSeason.name.slice(2)}`
+    const seasonLabel = activeSeason?.label
+        ? `SAISON : ${activeSeason.label.slice(0, 2)} / ${activeSeason.label.slice(2)}`
         : "SAISON : —";
 
     let menuItems =

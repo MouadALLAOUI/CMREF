@@ -19,8 +19,6 @@ class InvitationResource extends JsonResource
             'statut' => $this->statut,
             'emetteur_type' => $this->emetteur_type,
             'emetteur_id' => $this->emetteur_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

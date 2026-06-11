@@ -16,6 +16,8 @@ class Banque extends Model
 
     protected $fillable = ['nom', 'code_abreviation', 'logo_path', 'is_active'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $casts = [
         'is_active' => 'boolean',
     ];

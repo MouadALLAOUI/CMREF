@@ -1,3 +1,4 @@
+import useAppStore from "../../../store/useAppStore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
@@ -5,7 +6,6 @@ import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
 import { Archive, Printer, Download } from "lucide-react";
 import depotService from "../../../api/services/depotService";
-import seasonsService from "../../../api/services/seasonsService";
 import { exportToCSV } from "../../../utils/helpers";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
 import DepotPdf from "../../../components/pdfs/syntheses/DepotPdf";
@@ -33,31 +33,22 @@ const toNumber = (v) => {
 };
 
 const DepotPage = () => {
+    const { activeSeason } = useAppStore();
+    const selectedSeasonId = activeSeason?.label || "";
     const [rows, setRows] = useState([]);
     const [kpis, setKpis] = useState({ lignes: 0, reps: 0, quantite: 0 });
     const [isLoading, setIsLoading] = useState(true);
-    const [seasons, setSeasons] = useState([]);
-    const [selectedSeasonId, setSelectedSeasonId] = useState("");
-    const [pdfOpen, setPdfOpen] = useState(false);
+            const [pdfOpen, setPdfOpen] = useState(false);
     const printRef = useRef(null);
 
-    useEffect(() => {
-        seasonsService.getAll().then(setSeasons).catch(() => {});
-    }, []);
-
-    useEffect(() => {
-        if (seasons.length > 0 && !selectedSeasonId) {
-            const active = seasons.find(s => s.is_active);
-            setSelectedSeasonId(active?.id || seasons[0]?.id || "");
-        }
-    }, [seasons]);
-
+    
+    
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
             const params = {};
             if (selectedSeasonId && selectedSeasonId !== "all") {
-                params.season_id = selectedSeasonId;
+                params.annee = selectedSeasonId;
             }
             const depots = await fetchAllPaginated(depotService.getAll, params);
             const computed = depots.map((d) => ({
@@ -99,9 +90,7 @@ const DepotPage = () => {
         []
     );
 
-    const seasonLabel = selectedSeasonId && selectedSeasonId !== "all"
-        ? schoolYearFormat(seasons.find(s => s.id === selectedSeasonId)?.name)
-        : "Toutes les saisons";
+    const seasonLabel = activeSeason?.label ? schoolYearFormat(activeSeason.label) : "Toutes les saisons";
 
     const handleExportCSV = () => {
         const cols = [
@@ -122,19 +111,7 @@ const DepotPage = () => {
                         <Archive className="text-amber-600" />
                         <h1 className="text-2xl font-bold text-slate-800">Synthèse du Dépôt</h1>
                     </div>
-                    <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Saison:</span>
-                        <select
-                            value={selectedSeasonId}
-                            onChange={(e) => setSelectedSeasonId(e.target.value)}
-                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
-                        >
-                            <option value="all">Toutes les saisons</option>
-                            {seasons.map(s => (
-                                <option key={s.id} value={s.id}>{s.name.slice(0, 2)} / {s.name.slice(2)}</option>
-                            ))}
-                        </select>
-                    </div>
+                    
                 </div>
                 <div className="flex gap-2">
                     <Button onClick={handleExportCSV} className="bg-emerald-700 text-white flex items-center gap-2 hover:bg-emerald-800">

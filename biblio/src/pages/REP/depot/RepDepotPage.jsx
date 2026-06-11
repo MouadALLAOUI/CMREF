@@ -26,7 +26,7 @@ function RepDepotPage() {
         setIsLoading(true);
         try {
             const [depotsRes, livRes, catsRes] = await Promise.all([
-                depotService.getAll({ annee: activeSeason?.name }),
+                depotService.getAll({ annee: activeSeason?.label }),
                 livreService.getAll(),
                 categoryService.getAll()
             ]);
@@ -41,8 +41,8 @@ function RepDepotPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const livresByCategory = useMemo(() => {
         const grouped = {};
@@ -65,7 +65,7 @@ function RepDepotPage() {
             await depotService.create({
                 livre_id: formData.livre_id,
                 quantite: parseInt(formData.quantite),
-                annee: activeSeason?.name
+                annee: activeSeason?.label
             });
             toast.success("Dépôt déclaré avec succès");
             setFormData({ livre_id: "", quantite: "" });

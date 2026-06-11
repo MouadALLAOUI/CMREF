@@ -13,15 +13,17 @@ return new class extends Migration
     {
         Schema::create('b_livraisons', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade'); // Link to Rep
-            $table->string('bl_number', 50); // Professional numbering (e.g., BL-2026-001)
-            $table->date('date_emission');
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
+            $table->uuid('rep_id')->nullable()->index(); // Link to Rep
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
+            $table->string('bl_number', 50)->unique(); // Professional numbering (e.g., BL-2026-001)
+            $table->date('date_emission')->index();
             $table->text('mode_envoi')->nullable();
             $table->enum('type', ['Livre', 'Specimen', 'Pedagogie', 'Retour'])->default('Livre'); // Restricted types
             $table->boolean('statut_recu')->default(false);
             $table->boolean('statut_vu')->default(false);
             $table->enum('status', ['Pending', 'Seen', 'Received'])->default('Pending')->nullable(); // Status tracking
-            $table->text('annee')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

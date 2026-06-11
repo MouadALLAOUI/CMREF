@@ -17,6 +17,8 @@ class Content extends Model
         'champ3'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public $incrementing = false;
     protected $keyType = 'string';
 }

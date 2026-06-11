@@ -57,7 +57,7 @@ class LoginController extends Controller
         ]);
 
         // 🔥 ADD THIS: If it's a representative, notify the admin dashboard
-        if ($loginRecord->role === 'representant' && $loginRecord->profile) {
+        if ($loginRecord->role === 'representant' && $loginRecord->profile && config('broadcasting.reverb_trigger')) {
             event(new RepresentantUpdated($loginRecord->profile));
         }
 
@@ -74,7 +74,8 @@ class LoginController extends Controller
             ],
             'annee' => $request->annee,
             // This is the polymorphic data (Admin table or Representant table)
-            'profile' => $loginRecord->profile
+            'profile' => $loginRecord->profile,
+            'reverb_trigger' => config('broadcasting.reverb_trigger')
         ]);
     }
 
@@ -89,7 +90,7 @@ class LoginController extends Controller
 
             $user->update(['is_online' => false]);
 
-            if ($user->role === 'representant' && $user->profile) {
+            if ($user->role === 'representant' && $user->profile && config('broadcasting.reverb_trigger')) {
                 event(new \App\Events\RepresentantUpdated($user->profile));
             }
 
@@ -122,10 +123,38 @@ class LoginController extends Controller
 
         $loginRecord->update(['is_active' => $request->is_active]);
 
-        if ($loginRecord->role === 'representant' && $loginRecord->profile) {
+        if ($loginRecord->role === 'representant' && $loginRecord->profile && config('broadcasting.reverb_trigger')) {
             event(new RepresentantUpdated($loginRecord->profile));
         }
 
         return response()->json(['message' => 'User account updated successfully']);
+    }
+
+    /**
+     * Update the authenticated user's password.
+     */
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $loginRecord = $request->user();
+
+        if (!Hash::check($request->current_password, $loginRecord->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Le mot de passe actuel est incorrect.'],
+            ]);
+        }
+
+        $loginRecord->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mot de passe mis à jour avec succès.'
+        ]);
     }
 }

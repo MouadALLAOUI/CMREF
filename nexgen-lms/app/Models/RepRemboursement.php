@@ -29,11 +29,10 @@ class RepRemboursement extends Model
         'statut_recu',
         'statut_rejete',
         'statut_accepte',
-        'annee',
         'remarks'
     ];
 
-    protected $hidden = ['compte'];
+    protected $hidden = ['compte', 'created_at', 'updated_at'];
 
     public $incrementing = false;
     protected $keyType = 'string';

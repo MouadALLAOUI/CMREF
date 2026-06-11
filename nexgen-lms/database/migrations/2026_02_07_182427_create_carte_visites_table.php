@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('carte_visites', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
+            $table->uuid('rep_id')->nullable()->index();
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
 
             // Core Info
             $table->string('model')->nullable();
@@ -50,8 +53,8 @@ return new class extends Migration
             $table->boolean('livraison_chevalet')->default(false);
             $table->boolean('recu_chevalet')->default(false);
 
-            $table->string('annee_scolaire')->nullable();
-            $table->boolean('is_deleted')->default(false);
+
+            $table->boolean('is_deleted')->default(false)->index();
 
             $table->timestamps();
         });

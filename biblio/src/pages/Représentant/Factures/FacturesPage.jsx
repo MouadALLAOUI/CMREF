@@ -33,7 +33,7 @@ function FacturesPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+            const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
             const [res, reps, rembRes] = await Promise.all([
                 factService.getAll(seasonParams),
                 representantService.getAll(),
@@ -53,7 +53,7 @@ function FacturesPage() {
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.name]);
+    }, [activeSeason?.label]);
 
     // 4. Handle action click
     const handleAction = (action, row) => {

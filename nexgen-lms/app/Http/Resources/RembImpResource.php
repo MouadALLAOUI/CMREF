@@ -23,9 +23,6 @@ class RembImpResource extends JsonResource
             'statut_recu' => $this->statut_recu,
             'statut_rejete' => $this->statut_rejete,
             'remarks' => $this->remarks,
-            'annee' => $this->annee,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'imprimeur' => new ImprimeurResource($this->whenLoaded('imprimeur')),
         ];
     }

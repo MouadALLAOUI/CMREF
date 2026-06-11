@@ -12,23 +12,8 @@ class DemandeFController extends Controller
 {
     public function index(Request $request)
     {
-        $query = DemandeF::with(['representant', 'client', 'fact'])->latest('date_demande');
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->paginate($perPage);
-            return response()->json([
-                'data' => DemandeFResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        return DemandeFResource::collection($query->get());
+        $demandeFs = DemandeF::with(['representant', 'client', 'fact'])->latest('date_demande')->get();
+        return DemandeFResource::collection($demandeFs);
     }
 
     public function store(Request $request)
@@ -41,7 +26,6 @@ class DemandeFController extends Controller
             'type'           => 'required|string|max:255',
             'statut'         => 'required|integer',
             'livree'         => 'sometimes|boolean',
-            'annee_scolaire' => 'nullable|string|max:4',
             'contenu'        => 'nullable|string',
             'remarks'        => 'nullable|string',
         ]);
@@ -69,7 +53,6 @@ class DemandeFController extends Controller
             'objet'          => 'nullable|string|max:255',
             'statut'         => 'sometimes|integer',
             'livree'         => 'sometimes|boolean',
-            'annee_scolaire' => 'nullable|string|max:4',
             'contenu'        => 'nullable|string',
             'remarks'        => 'nullable|string',
         ]);

@@ -32,7 +32,7 @@ function RepFactureWataniyaPage() {
         setIsLoading(true);
         try {
             const [factsRes, livRes, catsRes] = await Promise.all([
-                factService.getAll({ annee: activeSeason?.name, type: "Wataniya" }),
+                factService.getAll({ annee: activeSeason?.label, type: "Wataniya" }),
                 livreService.getAll(),
                 categoryService.getAll()
             ]);
@@ -47,8 +47,8 @@ function RepFactureWataniyaPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const livresByCategory = useMemo(() => {
         const grouped = {};
@@ -108,7 +108,7 @@ function RepFactureWataniyaPage() {
                 adresse: formData.adresse,
                 tel: formData.tel,
                 articles: selectedArticles,
-                annee: activeSeason?.name
+                annee: activeSeason?.label
             });
             toast.success("Demande de facture Wataniya envoyée avec succès");
             setFormData({ date: "", ville: "", client: "", ice: "", adresse: "", tel: "", articles: {} });

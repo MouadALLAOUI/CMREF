@@ -12,6 +12,11 @@ class BLivraison extends Model
 {
     use HasFactory, HasUuids, ScopedByRepresentant, FilterBySeason;
 
+    protected static function booted(): void
+    {
+        static::deleting(fn (BLivraison $bl) => $bl->items()->update(['is_deleted' => true]));
+    }
+
     protected $fillable = [
         'rep_id',
         'season_id',
@@ -23,11 +28,12 @@ class BLivraison extends Model
         'statut_recu',
         'statut_vu',
         'status',
-        'annee',
         'remarks'
     ];
 
-    public $incrementing = false; //
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public $incrementing = false;
     protected $keyType = 'string';
 
     // Relation: Each BL belongs to one representative

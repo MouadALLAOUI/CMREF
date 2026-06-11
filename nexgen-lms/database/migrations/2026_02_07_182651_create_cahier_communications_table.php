@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('cahier_communication', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
+            $table->uuid('rep_id')->nullable()->index();
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
 
             // Basic Info
             $table->string('ecole');
@@ -38,11 +41,11 @@ return new class extends Migration
             $table->boolean('is_bc_validated')->default(false);  // etat_bon_commande
             $table->boolean('is_printed')->default(false);       // imprimer
             $table->boolean('is_delivered')->default(false);     // livree
-            $table->boolean('is_deleted')->default(false);       // supprimer (Soft delete flag)
+            $table->boolean('is_deleted')->default(false)->index();       // supprimer (Soft delete flag)
 
 
             $table->text('remarques')->nullable(); // Standardisé pour 'ann'
-            $table->string('annee_scolaire')->nullable();        // ann (ex: 2025/2026)
+
             $table->timestamps();
         });
     }

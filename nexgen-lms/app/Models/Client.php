@@ -21,6 +21,8 @@ class Client extends Model
         'email'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public $incrementing = false; // Required for UUIDs
     protected $keyType = 'string';
 

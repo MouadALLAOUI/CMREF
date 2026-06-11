@@ -70,8 +70,7 @@ class InvitationController extends Controller
 
     public function index(Request $request)
     {
-        $invitations = Invitation::orderBy('created_at', 'desc')
-            ->paginate(25);
+        $invitations = Invitation::orderBy('created_at', 'desc')->get();
 
         return InvitationResource::collection($invitations);
     }

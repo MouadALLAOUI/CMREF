@@ -24,7 +24,6 @@ class RepresentantFactory extends Factory
             'ville' => $this->faker->city(),
             'lieu_de_travail' => $this->faker->company(),
             'login' => $this->faker->unique()->userName(),
-            'password' => Hash::make('password'),
             'bl_count' => 0,
             'remb_count' => 0,
         ];

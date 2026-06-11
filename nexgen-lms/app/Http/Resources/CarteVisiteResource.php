@@ -39,10 +39,8 @@ class CarteVisiteResource extends JsonResource
             'prod_chevalet' => $this->prod_chevalet,
             'livraison_chevalet' => $this->livraison_chevalet,
             'recu_chevalet' => $this->recu_chevalet,
-            'annee_scolaire' => $this->annee_scolaire,
+
             'is_deleted' => $this->is_deleted,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
         ];
     }

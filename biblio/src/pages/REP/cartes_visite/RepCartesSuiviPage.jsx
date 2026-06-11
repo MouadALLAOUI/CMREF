@@ -17,7 +17,7 @@ function RepCartesSuiviPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const res = await carteVisiteService.getAll({ annee: activeSeason?.name });
+            const res = await carteVisiteService.getAll({ annee: activeSeason?.label });
             setRows(res?.data?.data || res?.data || []);
         } catch (error) {
             logger("Failed to load carte visite commands", "error")();
@@ -27,8 +27,8 @@ function RepCartesSuiviPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const handleDelete = async (id) => {
         if (!window.confirm("Voulez-vous vraiment supprimer cette commande ?")) return;

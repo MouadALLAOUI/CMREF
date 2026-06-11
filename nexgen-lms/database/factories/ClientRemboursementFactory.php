@@ -15,10 +15,12 @@ class ClientRemboursementFactory extends Factory
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
+
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'client_id' => Client::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'date_payment' => $this->faker->date(),
             'banque_id' => Banque::pluck('id')->random(),
             'banque_nom' => $this->faker->company() . ' Bank',

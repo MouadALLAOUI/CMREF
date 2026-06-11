@@ -15,8 +15,6 @@ class BanqueResource extends JsonResource
             'code_abreviation' => $this->code_abreviation,
             'logo_path' => $this->logo_path,
             'is_active' => $this->is_active,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

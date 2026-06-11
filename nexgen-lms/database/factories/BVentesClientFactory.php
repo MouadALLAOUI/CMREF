@@ -15,10 +15,12 @@ class BVentesClientFactory extends Factory
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
+
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'client_id' => Client::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'b_vente_number' => $this->faker->unique()->bothify('BV-####'),
             'date_vente' => $this->faker->date(),
             'type' => $this->faker->randomElement(['normal', 'retour']),

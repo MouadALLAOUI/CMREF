@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'supplier'      => \App\Http\Middleware\EnsureUserIsSupplier::class,
             'verified'      => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'read_only_rep' => \App\Http\Middleware\EnsureReadOnlyForReps::class,
+            'season'        => \App\Http\Middleware\FilterByActiveSeason::class,
         ]);
 
         // 3. Security settings

@@ -13,23 +13,8 @@ class BLivraisonController extends Controller
 {
     public function index(Request $request)
     {
-        $query = BLivraison::with(['representant', 'items.livre'])->latest();
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->paginate($perPage);
-            return response()->json([
-                'data' => BLivraisonResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        return BLivraisonResource::collection($query->get());
+        $bLivraisons = BLivraison::with(['representant', 'items.livre'])->latest()->get();
+        return BLivraisonResource::collection($bLivraisons);
     }
 
     public function store(Request $request)
@@ -40,7 +25,6 @@ class BLivraisonController extends Controller
             'date_emission' => 'required|date',
             'mode_envoi' => 'nullable|string',
             'type' => 'required|in:Livre,Specimen,Pedagogie,Retour',
-            'annee' => 'nullable|string',
             'details' => 'required|array|min:1',
             'details.*.livre_id' => 'required|uuid|exists:livres,id',
             'details.*.qte' => 'required|integer',
@@ -54,7 +38,6 @@ class BLivraisonController extends Controller
                     'date_emission' => $validatedData['date_emission'],
                     'mode_envoi' => $validatedData['mode_envoi'],
                     'type' => $validatedData['type'],
-                    'annee' => $validatedData['annee'],
                     'status' => 'Pending',
                 ]);
 
@@ -90,7 +73,6 @@ class BLivraisonController extends Controller
             'date_emission' => 'date',
             'mode_envoi' => 'nullable|string',
             'type' => 'in:Livre,Specimen,Pedagogie,Retour',
-            'annee' => 'nullable|string',
             'statut_recu' => 'sometimes|boolean',
             'statut_vu' => 'sometimes|boolean',
             'status' => 'nullable|in:Pending,Seen,Received',
@@ -107,7 +89,6 @@ class BLivraisonController extends Controller
         $bLivraison = BLivraison::findOrFail($id);
 
         return DB::transaction(function () use ($bLivraison) {
-            $bLivraison->items()->delete();
             $bLivraison->delete();
             return response()->json(null, 204);
         });

@@ -1,11 +1,11 @@
 const UDSummary = ({
     hedears = ["Désignation", "Qté"],
     data = [],
-    key
+    id
 }) => {
     return (
 
-        <div key={`sum-${key}`} className="col-span-full mt-8 animate-in fade-in slide-in-from-top-2">
+        <div key={`sum-${id ?? data.length}`} className="col-span-full mt-8 animate-in fade-in slide-in-from-top-2">
             <div className="border border-amber-200 rounded-xl overflow-hidden shadow-sm max-w-lg mx-auto">
                 <div className="grid grid-cols-4 bg-amber-400 font-bold text-[10px] uppercase p-3">
                     <div className="col-span-3">{hedears[0]}</div>

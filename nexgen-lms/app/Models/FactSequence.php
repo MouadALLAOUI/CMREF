@@ -12,6 +12,8 @@ class FactSequence extends Model
 
     protected $fillable = ['nom', 'dernier_numero', 'est_active'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     // Important: Tell Laravel IDs are not auto-incrementing integers
     public $incrementing = false;
     protected $keyType = 'string';

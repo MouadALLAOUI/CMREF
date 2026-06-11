@@ -16,10 +16,7 @@ class BLivraisonImpResource extends JsonResource
             'entity_type' => $this->entity_type,
             'date_reception' => $this->date_reception,
             'b_livraison_number' => $this->b_livraison_number,
-            'annee' => $this->annee,
             'remarks' => $this->remarks,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'imprimeur' => new ImprimeurResource($this->whenLoaded('imprimeur')),
             'items' => BLivraisonItemResource::collection($this->whenLoaded('items')),
         ];

@@ -18,7 +18,7 @@ class RepresentantUpdated implements ShouldBroadcastNow
      */
     public function __construct(public Representant $representant)
     {
-        $this->representant->load('login');
+        $this->representant->load('loginRecord');
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Models\Fact;
 use App\Models\Livre;
 use App\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 
 class DetFactFactory extends Factory
 {
@@ -18,11 +19,13 @@ class DetFactFactory extends Factory
         $price = $this->faker->randomFloat(2, 10, 200);
         $remise = $this->faker->randomFloat(2, 0, 20);
         $total = ($qty * $price) * (1 - $remise / 100);
+        $s2627_id = Season::where('name', '2627')->value('id');
 
         return [
             'fact_id' => Fact::pluck('id')->random(),
             'livre_id' => Livre::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            // 'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'quantite' => $qty,
             'prix_unitaire_ht' => $price,
             'remise' => $remise,

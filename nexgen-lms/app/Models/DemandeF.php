@@ -26,10 +26,12 @@ class DemandeF extends Model
         // 'objet', // Ensure this exists in your migration
         'statut',
         'livree',
-        'annee_scolaire',
+
         'contenu',
         'remarks',
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $casts = [
         'date_demande' => 'date',

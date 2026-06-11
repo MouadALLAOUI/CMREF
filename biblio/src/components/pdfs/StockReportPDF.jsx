@@ -47,7 +47,7 @@ const StockReportPDF = ({ destinationName, seasonLabel, groupedData, isGlobal: i
             ) : (
               <>
                 <Text style={styles.title}>Zone : {destinationName}</Text>
-                <Text style={styles.subtitle}>Categorie : {categoryGroup.categoryName} | Année : {seasonLabel}</Text>
+                <Text style={styles.subtitle}>Categorie : {categoryGroup.categoryName}</Text>
               </>
             )}
           </View>
@@ -75,7 +75,7 @@ const StockReportPDF = ({ destinationName, seasonLabel, groupedData, isGlobal: i
 
             {/* Loop through the books ONLY for this specific category */}
             {categoryGroup.books.map((row, idx) => (
-              <View style={styles.tableRow} key={idx}>
+              <View style={[styles.tableRow, idx % 2 !== 0 && { backgroundColor: '#f1f5f9' }]} key={idx}>
                 {isGlobal ? (
                   <>
                     <View style={styles.colGlobalLivre}><Text style={styles.textCell}>{row.livre}</Text></View>
@@ -88,7 +88,7 @@ const StockReportPDF = ({ destinationName, seasonLabel, groupedData, isGlobal: i
                 ) : (
                   <>
                     <View style={styles.colZone}><Text style={styles.textCell}>{row.livre}</Text></View>
-                    <View style={styles.colZone}><Text style={styles.textCell}>{row.achat}</Text></View>
+                    <View style={styles.colZone}><Text style={styles.textCell}>{row.livraison}</Text></View>
                     <View style={styles.colZone}><Text style={styles.textCell}>{row.vente}</Text></View>
                     <View style={styles.colZone}><Text style={styles.textCell}>{row.stock}</Text></View>
                   </>

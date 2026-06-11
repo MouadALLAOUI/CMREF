@@ -23,6 +23,8 @@ class Livre extends Model
         'annee_publication'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public $incrementing = false; // Required for UUIDs
     protected $keyType = 'string';
 

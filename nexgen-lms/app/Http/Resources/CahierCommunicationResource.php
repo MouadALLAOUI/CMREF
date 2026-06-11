@@ -33,8 +33,6 @@ class CahierCommunicationResource extends JsonResource
                 'bc' => $this->bon_de_commande,
             ],
             'remarques' => $this->remarques,
-            'annee_scolaire' => $this->annee_scolaire,
-            'created_at' => $this->created_at->diffForHumans(),
         ];
     }
 }

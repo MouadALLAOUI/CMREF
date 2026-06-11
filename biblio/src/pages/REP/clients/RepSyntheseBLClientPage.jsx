@@ -21,8 +21,8 @@ function RepSyntheseBLClientPage() {
             setIsLoading(true);
             try {
                 const [itemsRes, clientsRes] = await Promise.all([
-                    bLivraisonItemService.getAll({ annee: activeSeason?.name }),
-                    clientService.getAll({ annee: activeSeason?.name })
+                    bLivraisonItemService.getAll({ annee: activeSeason?.label }),
+                    clientService.getAll({ annee: activeSeason?.label })
                 ]);
                 setDeliveryItems(itemsRes?.data?.data || itemsRes?.data || []);
                 setClients(clientsRes?.data?.data || clientsRes?.data || []);
@@ -32,8 +32,8 @@ function RepSyntheseBLClientPage() {
                 setIsLoading(false);
             }
         };
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const clientSummary = useMemo(() => {
         const summary = {};

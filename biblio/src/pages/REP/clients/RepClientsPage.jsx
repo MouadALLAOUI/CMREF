@@ -37,7 +37,7 @@ function RepClientsPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const res = await clientService.getAll({ annee: activeSeason?.name });
+            const res = await clientService.getAll({ annee: activeSeason?.label });
             setClients(res?.data?.data || res?.data || []);
         } catch (error) {
             logger("Failed to load clients", "error")();
@@ -47,8 +47,8 @@ function RepClientsPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -57,7 +57,7 @@ function RepClientsPage() {
                 await clientService.update(editingClient.id, formData);
                 toast.success("Client modifié avec succès");
             } else {
-                await clientService.create({ ...formData, annee: activeSeason?.name });
+                await clientService.create({ ...formData, annee: activeSeason?.label });
                 toast.success("Client ajouté avec succès");
             }
             setFormData({ raison_sociale: "", ville: "", adresse: "", gerant: "", telephone: "" });

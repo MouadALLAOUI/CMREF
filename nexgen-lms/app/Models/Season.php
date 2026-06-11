@@ -19,6 +19,8 @@ class Season extends Model
         'is_active',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',

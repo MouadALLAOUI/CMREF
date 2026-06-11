@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('b_livraison_imps', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
             $table->foreignUuid('imprimeur_id')->constrained('imprimeurs')->onDelete('cascade'); // Link to Supplier
             // $table->uuidMorphs('deliverable');
             $table->date('date_reception'); // Professional DATE type
-            $table->string('b_livraison_number', 50); // The supplier's BL number
+            $table->string('b_livraison_number', 50)->unique(); // The supplier's BL number
             $table->text('remarks')->nullable(); // Legacy 'ann' field
-            $table->string('annee', 50)->nullable();
             $table->timestamps();
         });
     }

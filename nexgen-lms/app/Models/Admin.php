@@ -20,13 +20,15 @@ class Admin extends Authenticatable
 
     protected $hidden = [
         'password',
+        'created_at',
+        'updated_at',
     ];
 
     // Important: Tell Laravel IDs are not auto-incrementing integers
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public function login()
+    public function loginRecord()
     {
         return $this->morphOne(Login::class, 'authenticatable');
     }

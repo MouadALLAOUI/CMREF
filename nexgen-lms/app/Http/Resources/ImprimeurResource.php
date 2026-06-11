@@ -19,8 +19,6 @@ class ImprimeurResource extends JsonResource
             'adjoint_nom' => $this->adjoint_nom,
             'adjoint_tel' => $this->adjoint_tel,
             'adjoint_email' => $this->adjoint_email,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

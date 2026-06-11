@@ -9,14 +9,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CahierCommunicationFactory extends Factory
 {
-    use HasSchoolYear;
     protected $model = CahierCommunication::class;
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
+
         return [
             'rep_id' => Representant::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'ecole' => $this->faker->company(),
             'type' => $this->faker->word(),
             'qte' => $this->faker->numberBetween(10, 500),
@@ -35,7 +36,7 @@ class CahierCommunicationFactory extends Factory
             'is_delivered' => $this->faker->boolean(),
             'is_deleted' => false,
             'remarques' => $this->faker->sentence(),
-            'annee_scolaire' => $this->generateSchoolYear(5),
+
         ];
     }
 }

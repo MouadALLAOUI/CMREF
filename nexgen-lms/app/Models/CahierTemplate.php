@@ -18,6 +18,8 @@ class CahierTemplate extends Model
         'est_actif',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $casts = [
         'est_actif' => 'boolean',
     ];

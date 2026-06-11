@@ -15,24 +15,11 @@ class DestinationController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->has('page')) {
-            $query = Destination::with(['representants', 'ventes', 'livraisons']);
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->latest()->paginate($perPage);
-            return response()->json([
-                'data' => DestinationResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $destinations = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
-            return Destination::with(['representants', 'ventes', 'livraisons'])->get();
-        });
+        $destinations = Destination::with([
+            'representants',
+            'ventes.livre.category',
+            'livraisons.items.livre.category'
+        ])->latest()->get();
 
         return DestinationResource::collection($destinations);
     }

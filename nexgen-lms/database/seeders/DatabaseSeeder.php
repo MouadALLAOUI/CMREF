@@ -52,7 +52,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 2. Parent Factories
-        Destination::factory(5)->create();
         $livres = Livre::get(); // Create books first to assign to depots later
         Imprimeur::factory(7)->create();
         Banque::factory(7)->create();
@@ -66,7 +65,6 @@ class DatabaseSeeder extends Seeder
             // Create the polymorphic Login
             Login::factory()->create([
                 'username' => $rep->login,
-                'password' => $rep->password,
                 'authenticatable_id' => $rep->id,
                 'authenticatable_type' => Representant::class,
                 'role' => 'representant'

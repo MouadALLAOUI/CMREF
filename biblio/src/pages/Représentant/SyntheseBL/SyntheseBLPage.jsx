@@ -1,11 +1,12 @@
+/* eslint-disable no-console */
+import useAppStore from "../../../store/useAppStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
 import { Printer, Download } from "lucide-react";
-import bLivraisonItemService from "../../../api/services/bLivraisonItemService";
-import seasonsService from "../../../api/services/seasonsService";
+import bLivraisonService from "../../../api/services/bLivraisonService";
 
 const fetchAllPaginated = async (serviceGetAll, params = {}) => {
     const first = await serviceGetAll({ ...params, page: 1 });
@@ -29,43 +30,29 @@ const toNumber = (v) => {
 };
 
 const SyntheseBLPage = () => {
+    const { activeSeason } = useAppStore();
+    const selectedSeasonId = activeSeason?.label || "";
     const [rows, setRows] = useState([]);
     const [kpis, setKpis] = useState({ totalBL: 0, montant: 0, reps: 0 });
     const [isLoading, setIsLoading] = useState(true);
-    const [seasons, setSeasons] = useState([]);
-    const [selectedSeasonId, setSelectedSeasonId] = useState("");
 
-    useEffect(() => {
-        seasonsService.getAll().then(setSeasons).catch(() => {});
-    }, []);
 
-    useEffect(() => {
-        if (seasons.length > 0 && !selectedSeasonId) {
-            const active = seasons.find(s => s.is_active);
-            setSelectedSeasonId(active?.id || seasons[0]?.id || "");
-        }
-    }, [seasons]);
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
             const params = {};
             if (selectedSeasonId && selectedSeasonId !== "all") {
-                params.season_id = selectedSeasonId;
+                params.annee = selectedSeasonId;
             }
-            const items = await fetchAllPaginated(bLivraisonItemService.getAll, params);
+            const blivraisons = await fetchAllPaginated(bLivraisonService.getAll, params);
             const grouped = new Map();
 
-            for (const it of items) {
-                const livraison = it.livraison;
-                const repId = livraison?.rep_id || livraison?.representant?.id;
+            for (const bl of blivraisons) {
+                const repId = bl.representant?.id;
                 if (!repId) continue;
 
-                const repNom = livraison?.representant?.nom || repId;
-                const qty = toNumber(it.quantite);
-                const unit = toNumber(it.livre?.prix_vente ?? it.livre?.prix_public ?? 0);
-                const total = qty * unit;
-
+                const repNom = bl.representant?.nom || repId;
                 const prev = grouped.get(repId) || {
                     id: repId,
                     rep: repNom,
@@ -75,12 +62,18 @@ const SyntheseBLPage = () => {
                     blNumbers: new Set(),
                 };
 
-                prev.totalMontant += total;
-                if (livraison?.bl_number) prev.blNumbers.add(String(livraison.bl_number));
+                if (bl.bl_number) prev.blNumbers.add(String(bl.bl_number));
                 prev.totalBL = prev.blNumbers.size;
-                if (livraison?.date_emission && (!prev.lastUpdate || String(livraison.date_emission) > String(prev.lastUpdate))) {
-                    prev.lastUpdate = livraison.date_emission;
+                if (bl.date_emission && (!prev.lastUpdate || String(bl.date_emission) > String(prev.lastUpdate))) {
+                    prev.lastUpdate = bl.date_emission;
                 }
+
+                for (const it of bl.items || []) {
+                    const qty = toNumber(it.quantite);
+                    const unit = toNumber(it.livre?.prix_vente ?? it.livre?.prix_public ?? 0);
+                    prev.totalMontant += qty * unit;
+                }
+
                 grouped.set(repId, prev);
             }
 
@@ -118,19 +111,7 @@ const SyntheseBLPage = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800">Synthèse des Bons de Livraison</h1>
-                    <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Saison:</span>
-                        <select
-                            value={selectedSeasonId}
-                            onChange={(e) => setSelectedSeasonId(e.target.value)}
-                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
-                        >
-                            <option value="all">Toutes les saisons</option>
-                            {seasons.map(s => (
-                                <option key={s.id} value={s.id}>{s.name.slice(0, 2)} / {s.name.slice(2)}</option>
-                            ))}
-                        </select>
-                    </div>
+
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" className="flex items-center gap-2">

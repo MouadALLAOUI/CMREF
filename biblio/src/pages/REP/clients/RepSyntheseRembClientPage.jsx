@@ -21,8 +21,8 @@ function RepSyntheseRembClientPage() {
             setIsLoading(true);
             try {
                 const [rembRes, clientsRes] = await Promise.all([
-                    clientRemboursementService.getAll({ annee: activeSeason?.name }),
-                    clientService.getAll({ annee: activeSeason?.name })
+                    clientRemboursementService.getAll({ annee: activeSeason?.label }),
+                    clientService.getAll({ annee: activeSeason?.label })
                 ]);
                 setRemboursements(rembRes?.data?.data || rembRes?.data || []);
                 setClients(clientsRes?.data?.data || clientsRes?.data || []);
@@ -32,8 +32,8 @@ function RepSyntheseRembClientPage() {
                 setIsLoading(false);
             }
         };
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const clientSummary = useMemo(() => {
         const summary = {};

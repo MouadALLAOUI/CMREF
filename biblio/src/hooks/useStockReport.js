@@ -4,6 +4,7 @@ import destinationService from "../api/services/destinationService";
 import categoryService from "../api/services/categoryService";
 import livreService from "../api/services/livreService";
 import toast from "react-hot-toast";
+import logger from "../lib/logger";
 
 export function useStockReport(selectedDestinationId, selectedSeasonId) {
   const [destinations, setDestinations] = useState([]);
@@ -18,7 +19,7 @@ export function useStockReport(selectedDestinationId, selectedSeasonId) {
       try {
         const params = {};
         if (selectedSeasonId && selectedSeasonId !== "all") {
-          params.season_id = selectedSeasonId;
+          params.annee = selectedSeasonId;
         }
         const [destRes, catRes, livRes] = await Promise.all([
           destinationService.getAll(params),
@@ -28,8 +29,9 @@ export function useStockReport(selectedDestinationId, selectedSeasonId) {
         setDestinations(destRes);
         setCategories(catRes);
         setLivres(livRes);
+
       } catch (error) {
-        console.error("Error fetching report data:", error);
+        logger("Error fetching report data: " + error, "error")();
         toast.error("Erreur lors du chargement des données de stock");
       } finally {
         setIsLoading(false);
@@ -76,11 +78,18 @@ export function useStockReport(selectedDestinationId, selectedSeasonId) {
           const catId = vente.livre?.categorie_id;
           const catName = vente.livre?.category?.libelle;
           const bookRow = initBook(code, catId, catName);
-          bookRow.vente += Number(vente.quantite || 0);
+          const qte = Number(vente.quantite || 0);
+          if (vente.type?.toLowerCase() === 'retour') {
+            bookRow.vente -= qte;
+          } else {
+            bookRow.vente += qte;
+          }
         });
       }
       if (dest.livraisons) {
         dest.livraisons.forEach(livraison => {
+          // Only count livraisons that have been confirmed received
+          if (!livraison.statut_recu) return;
           if (livraison.items) {
             livraison.items.forEach(item => {
               const code = item.livre?.code || item.livre_id;
@@ -104,7 +113,7 @@ export function useStockReport(selectedDestinationId, selectedSeasonId) {
     return Object.values(categoryMap).map(cat => {
       const booksArray = Object.values(cat.booksMap).map(row => ({
         ...row,
-        stock: row.achat - row.vente - row.specimen + row.rejet
+        stock: row.livraison - row.vente
       })).sort((a, b) => a.livre.localeCompare(b.livre));
       return { categoryName: cat.categoryName, books: booksArray };
     }).filter(cat => cat.books.length > 0);
@@ -118,11 +127,25 @@ export function useStockReport(selectedDestinationId, selectedSeasonId) {
     }, 0);
   }, [groupedReportData]);
 
+  const totalGlobalLivraison = useMemo(() => {
+    return groupedReportData.reduce((total, cat) => {
+      return total + cat.books.reduce((sum, book) => sum + book.livraison, 0);
+    }, 0);
+  }, [groupedReportData]);
+
+  const totalGlobalVente = useMemo(() => {
+    return groupedReportData.reduce((total, cat) => {
+      return total + cat.books.reduce((sum, book) => sum + book.vente, 0);
+    }, 0);
+  }, [groupedReportData]);
+
   // 4. RETURN EVERYTHING THE UI NEEDS
   return {
     destinations,
     groupedReportData,
     totalGlobalStock,
+    totalGlobalLivraison,
+    totalGlobalVente,
     isLoading
   };
 }

@@ -12,6 +12,7 @@ class RepresentantResource extends JsonResource
         return [
             'id' => $this->id,
             'nom' => $this->nom,
+            'cin' => $this->cin,
             'destination_id' => $this->destination_id,
             'tel' => $this->tel,
             'email' => $this->email,
@@ -19,17 +20,14 @@ class RepresentantResource extends JsonResource
             'code_postale' => $this->code_postale,
             'ville' => $this->ville,
             'lieu_de_travail' => $this->lieu_de_travail,
-            'login' => $this->login,
             'last_online_at' => $this->last_online_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'login_data' => $this->whenLoaded('login', fn() => [
-                'id' => $this->login->id,
-                'username' => $this->login->username,
-                'role' => $this->login->role,
-                'is_active' => $this->login->is_active,
-                'is_online' => $this->login->is_online,
-                'last_visit' => $this->login->last_visit,
+            'login' => $this->whenLoaded('loginRecord', fn() => [
+                'id' => $this->loginRecord->id,
+                'username' => $this->loginRecord->username,
+                'role' => $this->loginRecord->role,
+                'is_active' => $this->loginRecord->is_active,
+                'is_online' => $this->loginRecord->is_online,
+                'last_visit' => $this->loginRecord->last_visit,
             ]),
         ];
     }

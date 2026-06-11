@@ -12,25 +12,11 @@ class CahierCommunicationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = CahierCommunication::with('representant')
+        $cahierCommunications = CahierCommunication::with('representant')
             ->where('is_deleted', false)
-            ->latest();
+            ->latest()
+            ->get();
 
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->paginate($perPage);
-            return response()->json([
-                'data' => CahierCommunicationResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $cahierCommunications = $query->paginate(1000);
         return CahierCommunicationResource::collection($cahierCommunications);
     }
 
@@ -44,7 +30,7 @@ class CahierCommunicationController extends Controller
             'date_commande' => 'required|date',
             'nom_fichier' => 'nullable|string',
             'indication' => 'nullable|string',
-            'annee_scolaire' => 'nullable|string',
+
             'remarques' => 'nullable|string',
         ]);
 

@@ -33,7 +33,7 @@ function RepCahierCommanderPage() {
         try {
             await cahierCommunicationService.create({
                 ...formData,
-                annee: activeSeason?.name
+                annee: activeSeason?.label
             });
             toast.success("Commande de cahier envoyée avec succès");
             setFormData({

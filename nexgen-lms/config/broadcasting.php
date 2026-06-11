@@ -17,6 +17,8 @@ return [
 
     'default' => env('BROADCAST_CONNECTION', 'null'),
 
+    'reverb_trigger' => filter_var(env('REVERB_TRIGGER', false), FILTER_VALIDATE_BOOLEAN),
+
     /*
     |--------------------------------------------------------------------------
     | Broadcast Connections

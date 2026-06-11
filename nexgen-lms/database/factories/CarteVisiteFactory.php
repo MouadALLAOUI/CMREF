@@ -9,14 +9,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CarteVisiteFactory extends Factory
 {
-    use HasSchoolYear;
     protected $model = CarteVisite::class;
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
+
         return [
             'rep_id' => Representant::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'model' => $this->faker->word(),
             'date_commande' => $this->faker->date(),
             'nom_sur_carte' => $this->faker->name(),
@@ -42,7 +43,7 @@ class CarteVisiteFactory extends Factory
             'prod_chevalet' => $this->faker->boolean(),
             'livraison_chevalet' => $this->faker->boolean(),
             'recu_chevalet' => $this->faker->boolean(),
-            'annee_scolaire' => $this->generateSchoolYear(5),
+
             'is_deleted' => false,
         ];
     }

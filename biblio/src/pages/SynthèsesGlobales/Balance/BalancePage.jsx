@@ -1,3 +1,4 @@
+import useAppStore from "../../../store/useAppStore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
@@ -9,7 +10,6 @@ import repRemboursementService from "../../../api/services/repRemboursementServi
 import clientRemboursementService from "../../../api/services/clientRemboursementService";
 import depotService from "../../../api/services/depotService";
 import livreService from "../../../api/services/livreService";
-import seasonsService from "../../../api/services/seasonsService";
 import { calculateRecouvrement, exportToCSV } from "../../../utils/helpers";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
 import BalancePdf from "../../../components/pdfs/syntheses/BalancePdf";
@@ -39,30 +39,21 @@ const toNumber = (v) => {
 const CATEGORY_ORDER = ["Primaire", "Collège", "Lycée", "Préscolaire", "Robotos"];
 
 const BalancePage = () => {
+    const { activeSeason } = useAppStore();
+    const selectedSeasonId = activeSeason?.label || "";
     const [categorySections, setCategorySections] = useState([]);
     const [summaryRows, setSummaryRows] = useState([]);
     const [kpis, setKpis] = useState({ ventes: 0, achats: 0, net: 0, recouvrement: 0 });
-    const [seasons, setSeasons] = useState([]);
-    const [selectedSeasonId, setSelectedSeasonId] = useState("");
-    const [pdfOpen, setPdfOpen] = useState(false);
+            const [pdfOpen, setPdfOpen] = useState(false);
     const printRef = useRef(null);
 
-    useEffect(() => {
-        seasonsService.getAll().then(setSeasons).catch(() => {});
-    }, []);
-
-    useEffect(() => {
-        if (seasons.length > 0 && !selectedSeasonId) {
-            const active = seasons.find(s => s.is_active);
-            setSelectedSeasonId(active?.id || seasons[0]?.id || "");
-        }
-    }, [seasons]);
-
+    
+    
     const fetchData = useCallback(async () => {
         try {
             const params = {};
             if (selectedSeasonId && selectedSeasonId !== "all") {
-                params.season_id = selectedSeasonId;
+                params.annee = selectedSeasonId;
             }
 
             const [livraisonsImp, ventes, rembRep, rembClient, depots, livres] = await Promise.all([
@@ -184,9 +175,7 @@ const BalancePage = () => {
         fetchData();
     }, [fetchData]);
 
-    const seasonLabel = selectedSeasonId && selectedSeasonId !== "all"
-        ? schoolYearFormat(seasons.find(s => s.id === selectedSeasonId)?.name)
-        : "Toutes les saisons";
+    const seasonLabel = activeSeason?.label ? schoolYearFormat(activeSeason.label) : "Toutes les saisons";
 
     const handleExportCSV = () => {
         const exportData = [];
@@ -225,19 +214,7 @@ const BalancePage = () => {
                         </div>
                         <h1 className="text-2xl font-bold text-slate-800">Balance Générale</h1>
                     </div>
-                    <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Saison:</span>
-                        <select
-                            value={selectedSeasonId}
-                            onChange={(e) => setSelectedSeasonId(e.target.value)}
-                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
-                        >
-                            <option value="all">Toutes les saisons</option>
-                            {seasons.map(s => (
-                                <option key={s.id} value={s.id}>{s.name.slice(0, 2)} / {s.name.slice(2)}</option>
-                            ))}
-                        </select>
-                    </div>
+                    
                 </div>
                 <div className="flex gap-2">
                     <Button onClick={handleExportCSV} className="bg-emerald-700 text-white flex items-center gap-2 hover:bg-emerald-800">

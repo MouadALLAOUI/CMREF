@@ -1,3 +1,4 @@
+import useAppStore from "../../../store/useAppStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
@@ -5,9 +6,8 @@ import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
 import { Printer, Landmark, FileText } from "lucide-react";
 import rembImpService from "../../../api/services/rembImpService";
-import seasonsService from "../../../api/services/seasonsService";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
-import { currencyFormat, getSchoolYearFromDate } from "../../../lib/utilities";
+import { currencyFormat } from "../../../lib/utilities";
 import SyntheseRembPdf from "../../../components/pdfs/fornisseurs/SyntheseRembPdf";
 
 const toNumber = (v) => {
@@ -30,28 +30,10 @@ const pickMainMode = (ops = []) => {
 };
 
 const SyntheseRemboursementPage = () => {
+    const { activeSeason } = useAppStore();
     const [rows, setRows] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [seasons, setSeasons] = useState([]);
-    const [selectedAnnee, setSelectedAnnee] = useState("");
 
-    useEffect(() => {
-        seasonsService.getAll().then(setSeasons).catch(() => {});
-    }, []);
-
-    const seasonOptions = useMemo(() => {
-        return seasons.map(s => ({
-            value: s.name,
-            label: `${new Date(s.start_date).getFullYear()} / ${new Date(s.end_date).getFullYear()}`
-        }));
-    }, [seasons]);
-
-    useEffect(() => {
-        if (seasons.length > 0 && !selectedAnnee) {
-            const active = seasons.find(s => s.is_active);
-            setSelectedAnnee(active?.name || seasons[0]?.name || "");
-        }
-    }, [seasons]);
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
@@ -64,21 +46,16 @@ const SyntheseRemboursementPage = () => {
                 const impId = o.imprimeur_id || o.imprimeur?.id;
                 if (!impId) continue;
 
-                // Group by Supplier + Year code
-                const calculatedAnnee = getSchoolYearFromDate(o.date_payment);
-                const key = `${impId}-${calculatedAnnee}`;
-
-                if (!grouped.has(key)) {
-                    grouped.set(key, {
-                        id: key,
+                if (!grouped.has(impId)) {
+                    grouped.set(impId, {
+                        id: impId,
                         fournisseur: o.imprimeur?.raison_sociale || o.imprimeur?.nom || "—",
-                        annee: calculatedAnnee,
                         totalRemb: 0,
                         lastDate: "",
-                        rawOps: [] // 👈 Store operations here to determine the mode later
+                        rawOps: []
                     });
                 }
-                const prev = grouped.get(key);
+                const prev = grouped.get(impId);
                 prev.totalRemb += toNumber(o.montant);
                 prev.rawOps.push(o);
                 if (o.date_payment && (!prev.lastDate || String(o.date_payment) > String(prev.lastDate))) {
@@ -88,6 +65,7 @@ const SyntheseRemboursementPage = () => {
             const computed = Array.from(grouped.values()).map((g) => ({
                 ...g,
                 mode: pickMainMode(g.rawOps),
+                annee: activeSeason?.label,
             })).sort((a, b) => b.totalRemb - a.totalRemb);
 
             setRows(computed);
@@ -103,19 +81,13 @@ const SyntheseRemboursementPage = () => {
         fetchData();
     }, [fetchData]);
 
-    const filteredRows = useMemo(() => {
-        if (!selectedAnnee || selectedAnnee === "all") return rows;
-        return rows.filter(row => row.annee === selectedAnnee);
-    }, [rows, selectedAnnee]);
-
-    // 2. Optimized KPI Calculations
     const stats = useMemo(() => {
-        return filteredRows.reduce((acc, r) => {
+        return rows.reduce((acc, r) => {
             acc.total += r.totalRemb;
             acc.count += r.rawOps?.length || 0;
             return acc;
-        }, { total: 0, count: 0, suppliers: filteredRows.length });
-    }, [filteredRows]);
+        }, { total: 0, count: 0, suppliers: rows.length });
+    }, [rows]);
 
     const columns = useMemo(
         () => [
@@ -132,21 +104,7 @@ const SyntheseRemboursementPage = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Synthèse Remboursements</h1>
-                    <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Année:</span>
-                        <select
-                            value={selectedAnnee}
-                            onChange={(e) => setSelectedAnnee(e.target.value)}
-                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
-                        >
-                            <option value="all">Toutes les années</option>
-                            {seasonOptions.map(opt => (
-                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                        </select>
-                    </div>
                 </div>
-
             </div>
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Fournisseurs - Synthèse Remboursements</h1>
@@ -154,10 +112,9 @@ const SyntheseRemboursementPage = () => {
                     {/* <Button variant="outline" className="flex items-center gap-2 rounded-xl h-11 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all">
                         <Download size={18} />
                     </Button> */}
-
                     <PdfDialogViewer
                         title="Synthèse des Remboursements"
-                        document={<SyntheseRembPdf data={filteredRows} annee={selectedAnnee} total={stats.total} />}
+                        document={<SyntheseRembPdf data={rows} annee={activeSeason?.label} total={stats.total} />}
                         trigger={
                             <Button className="bg-slate-900 text-white flex items-center gap-2 rounded-xl h-11 px-6 font-bold shadow-lg">
                                 <Printer size={18} /> Imprimer
@@ -187,7 +144,7 @@ const SyntheseRemboursementPage = () => {
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <MyTable
-                    data={filteredRows}
+                    data={rows}
                     columns={columns}
                     pageSize={10}
                     variant="slate"

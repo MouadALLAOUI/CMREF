@@ -23,8 +23,8 @@ function RepSyntheseBLPage() {
             setIsLoading(true);
             try {
                 const [itemsRes, rembRes, catsRes] = await Promise.all([
-                    bLivraisonItemService.getAll({ annee: activeSeason?.name }),
-                    repRemboursementService.getAll({ annee: activeSeason?.name }),
+                    bLivraisonItemService.getAll({ annee: activeSeason?.label }),
+                    repRemboursementService.getAll({ annee: activeSeason?.label }),
                     categoryService.getAll()
                 ]);
                 setDeliveryItems(itemsRes?.data?.data || itemsRes?.data || []);
@@ -36,8 +36,8 @@ function RepSyntheseBLPage() {
                 setIsLoading(false);
             }
         };
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const totalCredit = useMemo(() =>
         deliveryItems.reduce((sum, item) => sum + ((item.quantite || 0) * (item.livre?.prix_vente || 0)), 0),

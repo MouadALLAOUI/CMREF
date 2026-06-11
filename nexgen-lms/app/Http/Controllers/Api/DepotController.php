@@ -14,23 +14,7 @@ class DepotController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Depot::with(['representant', 'livre']);
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->latest()->paginate($perPage);
-            return response()->json([
-                'data' => DepotResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $depots = $query->latest()->get();
+        $depots = Depot::with(['representant', 'livre'])->latest()->get();
         return DepotResource::collection($depots);
     }
 
@@ -98,12 +82,8 @@ class DepotController extends Controller
 
     public function byRepresentant($id)
     {
-        $depot = Depot::where('rep_id', $id)->first();
+        $depots = Depot::where('rep_id', $id)->with(['representant', 'livre'])->get();
         
-        if (!$depot) {
-            return response()->json(['message' => 'No depot found for this representative'], 404);
-        }
-        
-        return new DepotResource($depot->load(['representant', 'items.livre']));
+        return DepotResource::collection($depots);
     }
 }

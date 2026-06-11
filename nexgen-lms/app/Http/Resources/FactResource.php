@@ -27,8 +27,6 @@ class FactResource extends JsonResource
             'status' => $this->status,
             'remarques' => $this->remarques,
             'type' => $this->type,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
             'details' => DetFactResource::collection($this->whenLoaded('details')),
         ];

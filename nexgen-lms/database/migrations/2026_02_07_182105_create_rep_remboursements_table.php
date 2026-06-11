@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('rep_remboursements', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
-            $table->foreignUuid('fact_id')->nullable()->constrained('fact')->nullOnDelete();
-            $table->date('date_payment');
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
+            $table->uuid('rep_id')->nullable()->index();
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
+            $table->foreignUuid('fact_id')->nullable()->index()->constrained('fact')->nullOnDelete();
+            $table->date('date_payment')->index();
             $table->foreignUuid('banque_id')->nullable()->constrained('banques')->nullOnDelete();
             $table->string('cheque_number', 50)->nullable();
             $table->string('cheque_image_path')->nullable(); // New column for the image path
@@ -27,7 +30,7 @@ return new class extends Migration
             $table->boolean('statut_recu')->default(false);
             $table->boolean('statut_rejete')->default(false);
             $table->boolean('statut_accepte')->default(false);
-            $table->string('annee', 4)->default(generateSchoolYear());
+
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

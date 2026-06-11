@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('ville', 100)->nullable();
             $table->string('lieu_de_travail', 255)->nullable();
             $table->string('login', 100)->unique(); // Added UNIQUE
-            $table->string('password'); // Renamed from 'pass'
             $table->unsignedInteger('bl_count')->default(0); // Standardized INT
             $table->unsignedInteger('remb_count')->default(0);
             $table->timestamp('last_online_at')->nullable();

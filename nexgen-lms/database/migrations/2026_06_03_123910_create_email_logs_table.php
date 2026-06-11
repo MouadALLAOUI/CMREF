@@ -14,9 +14,10 @@ return new class extends Migration
             $table->string('sujet', 255);
             $table->text('message');
             $table->string('type', 50)->default('email'); // email, invitation
-            $table->string('statut', 50)->default('envoyé'); // envoyé, échoué, en attente
-            $table->nullableUuidMorphs('emetteur', 'emetteur'); // admin who sent it
+            $table->string('statut', 50)->default('envoyé')->index(); // envoyé, échoué, en attente
+            $table->nullableUuidMorphs('emetteur', 'email_logs_emetteur_index'); // admin who sent it
             $table->timestamps();
+            $table->index('created_at');
         });
     }
 

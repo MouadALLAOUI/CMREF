@@ -19,7 +19,12 @@ trait FilterBySeason
 
             if ($seasonId) {
                 if (Schema::hasColumn($table, 'season_id')) {
-                    $builder->where($table . '.season_id', $seasonId);
+                    $season = Season::where('name', $seasonId)->first();
+                    if ($season) {
+                        $builder->where($table . '.season_id', $season->id);
+                    } else {
+                        $builder->where($table . '.season_id', $seasonId);
+                    }
                 }
             } elseif ($annee) {
                 if (Schema::hasColumn($table, 'season_id')) {

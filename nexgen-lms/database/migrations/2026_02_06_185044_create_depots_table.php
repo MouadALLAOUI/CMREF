@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('depots', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade'); // Link to Rep
-            $table->foreignUuid('livre_id')->constrained('livres')->onDelete('cascade'); // Link to Book
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
+            $table->uuid('rep_id')->nullable()->index(); // Link to Rep
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
+            $table->uuid('livre_id')->nullable()->index(); // Link to Book
+            $table->foreign('livre_id')->references('id')->on('livres')->nullOnDelete();
             $table->text('type')->nullable(); // Legacy 'ann' field
             $table->integer('quantite_balance')->default(0); // Tracks current stock held
             $table->integer('status')->default(1); // Status of the account line
-            $table->string('annee_scolaire')->nullable()->default(generateSchoolYear(2));
+
             $table->text('remarks')->nullable(); // Legacy 'ann' field
             $table->timestamps();
 

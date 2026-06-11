@@ -13,18 +13,21 @@ return new class extends Migration
     {
         Schema::create('fact', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
+            $table->uuid('rep_id')->nullable()->index();
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
             $table->foreignUuid('sequence_id')->nullable()->constrained('fact_sequences')->nullOnDelete();
             $table->foreignUuid('demande_id')->nullable()->constrained('demande_f')->onDelete('set null');
-            $table->string('year_session', 9)->default('2026-2027'); // e.g., "2025-2026"
+            $table->string('year_session', 9)->nullable()->default(null)->index(); // e.g., "2025-2026"
             $table->integer('number'); // The raw increment (1, 2, 3...)
             $table->string('fact_number', 50)->nullable()->unique(); // The full string: "FACT/26-27/0001"
-            $table->date('date_facture');
+            $table->date('date_facture')->index();
             $table->decimal('total_ht', 15, 2)->default(0.00); // Total Hors Taxe
             $table->decimal('tva_rate', 5, 2)->default(20.00); // Standard Moroccan TVA
             $table->decimal('total_ttc', 15, 2)->default(0.00);
             $table->decimal('reste_a_payer', 15, 2)->default(0.00);
-            $table->enum('status', ['Brouillon', 'Validée', 'Payée', 'Annulée'])->default('Brouillon');
+            $table->enum('status', ['Brouillon', 'Validée', 'Payée', 'Annulée'])->default('Brouillon')->index();
             $table->text('remarques')->nullable();
             $table->timestamps();
 

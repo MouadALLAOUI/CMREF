@@ -21,10 +21,7 @@ class BLivraisonResource extends JsonResource
             'statut_recu' => $this->statut_recu,
             'statut_vu' => $this->statut_vu,
             'status' => $this->status,
-            'annee' => $this->annee,
             'remarks' => $this->remarks,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
             'items' => BLivraisonItemResource::collection($this->whenLoaded('items')),
         ];

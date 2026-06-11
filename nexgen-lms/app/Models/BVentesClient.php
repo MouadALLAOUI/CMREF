@@ -26,7 +26,9 @@ class BVentesClient extends Model
         'remarks'
     ];
 
-    public $incrementing = false; //
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public $incrementing = false;
     protected $keyType = 'string';
 
     // Relation: The representative who made the sale

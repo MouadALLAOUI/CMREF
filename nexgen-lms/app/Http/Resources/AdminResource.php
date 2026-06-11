@@ -11,16 +11,13 @@ class AdminResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'login' => $this->login,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'login_data' => $this->whenLoaded('login', fn() => [
-                'id' => $this->login->id,
-                'username' => $this->login->username,
-                'role' => $this->login->role,
-                'is_active' => $this->login->is_active,
-                'is_online' => $this->login->is_online,
-                'last_visit' => $this->login->last_visit,
+            'login' => $this->whenLoaded('loginRecord', fn() => [
+                'id' => $this->loginRecord->id,
+                'username' => $this->loginRecord->username,
+                'role' => $this->loginRecord->role,
+                'is_active' => $this->loginRecord->is_active,
+                'is_online' => $this->loginRecord->is_online,
+                'last_visit' => $this->loginRecord->last_visit,
             ]),
         ];
     }

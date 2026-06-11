@@ -25,8 +25,9 @@ class RembImp extends Model
         'statut_recu',
         'statut_rejete',
         'remarks',
-        'annee'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $casts = [
         'statut_recu' => 'boolean',

@@ -42,12 +42,16 @@ const AlertBoxTitle = React.forwardRef(({ className, ...props }, ref) => (
 ))
 AlertBoxTitle.displayName = AlertDialog.Title.displayName
 
-const AlertBoxDescription = React.forwardRef(({ className, ...props }, ref) => (
+const AlertBoxDescription = React.forwardRef(({ className, children, ...props }, ref) => (
   <AlertDialog.Description
     ref={ref}
     {...props}
-    className={cn("text-sm text-muted-foreground", className)}
-  />
+    asChild
+  >
+    <div className={cn("text-sm text-muted-foreground", className)}>
+      {children}
+    </div>
+  </AlertDialog.Description>
 ))
 AlertBoxDescription.displayName = AlertDialog.Description.displayName
 
@@ -100,7 +104,7 @@ const AlertBoxContainer = ({
       <AlertBoxOverlay />
       <AlertBoxContent>
         <AlertBoxTitle>{title}</AlertBoxTitle>
-        {typeof description === "string" ? <AlertBoxDescription>{description}</AlertBoxDescription> : description}
+        <AlertBoxDescription>{description}</AlertBoxDescription>
         <div className="flex justify-end gap-[25px]">
           <AlertBoxCancel type={type} onClick={onCancel}>{cancelText}</AlertBoxCancel>
           <AlertBoxAction type={type} onClick={onOk}>{actionText}</AlertBoxAction>

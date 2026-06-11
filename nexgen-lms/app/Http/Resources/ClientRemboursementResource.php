@@ -25,8 +25,6 @@ class ClientRemboursementResource extends JsonResource
             'montant' => $this->montant,
             'observation' => $this->observation,
             'remarks' => $this->remarks,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
             'client' => new ClientResource($this->whenLoaded('client')),
         ];

@@ -14,25 +14,25 @@ import { currencyFormat } from "../../../lib/utilities";
 import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
 
 const REMB_IMP_RULES = {
-    imprimeur_id: 'required|uuid|exists:imprimeurs,id',
-    date_payment: 'required|date',
-    banque_id: 'nullable|uuid|exists:banques,id',
-    cheque_number: 'nullable|string|max:50',
-    montant: 'required|numeric|min:0',
-    annee: 'nullable|string',
+  imprimeur_id: 'required|uuid|exists:imprimeurs,id',
+  date_payment: 'required|date',
+  banque_id: 'nullable|uuid|exists:banques,id',
+  cheque_number: 'nullable|string|max:50',
+  montant: 'required|numeric|min:0',
+  annee: 'nullable|string',
 };
 
 const REMB_IMP_LABELS = {
-    imprimeur_id: "Fournisseur",
-    date_payment: "Date",
-    banque_id: "Banque",
-    cheque_number: "N° de Chèque",
-    montant: "Montant (DH)",
-    annee: "Année",
+  imprimeur_id: "Fournisseur",
+  date_payment: "Date",
+  banque_id: "Banque",
+  cheque_number: "N° de Chèque",
+  montant: "Montant (DH)",
+  annee: "Année",
 };
 
 const REMB_IMP_GRID = {
-    imprimeur_id: "col-span-2",
+  imprimeur_id: "col-span-2",
 };
 
 const FournisseurRemboursement = () => {
@@ -46,7 +46,7 @@ const FournisseurRemboursement = () => {
     cheque_image_path: "",
     cheque_number: "",
     montant: "",
-    annee: activeSeason?.name || "",
+    annee: activeSeason?.label || "",
   });
   const [remboursement, setRemboursement] = useState([]);
   const [imprimeurs, setImprimeurs] = useState([]);
@@ -92,7 +92,7 @@ const FournisseurRemboursement = () => {
     setIsLoading(true);
     try {
       const [impRemb, imp, bank] = await Promise.all([
-        rembImpService.getAll({ annee: activeSeason?.name }),
+        rembImpService.getAll({ annee: activeSeason?.label }),
         imprimeurService.getAll(),
         banqueService.getAll()
       ]);
@@ -109,7 +109,7 @@ const FournisseurRemboursement = () => {
 
   useEffect(() => {
     fetchData();
-  }, [activeSeason?.name]);
+  }, [activeSeason?.label]);
 
   const handleReset = () => {
     setFormData({
@@ -120,22 +120,27 @@ const FournisseurRemboursement = () => {
       cheque_image_path: "",
       cheque_number: "",
       montant: "",
-      annee: activeSeason?.name || "",
+      annee: activeSeason?.label || "",
     });
   };
 
   const handleAction = (type, row) => {
+    if (type === "edit") {
+      if (row.statut_recu || row.statut_rejete) {
+        return toast.error("Impossible de modifier un remboursement déjà reçu ou rejeté.");
+      }
+    }
     if (type === "edit" || type === "view") {
       setDialogMode(type === "edit" ? "update" : "view");
       setCurrentRembId(row.id);
       setFormData({
         imprimeur_id: row.imprimeur_id,
-        date_payment: row.date_payment,
+        date_payment: row.date_payment?.split('T')[0] || "",
         banque_id: row.banque_id || "",
         banque_nom: row.banque_nom || "",
         cheque_number: row.cheque_number,
         montant: row.montant,
-        annee: row.annee || activeSeason?.name || "",
+        annee: row.annee || activeSeason?.label || "",
       });
       setDialogOpen(true);
     }
@@ -144,6 +149,8 @@ const FournisseurRemboursement = () => {
   const handleUpdateStatusRecuRemb = async (row) => {
     try {
       const newStatus = !row.statut_recu;
+      if (newStatus && row.statut_rejete) return toast.error("ce rembourcement est rejeté.")
+      if (!newStatus) return toast.error("Cannot revert statut recu from true to false.")
       await rembImpService.update(row.id, { statut_recu: newStatus, statut_rejete: !newStatus });
       toast.success(newStatus ? "Marqué comme reçu" : "Marqué comme non reçu");
       fetchData(); // Refresh the table
@@ -154,6 +161,8 @@ const FournisseurRemboursement = () => {
   const handleUpdateStatusRejeteRemb = async (row) => {
     try {
       const newStatus = !row.statut_rejete;
+      if (newStatus && row.statut_recu) return toast.error("ce rembourcement est deja reçu.")
+      if (!newStatus) return toast.error("Cannot revert statut Rejeté from true to false.")
       await rembImpService.update(row.id, { statut_recu: !newStatus, statut_rejete: newStatus });
       toast.success(newStatus ? "Paiement rejeté" : "Rejet annulé");
       fetchData();
@@ -249,7 +258,7 @@ const FournisseurRemboursement = () => {
           }
         />
       </div>
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-slate-900 px-6 py-4 flex items-center gap-3">
           <FileText className="text-white" size={20} />
           <h2 className="text-white font-bold flex flex-wrap items-center gap-x-4 gap-y-1">

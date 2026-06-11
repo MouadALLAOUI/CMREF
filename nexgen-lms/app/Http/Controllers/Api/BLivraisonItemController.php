@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BLivraisonItem;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 
 use App\Http\Resources\BLivraisonItemResource;
 use App\Models\BLivraison;
@@ -14,23 +15,7 @@ class BLivraisonItemController extends Controller
 {
     public function index(Request $request)
     {
-        $query = BLivraisonItem::with(['deliverable', 'livre']);
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->latest()->paginate($perPage);
-            return response()->json([
-                'data' => BLivraisonItemResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $bLivraisonItems = $query->latest()->get();
+        $bLivraisonItems = BLivraisonItem::with(['deliverable', 'livre'])->latest()->get();
         return BLivraisonItemResource::collection($bLivraisonItems);
     }
 
@@ -62,7 +47,7 @@ class BLivraisonItemController extends Controller
     public function show($id)
     {
         $items = BLivraisonItem::where('deliverable_id', $id)
-            ->with(['deliverable', 'livre']) // Eager load book details (titre, category, etc.)
+            ->with(['deliverable', 'livre'])
             ->get();
 
         if ($items->isEmpty()) {

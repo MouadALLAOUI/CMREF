@@ -15,8 +15,6 @@ class CatalogueResource extends JsonResource
             'categorie_id' => $this->categorie_id,
             'image_url' => $this->image_url,
             'content' => $this->content,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

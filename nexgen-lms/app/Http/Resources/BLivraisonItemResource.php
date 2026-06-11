@@ -18,8 +18,7 @@ class BLivraisonItemResource extends JsonResource
             'id' => $this->id,
             'livre' => $this->livre, // Nested book data
             'quantite' => $this->quantite,
-            'deliverable' => $this->deliverable, // This will be either the Rep BL or Imp BL
-            'created_at' => $this->created_at,
+            'deliverable' => $this->deliverable,
         ];
     }
 }

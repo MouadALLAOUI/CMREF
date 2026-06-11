@@ -19,8 +19,6 @@ class DetFactResource extends JsonResource
             'prix_unitaire_ht' => $this->prix_unitaire_ht,
             'remise' => $this->remise,
             'total_ligne_ht' => $this->total_ligne_ht,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'livre' => new LivreResource($this->whenLoaded('livre')),
         ];
     }

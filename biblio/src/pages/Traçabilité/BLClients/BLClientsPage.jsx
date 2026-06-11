@@ -39,7 +39,7 @@ function BLClientsPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+            const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
             const [res, reps, cls, lvs] = await Promise.all([
                 bVentesClientService.getAll(seasonParams),
                 representantService.getAll(),
@@ -60,7 +60,7 @@ function BLClientsPage() {
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.name]);
+    }, [activeSeason?.label]);
 
     const filteredRows = useMemo(() => {
         if (selectedRep === "all") return rows;

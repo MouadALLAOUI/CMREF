@@ -46,7 +46,7 @@ function RemboursementClientPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+            const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
             const [res, reps, cls, bq] = await Promise.all([
                 clientRemboursementService.getAll(seasonParams),
                 representantService.getAll(),
@@ -67,7 +67,7 @@ function RemboursementClientPage() {
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.name]);
+    }, [activeSeason?.label]);
 
     const filteredRows = useMemo(() => {
         if (selectedRep === "all") return rows;

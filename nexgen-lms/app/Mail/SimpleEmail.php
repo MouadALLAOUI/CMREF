@@ -14,7 +14,7 @@ class SimpleEmail extends Mailable
 
     public function __construct(
         public string $sujet,
-        public string $message,
+        public string $contentBody,
     ) {}
 
     public function envelope(): Envelope

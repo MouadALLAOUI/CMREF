@@ -15,24 +15,6 @@ class BLivraisonImpController extends Controller
     {
         $query = BLivraisonImp::with(['imprimeur', 'items.livre'])->latest();
 
-        if ($request->filled('annee')) {
-            $query->where('annee', $request->annee);
-        }
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->paginate($perPage);
-            return response()->json([
-                'data' => BLivraisonImpResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
         return BLivraisonImpResource::collection($query->get());
     }
 
@@ -43,7 +25,6 @@ class BLivraisonImpController extends Controller
             'date_reception'     => 'required|date',
             'b_livraison_number' => 'required|string|max:50',
             'remarks'            => 'nullable|string',
-            'annee'            => 'nullable|string',
             'details'            => 'required|array|min:1',
             'details.*.livre_id' => 'required|uuid|exists:livres,id',
             'details.*.qte'      => 'required|integer|min:1',
@@ -54,7 +35,6 @@ class BLivraisonImpController extends Controller
                 'imprimeur_id'       => $validatedData['imprimeur_id'],
                 'date_reception'     => $validatedData['date_reception'],
                 'b_livraison_number' => $validatedData['b_livraison_number'],
-                'annee' => $validatedData['annee'],
                 'remarks'            => $validatedData['remarks'],
             ]);
 
@@ -106,8 +86,6 @@ class BLivraisonImpController extends Controller
     {
         $bl = BLivraisonImp::findOrFail($id);
         return DB::transaction(function () use ($bl) {
-            // Delete related items first if not using database cascade
-            $bl->items()->delete();
             $bl->delete();
             return response()->json(['message' => "BL supprimé"]);
         });

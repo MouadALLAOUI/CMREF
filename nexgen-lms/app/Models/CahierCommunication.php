@@ -35,9 +35,10 @@ class CahierCommunication extends Model
         'is_printed',
         'is_delivered',
         'is_deleted',
-        'remarques',
-        'annee_scolaire'
+        'remarques'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $casts = [
         'is_accepted' => 'boolean',

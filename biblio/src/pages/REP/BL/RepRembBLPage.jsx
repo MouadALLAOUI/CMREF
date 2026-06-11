@@ -16,7 +16,7 @@ function RepRembBLPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const res = await repRemboursementService.getAll({ annee: activeSeason?.name });
+            const res = await repRemboursementService.getAll({ annee: activeSeason?.label });
             setRemboursements(res?.data?.data || res?.data || []);
         } catch (error) {
             logger("Failed to load remboursements", "error")();
@@ -26,8 +26,8 @@ function RepRembBLPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const handleToggleRecu = async (remb) => {
         try {

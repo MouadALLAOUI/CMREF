@@ -20,7 +20,7 @@ function RepBLPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const res = await bLivraisonService.getAll({ annee: activeSeason?.name });
+            const res = await bLivraisonService.getAll({ annee: activeSeason?.label });
             setBls(res?.data?.data || res?.data || []);
         } catch (error) {
             logger("Failed to load BLs", "error")();
@@ -30,8 +30,8 @@ function RepBLPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const handleViewDetails = async (bl) => {
         setSelectedBL(bl);
@@ -131,7 +131,7 @@ function RepBLPage() {
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 tracking-tight">Mes Bons de Livraison</h1>
                     <p className="text-slate-500 text-xs mt-0.5">
-                        Liste de vos BL pour la saison {activeSeason?.name || "—"}
+                        Liste de vos BL pour la saison {activeSeason?.label || "—"}
                     </p>
                 </div>
             </div>

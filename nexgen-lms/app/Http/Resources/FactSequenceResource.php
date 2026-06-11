@@ -14,8 +14,6 @@ class FactSequenceResource extends JsonResource
             'nom' => $this->nom,
             'dernier_numero' => $this->dernier_numero,
             'est_active' => $this->est_active,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

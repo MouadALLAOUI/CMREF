@@ -18,10 +18,8 @@ class DepotResource extends JsonResource
             'type' => $this->type,
             'quantite_balance' => $this->quantite_balance,
             'status' => $this->status,
-            'annee_scolaire' => $this->annee_scolaire,
+
             'remarks' => $this->remarks,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
             'livre' => new LivreResource($this->whenLoaded('livre')),
         ];

@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('demande_f', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('rep_id')->constrained('representants')->onDelete('cascade');
-            $table->foreignUuid('client_id')->constrained('clients')->onDelete('cascade');
+            $table->foreignUuid('season_id')->nullable()->constrained('seasons')->nullOnDelete();
+            $table->string('entity_type')->nullable(); // 'MSM-MEDIAS' or 'Wataniya'
+            $table->foreignUuid('rep_id')->index()->constrained('representants')->onDelete('cascade');
+            $table->foreignUuid('client_id')->index()->constrained('clients')->onDelete('cascade');
             $table->date('date_demande');
             $table->integer('ref');
             $table->string('type', 255);
-            $table->integer('statut');
+            $table->integer('statut')->index();
             $table->integer('livree')->default(0);
-            $table->string('annee_scolaire', 4)->default(generateSchoolYear())->nullable();
+
             $table->text('contenu')->nullable(); // Détails de la demande
             $table->text('remarks')->nullable();
             $table->timestamps();

@@ -16,8 +16,6 @@ class CahierTemplateResource extends JsonResource
             'contenu' => $this->contenu,
             'variables' => $this->variables,
             'est_actif' => $this->est_actif,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

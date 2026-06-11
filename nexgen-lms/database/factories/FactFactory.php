@@ -15,6 +15,7 @@ class FactFactory extends Factory
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
         $totalHt = $this->faker->randomFloat(2, 100, 5000);
         $tvaRate = 20;
         $totalTtc = $totalHt * (1 + $tvaRate / 100);
@@ -23,7 +24,7 @@ class FactFactory extends Factory
             'rep_id' => Representant::pluck('id')->random(),
             'sequence_id' => FactSequence::pluck('id')->random(),
             'demande_id' => DemandeF::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'year_session' => $this->faker->year(),
             'number' => $this->faker->unique()->numberBetween(1, 9999),
             'fact_number' => $this->faker->unique()->bothify('FACT-####'),

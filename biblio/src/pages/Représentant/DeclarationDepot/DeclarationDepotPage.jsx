@@ -19,7 +19,7 @@ function DeclarationDepotPage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+            const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
             const [depotsRes, repsRes] = await Promise.all([
                 depotService.getAll(seasonParams),
                 representantService.getAll(),
@@ -50,7 +50,7 @@ function DeclarationDepotPage() {
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.name]);
+    }, [activeSeason?.label]);
 
     const handleValidateDepot = async (depotId, validated) => {
         try {

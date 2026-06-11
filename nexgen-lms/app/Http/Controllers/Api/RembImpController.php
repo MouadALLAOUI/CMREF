@@ -12,27 +12,9 @@ class RembImpController extends Controller
 {
     public function index(Request $request)
     {
-        $query = RembImp::with('imprimeur')->with('banque')->latest();
+        $rembImps = RembImp::with('imprimeur')->with('banque')->latest()->get();
 
-        if ($request->filled('annee')) {
-            $query->where('annee', $request->annee);
-        }
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->paginate($perPage);
-            return response()->json([
-                'data' => RembImpResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        return RembImpResource::collection($query->latest()->get());
+        return RembImpResource::collection($rembImps);
     }
 
     public function store(Request $request)
@@ -47,7 +29,6 @@ class RembImpController extends Controller
             'montant' => 'required|numeric|min:0',
             'statut_recu' => 'sometimes|boolean',
             'statut_rejete' => 'sometimes|boolean',
-            'annee' => 'nullable|string',
             'remarks' => 'nullable|string',
         ]);
 

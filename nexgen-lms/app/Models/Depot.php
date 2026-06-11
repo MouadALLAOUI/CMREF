@@ -19,9 +19,11 @@ class Depot extends Model
         'type',
         'quantite_balance',
         'status',
-        'annee_scolaire',
+
         'remarks'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     public $incrementing = false; // Disable auto-incrementing since we're using UUIDs
     protected $keyType = 'string';

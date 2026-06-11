@@ -77,7 +77,7 @@ import seasonsService from "../api/services/seasonsService";
 
 
 export const AppRoutes = () => {
-    const { user, isAdminMode, activeSeason, loadActiveSeason } = useAppStore();
+    const { user, isAdminMode, activeSeason, loadActiveSeason, checkReverbStatus, hasCheckedActiveSeason } = useAppStore();
 
     /**
      * URL CASING CONVENTION:
@@ -85,9 +85,13 @@ export const AppRoutes = () => {
      *  - Representative portal: /REP/dash/...      (uppercase REP root, nested paths lowercase)
      */
     useEffect(() => {
-        if (!user || activeSeason) return;
+        checkReverbStatus();
+    }, [checkReverbStatus]);
+
+    useEffect(() => {
+        if (!user || activeSeason || hasCheckedActiveSeason) return;
         loadActiveSeason();
-    }, [user, activeSeason, loadActiveSeason]);
+    }, [user, activeSeason, hasCheckedActiveSeason, loadActiveSeason]);
 
     return (
         <Routes>

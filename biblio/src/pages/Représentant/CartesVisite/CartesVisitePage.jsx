@@ -42,7 +42,7 @@ function CartesVisitePage() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+            const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
             const [res, reps] = await Promise.all([
                 carteVisiteService.getAll(seasonParams),
                 representantService.getAll(),
@@ -59,7 +59,7 @@ function CartesVisitePage() {
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.name]);
+    }, [activeSeason?.label]);
 
     const resetForm = () => {
         setFormData({

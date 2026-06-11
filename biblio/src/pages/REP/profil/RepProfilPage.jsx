@@ -4,6 +4,7 @@ import SectionContainer from "../../../components/ui/SectionContainer";
 import useAppStore from "../../../store/useAppStore";
 import logger from "../../../lib/logger";
 import toast from "react-hot-toast";
+import api from "../../../api/axios";
 
 function RepProfilPage() {
     const user = useAppStore(state => state.user);
@@ -33,12 +34,24 @@ function RepProfilPage() {
 
         setIsSubmitting(true);
         try {
-            // TODO: Wire to backend endpoint when available
+            await api.put("/user/password", {
+                current_password: loginData.current_password,
+                new_password: loginData.new_password,
+                new_password_confirmation: loginData.confirm_password
+            });
             toast.success("Profil mis à jour avec succès");
             setLoginData(prev => ({ ...prev, new_password: "", confirm_password: "", current_password: "" }));
         } catch (error) {
-            toast.error("Erreur lors de la mise à jour");
-            logger("Failed to update profile", "error")();
+            const validationErrors = error.response?.data?.errors;
+            if (validationErrors) {
+                const firstErrorKey = Object.keys(validationErrors)[0];
+                const firstErrorMessage = validationErrors[firstErrorKey][0];
+                toast.error(firstErrorMessage);
+            } else {
+                const message = error.response?.data?.message || "Erreur lors de la mise à jour";
+                toast.error(message);
+            }
+            logger("Failed to update profile password: " + (error.response?.data?.message || error.message), "error")();
         } finally {
             setIsSubmitting(false);
         }

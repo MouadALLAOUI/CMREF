@@ -28,6 +28,8 @@ class ClientRemboursement extends Model
         'remarks'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     // Accessor for the React frontend
     protected $appends = ['cheque_url'];
 

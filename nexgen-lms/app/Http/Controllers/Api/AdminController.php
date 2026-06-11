@@ -34,7 +34,7 @@ class AdminController extends Controller
                     'password' => $validatedData['password'],
                 ]);
 
-                $admin->login()->create([
+                $admin->loginRecord()->create([
                     'username' => $validatedData['login'],
                     'password' => $validatedData['password'],
                     'role' => 'admin',
@@ -43,7 +43,7 @@ class AdminController extends Controller
 
                 return $admin;
             });
-            return new AdminResource($admin->load('login'));
+            return new AdminResource($admin->load('loginRecord'));
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erreur lors de la création de l\'administrateur',

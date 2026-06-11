@@ -1,3 +1,4 @@
+import useAppStore from "../../../store/useAppStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
@@ -6,7 +7,6 @@ import { MyTable } from "../../../components/ui/myTable";
 import { Printer, Download, TrendingDown, Users, Wallet, CreditCard } from "lucide-react";
 import repRemboursementService from "../../../api/services/repRemboursementService";
 import representantService from "../../../api/services/representantService";
-import seasonsService from "../../../api/services/seasonsService";
 import { formatMoney, calculateFinancialSummary } from "../../../utils/helpers";
 
 const fetchAllPaginated = async (serviceGetAll, params = {}) => {
@@ -31,30 +31,21 @@ const toNumber = (v) => {
 };
 
 const SyntheseRemboursementPage = () => {
+    const { activeSeason } = useAppStore();
+    const selectedSeasonId = activeSeason?.label || "";
     const [rows, setRows] = useState([]);
     const [representants, setRepresentants] = useState([]);
     const [kpis, setKpis] = useState({ total: 0, operations: 0, totalCredit: 0, totalAvance: 0, totalReste: 0 });
     const [isLoading, setIsLoading] = useState(true);
-    const [seasons, setSeasons] = useState([]);
-    const [selectedSeasonId, setSelectedSeasonId] = useState("");
-
-    useEffect(() => {
-        seasonsService.getAll().then(setSeasons).catch(() => {});
-    }, []);
-
-    useEffect(() => {
-        if (seasons.length > 0 && !selectedSeasonId) {
-            const active = seasons.find(s => s.is_active);
-            setSelectedSeasonId(active?.id || seasons[0]?.id || "");
-        }
-    }, [seasons]);
-
+        
+    
+    
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
             const params = {};
             if (selectedSeasonId && selectedSeasonId !== "all") {
-                params.season_id = selectedSeasonId;
+                params.annee = selectedSeasonId;
             }
             const [ops, reps] = await Promise.all([
                 fetchAllPaginated(repRemboursementService.getAll, params),
@@ -122,19 +113,7 @@ const SyntheseRemboursementPage = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800">Synthèse des Remboursements</h1>
-                    <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Saison:</span>
-                        <select
-                            value={selectedSeasonId}
-                            onChange={(e) => setSelectedSeasonId(e.target.value)}
-                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
-                        >
-                            <option value="all">Toutes les saisons</option>
-                            {seasons.map(s => (
-                                <option key={s.id} value={s.id}>{s.name.slice(0, 2)} / {s.name.slice(2)}</option>
-                            ))}
-                        </select>
-                    </div>
+                    
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" className="flex items-center gap-2">

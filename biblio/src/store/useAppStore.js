@@ -17,6 +17,9 @@ const useAppStore = create(
             lastLoginTime: null,
             isAdminMode: false,
             loading: true,
+            reverbTrigger: false,
+            hasCheckedReverb: false,
+            hasCheckedActiveSeason: false,
 
             setLoading: (loading) => set({ loading }),
             setAdminMode: (value) => set({ isAdminMode: !!value }),
@@ -38,12 +41,15 @@ const useAppStore = create(
                     activeSeason,
                     isAdminMode: userData.role === 'admin',
                     lastLoginTime: Date.now(),
+                    reverbTrigger: userData.reverb_trigger !== undefined ? !!userData.reverb_trigger : false,
+                    hasCheckedActiveSeason: !!activeSeason,
                     loading: false
                 });
             },
 
             // --- NEW: loadActiveSeason ---
             loadActiveSeason: async () => {
+                if (get().hasCheckedActiveSeason) return null;
                 try {
                     // const response = await api.get('/seasons/active');
                     const response = await seasonsService.isActive();
@@ -57,29 +63,33 @@ const useAppStore = create(
                     }
                 } catch (error) {
                     // 404 or other error — skip silently, pages show empty-state
+                } finally {
+                    set({ hasCheckedActiveSeason: true });
                 }
                 return null;
             },
 
             logout: async () => {
+                // Clear session storage and store state synchronously first to prevent race conditions during page unloads/redirects
+                sessionStorage.removeItem('app-storage');
+                set({
+                    user: null,
+                    profile: null,
+                    token: null,
+                    school_annee: null, // 👈 Clear it out on logout
+                    activeSeason: null,
+                    lastLoginTime: null,
+                    isAdminMode: false,
+                    loading: false,
+                    hasCheckedReverb: false,
+                    hasCheckedActiveSeason: false
+                });
+
                 try {
                     await api.post('/logout');
                 } catch (error) {
                     // Fail silently or handle without console prints
-                } finally {
-                    sessionStorage.removeItem('app-storage');
-                    set({
-                        user: null,
-                        profile: null,
-                        token: null,
-                        school_annee: null, // 👈 Clear it out on logout
-                        activeSeason: null,
-                        lastLoginTime: null,
-                        isAdminMode: false,
-                        loading: false
-                    });
                 }
-
             },
 
             refreshProfile: () => {
@@ -93,6 +103,21 @@ const useAppStore = create(
                 set((state) => ({
                     profile: { ...state.profile, ...newData }
                 }));
+            },
+
+            checkReverbStatus: async () => {
+                if (get().hasCheckedReverb) return;
+                try {
+                    const response = await api.get('/reverb-status');
+                    // Handle unwrapped or wrapped response format
+                    const data = response?.data || response;
+                    const isTriggered = !!data?.reverb_trigger;
+                    set({ reverbTrigger: isTriggered });
+                } catch (error) {
+                    logger("Error checking reverb status:", error);
+                } finally {
+                    set({ hasCheckedReverb: true });
+                }
             },
 
             // --- API Loading State ---
@@ -129,6 +154,7 @@ const useAppStore = create(
                 isAdminMode: state.isAdminMode,
                 services: state.services,
                 lastLoginTime: state.lastLoginTime,
+                reverbTrigger: state.reverbTrigger,
             }), // only persist these fields
             onRehydrateStorage: () => (state) => {
                 if (state) state.setLoading(false);

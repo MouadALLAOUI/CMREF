@@ -22,7 +22,7 @@ class SendEmailJob implements ShouldQueue
         public string $to,
         public string $subject,
         public string $message,
-        public int $userId,
+        public string $userId,
         public string $userType,
     ) {}
 

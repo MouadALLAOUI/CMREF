@@ -1,3 +1,4 @@
+import useAppStore from "../../../store/useAppStore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
@@ -5,7 +6,6 @@ import logger from "../../../lib/logger";
 import { TrendingUp, Printer, Download } from "lucide-react";
 import bVentesClientService from "../../../api/services/bVentesClientService";
 import livreService from "../../../api/services/livreService";
-import seasonsService from "../../../api/services/seasonsService";
 import { exportToCSV } from "../../../utils/helpers";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
 import VentesPdf from "../../../components/pdfs/syntheses/VentesPdf";
@@ -35,26 +35,17 @@ const toNumber = (v) => {
 const CATEGORY_ORDER = ["Primaire", "Collège", "Lycée", "Préscolaire", "Robotos"];
 
 const VentesPage = () => {
+    const { activeSeason } = useAppStore();
+    const selectedSeasonId = activeSeason?.id || "";
     const [categorySections, setCategorySections] = useState([]);
     const [globalRows, setGlobalRows] = useState([]);
     const [kpis, setKpis] = useState({ qte: 0, total: 0, articles: 0 });
     const [isLoading, setIsLoading] = useState(true);
-    const [seasons, setSeasons] = useState([]);
-    const [selectedSeasonId, setSelectedSeasonId] = useState("");
-    const [pdfOpen, setPdfOpen] = useState(false);
+            const [pdfOpen, setPdfOpen] = useState(false);
     const printRef = useRef(null);
 
-    useEffect(() => {
-        seasonsService.getAll().then(setSeasons).catch(() => {});
-    }, []);
-
-    useEffect(() => {
-        if (seasons.length > 0 && !selectedSeasonId) {
-            const active = seasons.find(s => s.is_active);
-            setSelectedSeasonId(active?.id || seasons[0]?.id || "");
-        }
-    }, [seasons]);
-
+    
+    
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -138,9 +129,7 @@ const VentesPage = () => {
         fetchData();
     }, [fetchData]);
 
-    const seasonLabel = selectedSeasonId && selectedSeasonId !== "all"
-        ? schoolYearFormat(seasons.find(s => s.id === selectedSeasonId)?.name)
-        : "Toutes les saisons";
+    const seasonLabel = activeSeason?.label ? schoolYearFormat(activeSeason.label) : "Toutes les saisons";
 
     const handleExportCSV = () => {
         const exportData = [];
@@ -173,19 +162,7 @@ const VentesPage = () => {
                         <TrendingUp className="text-emerald-600" />
                         <h1 className="text-2xl font-bold text-slate-800">Synthèse des Ventes</h1>
                     </div>
-                    <div className="mt-2 flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase">Filtre Saison:</span>
-                        <select
-                            value={selectedSeasonId}
-                            onChange={(e) => setSelectedSeasonId(e.target.value)}
-                            className="bg-slate-100 border-none text-sm font-bold rounded-lg px-3 py-1 focus:ring-2 focus:ring-slate-900"
-                        >
-                            <option value="all">Toutes les saisons</option>
-                            {seasons.map(s => (
-                                <option key={s.id} value={s.id}>{s.name.slice(0, 2)} / {s.name.slice(2)}</option>
-                            ))}
-                        </select>
-                    </div>
+                    
                 </div>
                 <div className="flex gap-2">
                     <Button onClick={handleExportCSV} className="bg-emerald-700 text-white flex items-center gap-2 hover:bg-emerald-800">

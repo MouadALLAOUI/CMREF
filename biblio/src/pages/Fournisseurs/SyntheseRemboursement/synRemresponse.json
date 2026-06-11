@@ -1,0 +1,80 @@
+[
+    {
+        "id": "019eb851-9f04-730f-8f55-b83648d5d956",
+        "season_id": "019eb79a-b213-72b6-b67f-280713f83ae3",
+        "imprimeur_id": "019eb79a-ba36-7133-be3e-3d7d2f7f3c52",
+        "date_payment": "2026-06-19T23:00:00.000000Z",
+        "banque_id": "019eb79a-b639-7177-8278-a7d4ff117184",
+        "banque_nom": "BMCI",
+        "cheque_number": "ftf",
+        "cheque_image_path": null,
+        "cheque_url": null,
+        "montant": 456,
+        "statut_recu": false,
+        "statut_rejete": true,
+        "remarks": null,
+        "imprimeur": {
+            "id": "019eb79a-ba36-7133-be3e-3d7d2f7f3c52",
+            "raison_sociale": "Valette Besson S.A.R.L.",
+            "adresse": "33, rue de Chevalier\n25840 Fleury",
+            "directeur_nom": "Chantal Albert",
+            "directeur_tel": "+33 6 14 94 26 32",
+            "directeur_email": "maury.emile@bourdon.com",
+            "adjoint_nom": "Nicole du Francois",
+            "adjoint_tel": "04 34 95 64 15",
+            "adjoint_email": "margaret.lelievre@example.net"
+        }
+    },
+    {
+        "id": "019eb84f-dbb7-7344-9ea8-e3240217af05",
+        "season_id": "019eb79a-b213-72b6-b67f-280713f83ae3",
+        "imprimeur_id": "019eb79a-ba36-7133-be3e-3d7d2f7f3c52",
+        "date_payment": "2026-06-11T23:00:00.000000Z",
+        "banque_id": "019eb79a-b5f6-70aa-ab23-a7aa14e189a5",
+        "banque_nom": "BMCE Bank of Africa",
+        "cheque_number": "gh",
+        "cheque_image_path": null,
+        "cheque_url": null,
+        "montant": 34,
+        "statut_recu": true,
+        "statut_rejete": false,
+        "remarks": null,
+        "imprimeur": {
+            "id": "019eb79a-ba36-7133-be3e-3d7d2f7f3c52",
+            "raison_sociale": "Valette Besson S.A.R.L.",
+            "adresse": "33, rue de Chevalier\n25840 Fleury",
+            "directeur_nom": "Chantal Albert",
+            "directeur_tel": "+33 6 14 94 26 32",
+            "directeur_email": "maury.emile@bourdon.com",
+            "adjoint_nom": "Nicole du Francois",
+            "adjoint_tel": "04 34 95 64 15",
+            "adjoint_email": "margaret.lelievre@example.net"
+        }
+    },
+    {
+        "id": "019eb841-2c3e-7308-8bf3-37e347187c9c",
+        "season_id": "019eb79a-b213-72b6-b67f-280713f83ae3",
+        "imprimeur_id": "019eb79a-ba00-7344-8abd-0792b682a822",
+        "date_payment": "2026-06-17T23:00:00.000000Z",
+        "banque_id": "019eb79a-b5f6-70aa-ab23-a7aa14e189a5",
+        "banque_nom": "BMCE Bank of Africa",
+        "cheque_number": "dsdf",
+        "cheque_image_path": null,
+        "cheque_url": null,
+        "montant": 25,
+        "statut_recu": false,
+        "statut_rejete": true,
+        "remarks": null,
+        "imprimeur": {
+            "id": "019eb79a-ba00-7344-8abd-0792b682a822",
+            "raison_sociale": "Gilles",
+            "adresse": "70, rue Weiss\n42960 Guerin",
+            "directeur_nom": "Olivie Le Goff",
+            "directeur_tel": "07 41 03 63 76",
+            "directeur_email": "qbousquet@delahaye.fr",
+            "adjoint_nom": "Zoé Vallee",
+            "adjoint_tel": "+33 6 59 12 08 83",
+            "adjoint_email": "tverdier@example.org"
+        }
+    }
+]

@@ -15,23 +15,7 @@ class RepresentantController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Representant::with(["login"]);
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->latest()->paginate($perPage);
-            return response()->json([
-                'data' => RepresentantResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $representants = $query->latest()->get();
+        $representants = Representant::with(["loginRecord"])->latest()->get();
         return RepresentantResource::collection($representants);
     }
 
@@ -62,7 +46,7 @@ class RepresentantController extends Controller
                 $data = collect($validatedData)->except('password')->toArray();
                 $representant = Representant::create($data);
                 // 2. Create the central login record
-                $representant->login()->create([
+                $representant->loginRecord()->create([
                     'username' => $validatedData['login'],
                     'password' => $hashedPassword,
                     'role' => 'representant',
@@ -71,8 +55,10 @@ class RepresentantController extends Controller
 
                 return $representant;
             });
-            event(new RepresentantUpdated($representant));
-            return new RepresentantResource($representant->load('login'));
+            if (config('broadcasting.reverb_trigger')) {
+                event(new RepresentantUpdated($representant));
+            }
+            return new RepresentantResource($representant->load('loginRecord'));
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur serveur', 'error' => $e->getMessage()], 500);
         }
@@ -111,22 +97,24 @@ class RepresentantController extends Controller
                 $representant->update(collect($validatedData)->except('password')->toArray());
 
                 // 2. Sync password with Login Table if provided
-                if (isset($validatedData['password']) && !empty($validatedData['password']) && $representant->login) {
-                    $representant->login->update([
+                if (isset($validatedData['password']) && !empty($validatedData['password']) && $representant->loginRecord) {
+                    $representant->loginRecord->update([
                         'password' => Hash::make($validatedData['password']),
                     ]);
                 }
 
                 // 3. Sync login username with Login Table if provided
-                if (isset($validatedData['login']) && $representant->login) {
-                    $representant->login->update([
+                if (isset($validatedData['login']) && $representant->loginRecord) {
+                    $representant->loginRecord->update([
                         'username' => $validatedData['login'],
                     ]);
                 }
             });
-            event(new RepresentantUpdated($representant));
+            if (config('broadcasting.reverb_trigger')) {
+                event(new RepresentantUpdated($representant));
+            }
 
-            return new RepresentantResource($representant->load('login'));
+            return new RepresentantResource($representant->load('loginRecord'));
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur de mise à jour', 'error' => $e->getMessage()], 500);
         }
@@ -141,9 +129,11 @@ class RepresentantController extends Controller
         ]);
 
         $representant->update($validated);
-        event(new RepresentantUpdated($representant));
+        if (config('broadcasting.reverb_trigger')) {
+            event(new RepresentantUpdated($representant));
+        }
 
-        return new RepresentantResource($representant->load('login'));
+        return new RepresentantResource($representant->load('loginRecord'));
     }
 
     public function destroy($id)
@@ -151,10 +141,12 @@ class RepresentantController extends Controller
         $representant = Representant::findOrFail($id);
 
         DB::transaction(function () use ($representant) {
-            $representant->login()->delete();
+            $representant->loginRecord()->delete();
             $representant->delete();
         });
-        event(new RepresentantUpdated($representant));
+        if (config('broadcasting.reverb_trigger')) {
+            event(new RepresentantUpdated($representant));
+        }
 
         return response()->json(null, 204);
     }

@@ -21,8 +21,7 @@ class LivreResource extends JsonResource
             'color_code' => $this->color_code,
             'description' => $this->description,
             'annee_publication' => $this->annee_publication,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'category' => $this->whenLoaded('category'),
         ];
     }
 }

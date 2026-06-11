@@ -28,6 +28,10 @@ instance.interceptors.request.use((config) => {
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    const { activeSeason } = useAppStore.getState();
+    if (activeSeason?.label) {
+        config.params = { annee: activeSeason.label, ...config.params };
+    }
     useAppStore.getState().startApiCall();
     return config;
 });

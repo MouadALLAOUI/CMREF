@@ -29,8 +29,8 @@ function RepRembClientPage() {
         setIsLoading(true);
         try {
             const [rembRes, clientsRes] = await Promise.all([
-                clientRemboursementService.getAll({ annee: activeSeason?.name }),
-                clientService.getAll({ annee: activeSeason?.name })
+                clientRemboursementService.getAll({ annee: activeSeason?.label }),
+                clientService.getAll({ annee: activeSeason?.label })
             ]);
             setRemboursements(rembRes?.data?.data || rembRes?.data || []);
             setClients(clientsRes?.data?.data || clientsRes?.data || []);
@@ -42,8 +42,8 @@ function RepRembClientPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -51,7 +51,7 @@ function RepRembClientPage() {
             await clientRemboursementService.create({
                 ...formData,
                 montant: parseFloat(formData.montant),
-                annee: activeSeason?.name
+                annee: activeSeason?.label
             });
             toast.success("Remboursement enregistré");
             setFormData({ client_id: "", date_payment: "", banque: "", cheque_number: "", type_versement: "", montant: "", date_prevue: "" });

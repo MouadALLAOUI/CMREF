@@ -19,7 +19,6 @@ class StoreBLivraisonRequest extends FormRequest
             'date_emission' => 'required|date',
             'mode_envoi' => 'nullable|string',
             'type' => 'required|in:Livre,Specimen,Pedagogie,Retour',
-            'annee' => 'nullable|string',
             'details' => 'required|array|min:1',
             'details.*.livre_id' => 'required|uuid|exists:livres,id',
             'details.*.qte' => 'required|integer|min:1',

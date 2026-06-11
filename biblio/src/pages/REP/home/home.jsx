@@ -19,7 +19,7 @@ function RepHomePage() {
             setIsLoading(true);
             try {
                 const [itemsRes, catsRes] = await Promise.all([
-                    bLivraisonItemService.getAll({ annee: activeSeason?.name }),
+                    bLivraisonItemService.getAll({ annee: activeSeason?.label }),
                     categoryService.getAll()
                 ]);
                 setDeliveryItems(itemsRes?.data?.data || itemsRes?.data || []);
@@ -30,8 +30,8 @@ function RepHomePage() {
                 setIsLoading(false);
             }
         };
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const groupedByCategory = useMemo(() => {
         if (!deliveryItems.length || !categories.length) return [];
@@ -95,7 +95,7 @@ function RepHomePage() {
                         Bienvenue {welcomeName}
                     </h1>
                     <p className="text-slate-500 text-xs mt-0.5">
-                        Voici un résumé de vos livraisons pour la saison {activeSeason?.name || "—"}
+                        Voici un résumé de vos livraisons pour la saison {activeSeason?.label || "—"}
                     </p>
                 </div>
             </div>

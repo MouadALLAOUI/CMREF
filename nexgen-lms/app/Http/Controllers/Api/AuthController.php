@@ -51,7 +51,7 @@ class AuthController extends Controller
 
         // return response()->json([
         //     'user' => $user,
-        //     // Still returning token for backward compatibility or initial setup if needed, 
+        //     // Still returning token for backward compatibility or initial setup if needed,
         //     // but the cookie is the primary auth method now.
         //     'access_token' => $token,
         //     'token_type' => 'Bearer',

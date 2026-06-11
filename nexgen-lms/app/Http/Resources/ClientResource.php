@@ -18,8 +18,6 @@ class ClientResource extends JsonResource
             'adresse' => $this->adresse,
             'tel' => $this->tel,
             'email' => $this->email,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
             'destination' => new DestinationResource($this->whenLoaded('destination')),
         ];

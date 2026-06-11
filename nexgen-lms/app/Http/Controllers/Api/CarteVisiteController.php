@@ -12,25 +12,11 @@ class CarteVisiteController extends Controller
 {
     public function index(Request $request)
     {
-        $query = CarteVisite::with('representant')
+        $carteVisites = CarteVisite::with('representant')
             ->where('is_deleted', false)
-            ->latest();
+            ->latest()
+            ->get();
 
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->paginate($perPage);
-            return response()->json([
-                'data' => CarteVisiteResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $carteVisites = $query->paginate(1000);
         return CarteVisiteResource::collection($carteVisites);
     }
 
@@ -40,7 +26,6 @@ class CarteVisiteController extends Controller
             // Identity & Dates
             'rep_id' => 'required|uuid|exists:representants,id',
             'date_commande' => 'required|date',
-            'annee_scolaire' => 'nullable|string|max:20',
             'model' => 'nullable|string',
 
             // Card Content
@@ -92,7 +77,6 @@ class CarteVisiteController extends Controller
         $validatedData = $request->validate([
             'rep_id' => 'sometimes|uuid|exists:representants,id',
             'date_commande' => 'sometimes|date',
-            'annee_scolaire' => 'nullable|string|max:20',
             'model' => 'nullable|string',
 
             'nom_sur_carte' => 'sometimes|string|max:255',

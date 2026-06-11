@@ -11,7 +11,8 @@
 
 - if i asked you to push to github, run this prompt `.agents\skills\git-workflow-agent\git-workflow-agent.md`
 - always create a new branch for push.
-- branch naming convention: `DEV{last_pr_number + 1}` for development branches, `DEV{last_pr_number}_{small_description}` for small changes (e.g., `DEV42_fix_login_bug`).
+- branch naming convention: `DEV{last_pr_number + 1}` for example the last one was DEV 10 this new one should be DEV11 for development branches,
+- `DEV{last_pr_number}_{small_description}` for small changes (e.g., `DEV42_fix_login_bug`). => (max 3 files update)
 
 ## Repo structure
 

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('role', 50)->default('représentant'); // représentant, fournisseur, admin
             $table->text('message')->nullable();
             $table->string('token', 64)->unique();
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->index();
             $table->timestamp('accepted_at')->nullable();
             $table->string('statut', 50)->default('en attente'); // en attente, acceptée, expirée
             $table->nullableUuidMorphs('emetteur', 'emetteur');

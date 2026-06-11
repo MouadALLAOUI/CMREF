@@ -9,14 +9,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BLivraisonFactory extends Factory
 {
-    use HasSchoolYear;
     protected $model = BLivraison::class;
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
+
         return [
             'rep_id' => Representant::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'bl_number' => $this->faker->unique()->bothify('BL-####'),
             'date_emission' => $this->faker->date(),
             'type' => $this->faker->randomElement(['Livre', 'Specimen', 'Pedagogie', 'Retour']),
@@ -24,7 +25,6 @@ class BLivraisonFactory extends Factory
             'statut_recu' => $this->faker->boolean(),
             'statut_vu' => $this->faker->boolean(),
             'status' => $this->faker->randomElement(['Pending', 'Seen', 'Received']),
-            'annee' => $this->generateSchoolYear(2),
             'remarks' => $this->faker->sentence(),
         ];
     }

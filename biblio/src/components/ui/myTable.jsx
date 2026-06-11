@@ -657,7 +657,7 @@ const ActionToolTip = ({ Icon, tip, onAction, triggerStyle, hasAlert, alertInfo,
       <AlertBox>
         <AlertBoxTrigger asChild>
           <button
-            onClick={!hasAlert ? onAction : undefined}
+            onClick={onAction}
             className={cn("p-2 transition-transform active:scale-95", triggerStyle)}
           >
             <Icon size={18} />

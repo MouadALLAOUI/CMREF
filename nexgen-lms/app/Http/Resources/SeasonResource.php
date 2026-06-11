@@ -17,8 +17,6 @@ class SeasonResource extends JsonResource
             'end_date' => $this->end_date,
             'end_year' => $this->end_year,
             'is_active' => $this->is_active,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }

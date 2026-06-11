@@ -31,6 +31,8 @@ class Fact extends Model
         'remarques'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public $incrementing = false;
     protected $keyType = 'string';
 

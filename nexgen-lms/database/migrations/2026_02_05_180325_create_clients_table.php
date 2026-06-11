@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->uuid('id')->primary(); // UUID Primary Key
-            $table->foreignUuid('representant_id')->constrained('representants')->onDelete('cascade'); // Link to Representative
+            $table->uuid('representant_id')->nullable()->index(); // Link to Representative
+            $table->foreign('representant_id')->references('id')->on('representants')->nullOnDelete();
             $table->foreignUuid('destination_id')->nullable()->constrained('destinations')->nullOnDelete(); // Link to Zone (Destination)
             $table->string('raison_sociale', 255); // Renamed from 'ste'
             $table->string('ice', 20)->nullable(); // Identifiant Commun des Entreprises

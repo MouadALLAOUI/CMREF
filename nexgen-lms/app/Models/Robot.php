@@ -27,6 +27,8 @@ class Robot extends Model
         'remarques'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     // Automatically convert JSON to Array and vice-versa
     protected $casts = [
         'images' => 'array',

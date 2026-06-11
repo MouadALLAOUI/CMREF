@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import toast from "react-hot-toast";
 import { Button } from "../../../components/ui/button";
 import { useState, useEffect, useMemo } from "react";
@@ -61,7 +62,7 @@ function LivresPage() {
         nb_pages: "",
         color_code: "#FFFFFF",
         description: "",
-        annee_publication: activeSeason?.name || ""
+        annee_publication: activeSeason?.label || ""
     });
     const [livreID, setLivreID] = useState("");
     const actionsDetaille = {
@@ -88,10 +89,10 @@ function LivresPage() {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogMode, setDialogMode] = useState("add");
 
-    // Sync activeSeason.name with form.annee_publication when in 'add' mode or when activeSeason changes
+    // Sync activeSeason.label with form.annee_publication when in 'add' mode or when activeSeason changes
     useEffect(() => {
-        if (dialogMode === "add" && activeSeason?.name) {
-            setForm(prev => ({ ...prev, annee_publication: activeSeason.name }));
+        if (dialogMode === "add" && activeSeason?.label) {
+            setForm(prev => ({ ...prev, annee_publication: activeSeason.label }));
         }
     }, [activeSeason, dialogMode]);
 
@@ -102,9 +103,9 @@ function LivresPage() {
                 livreService.getAll(),
                 categoryService.getAll()
             ]);
-            const rawLivres = livresRes;
-            setLivres(rawLivres);
+            setLivres(livresRes);
             setCategories(categoriesRes);
+            console.log({ livresRes, categoriesRes })
         } catch (error) {
             logger({ msg: "Error fetching data", error }, "error")();
             toast.error("Erreur lors du chargement des données");
@@ -143,7 +144,7 @@ function LivresPage() {
             nb_pages: "",
             color_code: "#FFFFFF",
             description: "",
-            annee_publication: activeSeason?.name || ""
+            annee_publication: activeSeason?.label || ""
         });
     };
 
@@ -160,7 +161,7 @@ function LivresPage() {
                 nb_pages: row.nb_pages || 0,
                 color_code: row.color_code || "#FFFFFF",
                 description: row.description || "",
-                annee_publication: row.annee_publication || activeSeason?.name || ""
+                annee_publication: row.annee_publication || activeSeason?.label || ""
             });
             setLivreID(row.id);
             setDialogOpen(true);
@@ -177,7 +178,7 @@ function LivresPage() {
                 nb_pages: row.nb_pages || 0,
                 color_code: row.color_code || "#FFFFFF",
                 description: row.description || "",
-                annee_publication: row.annee_publication || activeSeason?.name || ""
+                annee_publication: row.annee_publication || activeSeason?.label || ""
             });
             setDialogOpen(true);
         }
@@ -210,11 +211,11 @@ function LivresPage() {
         if (field.name === "description") return { ...field, inputType: "textarea" };
         if (field.name === "annee_publication") return {
             ...field,
-            placeholder: activeSeason?.name
-                ? `${activeSeason.name.slice(0, 2)}/${activeSeason.name.slice(2)}`
+            placeholder: activeSeason?.label
+                ? `${activeSeason.label.slice(0, 2)}/${activeSeason.label.slice(2)}`
                 : "----",
             disabled: true,
-            value: form.annee_publication || activeSeason?.name || "",
+            value: form.annee_publication || activeSeason?.label || "",
         };
         return field;
     }), [baseLivreSchema, activeSeason, form.annee_publication]);

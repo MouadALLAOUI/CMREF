@@ -13,8 +13,9 @@ class DestinationResource extends JsonResource
             'id' => $this->id,
             'destination' => $this->destination,
             'description' => $this->description,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'representants' => RepresentantResource::collection($this->whenLoaded('representants')),
+            'ventes' => BVentesClientResource::collection($this->whenLoaded('ventes')),
+            'livraisons' => BLivraisonResource::collection($this->whenLoaded('livraisons')),
         ];
     }
 }

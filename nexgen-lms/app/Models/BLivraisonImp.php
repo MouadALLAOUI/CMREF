@@ -12,15 +12,21 @@ class BLivraisonImp extends Model
 {
     use HasFactory, HasUuids, FilterBySeason;
 
+    protected static function booted(): void
+    {
+        static::deleting(fn (BLivraisonImp $imp) => $imp->items()->update(['is_deleted' => true]));
+    }
+
     protected $fillable = [
         'imprimeur_id',
         'season_id',
         'entity_type',
         'date_reception',
         'b_livraison_number',
-        'annee',
         'remarks'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     public $incrementing = false;
     protected $keyType = 'string';

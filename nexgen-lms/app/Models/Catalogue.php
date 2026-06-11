@@ -17,7 +17,9 @@ class Catalogue extends Model
         'content'
     ];
 
-    public $incrementing = false; //
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public $incrementing = false;
     protected $keyType = 'string';
 
     // Relation: Each catalogue entry belongs to one category

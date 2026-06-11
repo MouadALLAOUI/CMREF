@@ -41,9 +41,11 @@ class CarteVisite extends Model
         'prod_chevalet',
         'livraison_chevalet',
         'recu_chevalet',
-        'annee_scolaire',
+
         'is_deleted'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     protected $casts = [
         'date_commande' => 'date',

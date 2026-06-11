@@ -17,6 +17,8 @@ class Setting extends Model
         'description',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public $incrementing = false;
     protected $keyType = 'string';
 

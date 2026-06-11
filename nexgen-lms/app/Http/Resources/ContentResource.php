@@ -20,7 +20,6 @@ class ContentResource extends JsonResource
             'champ1' => $this->champ1,
             'champ2' => $this->champ2,
             'champ3' => $this->champ3,
-            'created_at' => $this->created_at,
         ];
     }
 }

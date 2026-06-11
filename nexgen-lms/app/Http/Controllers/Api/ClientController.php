@@ -12,23 +12,7 @@ class ClientController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Client::with('representant');
-
-        if ($request->has('page')) {
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->latest()->paginate($perPage);
-            return response()->json([
-                'data' => ClientResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
-        $clients = $query->latest()->get();
+        $clients = Client::with('representant')->latest()->get();
         return ClientResource::collection($clients);
     }
 

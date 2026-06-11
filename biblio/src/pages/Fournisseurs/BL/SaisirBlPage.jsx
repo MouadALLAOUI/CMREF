@@ -35,7 +35,7 @@ function FournisseurSaisirBl() {
         quantite: "",
         livre_id: "",
         remarks: "",
-        annee: activeSeason?.name || "",
+        season_id: activeSeason?.id || "",
         details: [], // This will store items with qte > 0
     });
 
@@ -50,6 +50,7 @@ function FournisseurSaisirBl() {
                 try {
                     await bLivraisonImpService.deleteGroup(row.id);
                     toast.success("b_livraison supprimée");
+                    setSelectedBlItems(null);
                     fetchData();
                 } catch (error) {
                     logger("Error deleting b_livraison:", error)();
@@ -124,7 +125,7 @@ function FournisseurSaisirBl() {
         setIsLoading(true);
         try {
             // Backend now returns headers with nested items
-            const response = await bLivraisonImpService.getAll({ annee: activeSeason?.name });
+            const response = await bLivraisonImpService.getAll({ annee: activeSeason?.label });
             setBlData(response);
 
             const [impRes, livreRes, catRes] = await Promise.all([
@@ -143,7 +144,7 @@ function FournisseurSaisirBl() {
         }
     };
 
-    useEffect(() => { fetchData(); }, [activeSeason?.name]);
+    useEffect(() => { fetchData(); }, [activeSeason?.label]);
 
     const updateDetail = (livreId, label, qte) => {
         setFormData(prev => {
@@ -198,7 +199,7 @@ function FournisseurSaisirBl() {
             quantite: "",
             livre_id: "",
             remarks: "",
-            annee: activeSeason?.name || "",
+            season_id: activeSeason?.id || "",
             details: [],
         });
     }

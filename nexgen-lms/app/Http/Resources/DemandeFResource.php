@@ -20,11 +20,9 @@ class DemandeFResource extends JsonResource
             'type' => $this->type,
             'statut' => $this->statut,
             'livree' => $this->livree,
-            'annee_scolaire' => $this->annee_scolaire,
+
             'contenu' => $this->contenu,
             'remarks' => $this->remarks,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'representant' => new RepresentantResource($this->whenLoaded('representant')),
             'client' => new ClientResource($this->whenLoaded('client')),
         ];

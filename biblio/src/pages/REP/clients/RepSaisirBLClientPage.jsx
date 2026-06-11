@@ -25,7 +25,7 @@ function RepSaisirBLClientPage() {
         setIsLoading(true);
         try {
             const [clientsRes, livRes, catsRes] = await Promise.all([
-                clientService.getAll({ annee: activeSeason?.name }),
+                clientService.getAll({ annee: activeSeason?.label }),
                 livreService.getAll(),
                 categoryService.getAll()
             ]);
@@ -40,8 +40,8 @@ function RepSaisirBLClientPage() {
     };
 
     useEffect(() => {
-        if (activeSeason?.name) fetchData();
-    }, [activeSeason?.name]);
+        if (activeSeason?.label) fetchData();
+    }, [activeSeason?.label]);
 
     const livresByCategory = useMemo(() => {
         const grouped = {};
@@ -92,7 +92,7 @@ function RepSaisirBLClientPage() {
             const blRes = await bLivraisonService.create({
                 client_id: selectedClient,
                 type: "Livre",
-                annee: activeSeason?.name
+                annee: activeSeason?.label
             });
             const blId = blRes?.data?.data?.id || blRes?.data?.id;
 

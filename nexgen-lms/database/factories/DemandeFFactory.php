@@ -14,10 +14,12 @@ class DemandeFFactory extends Factory
 
     public function definition(): array
     {
+        $s2627_id = Season::where('name', '2627')->value('id');
+
         return [
             'rep_id' => Representant::pluck('id')->random(),
             'client_id' => Client::pluck('id')->random(),
-            'season_id' => Season::pluck('id')->random(),
+            'season_id' => $s2627_id,
             'date_demande' => $this->faker->date(),
             'ref' => $this->faker->randomDigitNotNull(),
             'type' => $this->faker->randomElement(['MSM', 'Wataniya']),

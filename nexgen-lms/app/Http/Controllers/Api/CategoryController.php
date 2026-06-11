@@ -16,21 +16,6 @@ class CategoryController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->has('page')) {
-            $query = Category::query();
-            $perPage = min((int) $request->query('per_page', 15), 100);
-            $paginator = $query->latest()->paginate($perPage);
-            return response()->json([
-                'data' => CategoryResource::collection($paginator->items()),
-                'meta' => [
-                    'current_page' => $paginator->currentPage(),
-                    'last_page' => $paginator->lastPage(),
-                    'per_page' => $paginator->perPage(),
-                    'total' => $paginator->total(),
-                ],
-            ]);
-        }
-
         $categories = Cache::remember(self::CACHE_KEY, self::CACHE_TTL, function () {
             return Category::orderBy('libelle', 'asc')->get();
         });

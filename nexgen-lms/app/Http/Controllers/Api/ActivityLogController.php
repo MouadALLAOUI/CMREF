@@ -33,8 +33,7 @@ class ActivityLogController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $perPage = $request->input('per_page', 50);
-        $logs = $query->latest()->paginate($perPage);
+        $logs = $query->latest()->get();
 
         return ActivityLogResource::collection($logs);
     }

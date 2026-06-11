@@ -54,7 +54,7 @@ const SyntheseTracabilitePage = () => {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const seasonParams = activeSeason?.name ? { annee: activeSeason.name } : {};
+            const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
             const [clients, ventes, remboursements, livres, reps] = await Promise.all([
                 fetchAllPaginated(clientService.getAll),
                 fetchAllPaginated(bVentesClientService.getAll, seasonParams),
@@ -139,7 +139,7 @@ const SyntheseTracabilitePage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.name]);
+    }, [activeSeason?.label]);
 
     const filteredRows = useMemo(() => {
         if (selectedRep === "all") return rows;
@@ -174,8 +174,8 @@ const SyntheseTracabilitePage = () => {
         []
     );
 
-    const seasonLabel = activeSeason?.name
-        ? `Saison : ${schoolYearFormat(activeSeason.name)}`
+    const seasonLabel = activeSeason?.label
+        ? `Saison : ${schoolYearFormat(activeSeason.label)}`
         : "";
 
     const repLabel = selectedRep === "all"

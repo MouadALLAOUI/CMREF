@@ -40,7 +40,7 @@ class EmailingInvitationTest extends TestCase
         $responseEmail->assertStatus(200)
             ->assertJson([
                 'status' => 'success',
-                'message' => 'Email envoyé avec succès (simulation).',
+                'message' => 'Email en cours d\'envoi.',
             ]);
 
         // Send simulated invitation
@@ -49,11 +49,8 @@ class EmailingInvitationTest extends TestCase
             'role' => 'représentant',
             'message' => 'Welcome',
         ]);
-        $responseInvite->assertStatus(200)
-            ->assertJson([
-                'status' => 'success',
-                'message' => 'Invitation envoyée avec succès (simulation).',
-            ]);
+        $responseInvite->assertStatus(201)
+            ->assertJsonPath('email', 'invite@example.com');
     }
 
     public function test_representative_cannot_send_emails_or_invitations()

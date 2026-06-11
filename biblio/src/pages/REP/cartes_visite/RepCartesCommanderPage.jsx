@@ -43,7 +43,7 @@ function RepCartesCommanderPage() {
             await carteVisiteService.create({
                 ...formData,
                 model: selectedModel,
-                annee: activeSeason?.name
+                annee: activeSeason?.label
             });
             toast.success("Commande de carte envoyée avec succès");
             setFormData({

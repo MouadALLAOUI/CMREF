@@ -55,11 +55,10 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
-        "dev-all": "php artisan config:clear && php artisan cache:clear && (php artisan reverb:start & php artisan serve)",
-    "post-autoload-dump": [
-        "Illuminate\\Foundation\\Composition\\Actions\\ClearCachedServices::handle",
-        "@php artisan package:discover --ansi"
-    ]
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],

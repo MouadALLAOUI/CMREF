@@ -55,7 +55,7 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
-        "dev-all": "php artisan config:cache && php artisan optimize && (php artisan reverb:start & php artisan serve)",
+        "dev-all": "php artisan config:clear && php artisan cache:clear && (php artisan reverb:start & php artisan serve)",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

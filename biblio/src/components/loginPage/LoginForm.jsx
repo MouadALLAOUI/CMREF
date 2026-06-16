@@ -5,8 +5,8 @@ import seasonsService from "../../api/services/seasonsService";
 
 function LoginForm({ onLogIn, error }) {
     const [formData, setFormData] = useState({
-        login: "admin",
-        password: "12345678",
+        login: "",
+        password: "",
         annee: ""
     });
     const [dataErr, setDataErr] = useState({

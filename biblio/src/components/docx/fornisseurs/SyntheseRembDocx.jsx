@@ -4,7 +4,7 @@ const docxModule = { ...docx, ...(docx.default || {}) };
 const { Document, Paragraph, Table, TableRow, TableCell, TextRun, WidthType, AlignmentType, BorderStyle } = docxModule;
 
 const border = {
-  style: BorderStyle.SINGLE, size: 1, color: "999999",
+  style: size: 1, color: "999999",
 };
 
 export const SyntheseRembDocx = ({ data, annee, total }) => {

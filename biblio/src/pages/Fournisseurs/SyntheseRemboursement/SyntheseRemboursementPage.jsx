@@ -4,11 +4,13 @@ import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
-import { Printer, Landmark, FileText } from "lucide-react";
+import { Printer, Landmark, FileText, Download } from "lucide-react";
 import rembImpService from "../../../api/services/rembImpService";
 import PdfDialogViewer from "../../../components/template/pdfs/PdfDialogViewer";
 import { currencyFormat } from "../../../lib/utilities";
 import SyntheseRembPdf from "../../../components/pdfs/fornisseurs/SyntheseRembPdf";
+import { SyntheseRembDocx } from "../../../components/docx/fornisseurs/SyntheseRembDocx";
+import { downloadDocx } from "../../../lib/downloadDocx";
 
 const toNumber = (v) => {
     const n = Number(v);
@@ -121,6 +123,16 @@ const SyntheseRemboursementPage = () => {
                             </Button>
                         }
                     />
+                    <Button
+                        onClick={() => downloadDocx(
+                            SyntheseRembDocx({ data: rows, annee: activeSeason?.label, total: stats.total }),
+                            `synthese_remb_fournisseurs_${activeSeason?.label || "all"}.docx`
+                        )}
+                        variant="outline"
+                        className="flex items-center gap-2 rounded-xl h-11 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all"
+                    >
+                        <Download size={18} /> DOCX
+                    </Button>
 
                 </div>
             </div>

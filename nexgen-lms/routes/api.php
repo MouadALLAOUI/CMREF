@@ -37,6 +37,8 @@ use App\Http\Controllers\Api\CahierTemplateController;
 use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\EmailController;
 use App\Http\Controllers\Api\InvitationController;
+use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\RepresentantSeasonController;
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
@@ -53,6 +55,7 @@ Route::get('/reverb-status', function () {
 
 // 1. Allow public access ONLY to view all seasons (and optionally a single season)
 Route::get('/seasons', [SeasonController::class, 'index']);
+Route::get('/seasons/active', [SeasonController::class, 'active']);
 Route::get('/seasons/{season}', [SeasonController::class, 'show']);
 
 // --- Protected Routes (Requires Sanctum Token) ---
@@ -62,7 +65,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // ─── Shared Routes (accessible by all authenticated roles) ───
 
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::post('/active_compte', [LoginController::class, 'active_compte'])->name('active_compte');
     Route::get('/user', function (Request $request) {
         return response()->json([
             'user' => $request->user(),
@@ -70,7 +72,10 @@ Route::middleware('auth:sanctum')->group(function () {
             'reverb_trigger' => config('broadcasting.reverb_trigger')
         ]);
     })->name('user');
-    Route::put('/user/password', [LoginController::class, 'updatePassword'])->name('user.password');
+        Route::put('/user/password', [LoginController::class, 'updatePassword'])->name('user.password');
+
+        // File upload
+        Route::post('/upload-cheque', [UploadController::class, 'uploadCheque']);
 
     // ─── Non-season-scoped resources (reference / catalog / system) ───
     Route::apiResource('livres', LivreController::class)->middleware('read_only_rep');
@@ -105,9 +110,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Facturation transformation
     Route::post('/demande-f/{id}/transform', [FacturationController::class, 'transform']);
-
-    // Active season (read-only for all auth users)
-    Route::get('/seasons/active', [SeasonController::class, 'active']);
 
     // ─── Admin-Only Routes ───
 
@@ -146,6 +148,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Representative CRUD
         Route::apiResource('representants', RepresentantController::class);
+
+        // Representative season access management
+        Route::get('/representants/{representant}/seasons', [RepresentantSeasonController::class, 'index']);
+        Route::put('/representants/{representant}/seasons/{season}', [RepresentantSeasonController::class, 'update']);
+        Route::post('/representants/{representant}/seasons', [RepresentantSeasonController::class, 'sync']);
+        Route::delete('/representants/{representant}/seasons/{season}', [RepresentantSeasonController::class, 'destroy']);
 
         // Activity Logs (audit trail)
         Route::get('/activity-logs', [ActivityLogController::class, 'index']);

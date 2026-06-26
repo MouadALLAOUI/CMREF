@@ -8,11 +8,14 @@ import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
 import repRemboursementService from "../../../api/services/repRemboursementService";
 import representantService from "../../../api/services/representantService";
 import banqueService from "../../../api/services/banqueService";
+import imprimeurService from "../../../api/services/imprimeurService";
+import ChequeUpload from "../../../components/ui/ChequeUpload";
 
 function ReprésentantRemboursement() {
     const [rows, setRows] = useState([]);
     const [representants, setRepresentants] = useState([]);
     const [banques, setBanques] = useState([]);
+    const [imprimeurs, setImprimeurs] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedRep, setSelectedRep] = useState("all");
 
@@ -27,26 +30,33 @@ function ReprésentantRemboursement() {
         banque_nom: "",
         cheque_number: "",
         cheque_image_path: "",
+        a_lordre_de_id: "",
+        imp: "",
         type_versement: "Versement",
         montant: "",
         date_prevue: "",
         statut_recu: false,
         statut_rejete: false,
         statut_accepte: false,
+        statut_retourne: false,
+        date_retour: "",
+        motif_retour: "",
         remarks: "",
     });
 
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const [res, reps, bq] = await Promise.all([
+            const [res, reps, bq, imprs] = await Promise.all([
                 repRemboursementService.getAll(),
                 representantService.getAll(),
                 banqueService.getAll(),
+                imprimeurService.getAll(),
             ]);
             setRows(res);
             setRepresentants(reps);
             setBanques(bq);
+            setImprimeurs(imprs);
         } catch (error) {
             logger("Error fetching rep remboursements:", error);
             toast.error("Erreur lors du chargement des données");
@@ -67,12 +77,17 @@ function ReprésentantRemboursement() {
             banque_nom: "",
             cheque_number: "",
             cheque_image_path: "",
+            a_lordre_de_id: "",
+            imp: "",
             type_versement: "Versement",
             montant: "",
             date_prevue: "",
             statut_recu: false,
             statut_rejete: false,
             statut_accepte: false,
+            statut_retourne: false,
+            date_retour: "",
+            motif_retour: "",
             remarks: "",
         });
         setRowId("");
@@ -121,21 +136,27 @@ function ReprésentantRemboursement() {
         { header: "Chèque N°", accessor: "cheque_number" },
         { header: "Titulaire", accessor: "compte" },
         { header: "Type de versement", accessor: "type_versement" },
-        { header: "A l'ordre de", accessor: "imp" },
+        { header: "A l'ordre de", accessor: "a_ordre_de.raison_sociale || imp" },
         { header: "Montant (DH)", accessor: "montant", type: "money" },
         { header: "Date (prévue) de versement", accessor: "date_prevue", type: "date" },
         { header: "Date de versement", accessor: "date_versement", type: "date" },
         { header: "Reçu", accessor: "statut_recu", type: "bool" },
         { header: "Rejeté", accessor: "statut_rejete", type: "bool" },
         { header: "Accepté", accessor: "statut_accepte", type: "bool" },
+        { header: "Retourné", accessor: "statut_retourne", type: "bool" },
     ];
+
+    const aLordreDeOptions = useMemo(() => [
+        { label: "MSM-media", value: "__msm_media__" },
+        ...imprimeurs.map((i) => ({ label: i.raison_sociale, value: i.id })),
+    ], [imprimeurs]);
 
     const schema = useMemo(() => {
         const rules = {
             rep_id: "required|uuid|exists:representants,id",
             date_payment: "required|date",
             banque_id: "nullable|uuid|exists:banques,id",
-            imp: "nullable|in:Wataniya,MSM-media,Commun,Autre",
+            a_lordre_de_id: "nullable|string",
             cheque_number: "nullable|string|max:50",
             cheque_image_path: "nullable|string",
             type_versement: "required|in:En main propre,Virement,Versement",
@@ -146,6 +167,9 @@ function ReprésentantRemboursement() {
             statut_recu: "sometimes|boolean",
             statut_rejete: "sometimes|boolean",
             statut_accepte: "sometimes|boolean",
+            statut_retourne: "sometimes|boolean",
+            date_retour: "nullable|date",
+            motif_retour: "nullable|string|max:500",
             remarks: "nullable|string",
         };
 
@@ -153,7 +177,7 @@ function ReprésentantRemboursement() {
             rep_id: "Représentant",
             date_payment: "Date",
             banque_id: "Banque",
-            imp: "A l'ordre de",
+            a_lordre_de_id: "À l'ordre de",
             cheque_number: "N° chèque",
             cheque_image_path: "Chemin image chèque",
             type_versement: "Type de versement",
@@ -164,6 +188,9 @@ function ReprésentantRemboursement() {
             statut_recu: "Reçu",
             statut_rejete: "Rejeté",
             statut_accepte: "Accepté",
+            statut_retourne: "Retourné",
+            date_retour: "Date de retour",
+            motif_retour: "Motif de retour",
             remarks: "Remarques",
         }
 
@@ -181,12 +208,7 @@ function ReprésentantRemboursement() {
                     { label: "Virement", value: "Virement" },
                     { label: "Versement", value: "Versement" },
                 ],
-                imp: [
-                    { label: "Wataniya", value: "Wataniya" },
-                    { label: "MSM-media", value: "MSM-media" },
-                    { label: "Commun", value: "Commun" },
-                    { label: "Autre", value: "Autre" },
-                ],
+                a_lordre_de_id: aLordreDeOptions,
                 statut_recu: [
                     { label: "Non", value: false },
                     { label: "Oui", value: true },
@@ -199,15 +221,31 @@ function ReprésentantRemboursement() {
                     { label: "Non", value: false },
                     { label: "Oui", value: true },
                 ],
+                statut_retourne: [
+                    { label: "Non", value: false },
+                    { label: "Oui", value: true },
+                ],
             },
             overrides: {
                 remarks: { inputType: "textarea" },
+                motif_retour: { inputType: "textarea" },
+                a_lordre_de_id: {
+                    onChange: (val) => {
+                        if (val === "__msm_media__") {
+                            setFormData(prev => ({ ...prev, a_lordre_de_id: null, imp: "MSM-media" }));
+                        } else {
+                            const imprimeur = imprimeurs.find(i => i.id === val);
+                            setFormData(prev => ({ ...prev, a_lordre_de_id: val, imp: imprimeur?.raison_sociale || "" }));
+                        }
+                    },
+                },
             },
             gridSpan: {
                 remarks: "space-y-2 col-span-2",
             },
+            exclude: ["imp", "statut_retourne"],
         });
-    }, [formData, representants, banques]);
+    }, [formData, representants, banques, aLordreDeOptions, imprimeurs]);
 
     const onSubmit = async () => {
         try {
@@ -237,12 +275,17 @@ function ReprésentantRemboursement() {
                 banque_nom: row.banque_nom || row.banque?.nom || "",
                 cheque_number: row.cheque_number || "",
                 cheque_image_path: row.cheque_image_path || "",
+                a_lordre_de_id: row.a_lordre_de_id || "",
+                imp: row.imp || "",
                 type_versement: row.type_versement || "Versement",
                 montant: row.montant ?? "",
                 date_prevue: row.date_prevue || "",
                 statut_recu: !!row.statut_recu,
                 statut_rejete: !!row.statut_rejete,
                 statut_accepte: !!row.statut_accepte,
+                statut_retourne: !!row.statut_retourne,
+                date_retour: row.date_retour || "",
+                motif_retour: row.motif_retour || "",
                 remarks: row.remarks || "",
             });
             setIsDialogOpen(true);
@@ -257,12 +300,17 @@ function ReprésentantRemboursement() {
                 banque_nom: row.banque_nom || row.banque?.nom || "",
                 cheque_number: row.cheque_number || "",
                 cheque_image_path: row.cheque_image_path || "",
+                a_lordre_de_id: row.a_lordre_de_id || "",
+                imp: row.imp || "",
                 type_versement: row.type_versement || "Versement",
                 montant: row.montant ?? "",
                 date_prevue: row.date_prevue || "",
                 statut_recu: !!row.statut_recu,
                 statut_rejete: !!row.statut_rejete,
                 statut_accepte: !!row.statut_accepte,
+                statut_retourne: !!row.statut_retourne,
+                date_retour: row.date_retour || "",
+                motif_retour: row.motif_retour || "",
                 remarks: row.remarks || "",
             });
             setIsDialogOpen(true);
@@ -292,7 +340,13 @@ function ReprésentantRemboursement() {
                         subtitle: { add: "Enregistrer un remboursement.", update: "Mettre à jour le remboursement.", view: "Consultation." },
                         submitLabel: dialogMode === "add" ? "Créer" : "Enregistrer",
                     }}
-                />
+                >
+                    <ChequeUpload
+                        value={formData.cheque_image_path}
+                        onChange={(path) => setFormData(prev => ({ ...prev, cheque_image_path: path }))}
+                        isView={dialogMode === "view"}
+                    />
+                </UniversalDialog>
             </div>
 
             <div className="flex items-center gap-4 mb-2">

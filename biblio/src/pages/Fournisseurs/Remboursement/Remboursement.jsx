@@ -7,7 +7,9 @@ import rembImpService from "../../../api/services/rembImpService";
 import logger from "../../../lib/logger";
 import imprimeurService from "../../../api/services/imprimeurService";
 import banqueService from "../../../api/services/banqueService";
+import representantService from "../../../api/services/representantService";
 import UniversalDialog from "../../../components/template/dialog/UniversalDialog";
+import ChequeUpload from "../../../components/ui/ChequeUpload";
 import { useNavigate } from "react-router-dom";
 import useAppStore from "../../../store/useAppStore";
 import { currencyFormat } from "../../../lib/utilities";
@@ -15,19 +17,27 @@ import { buildSchemaFromControllerRules } from "../../../api/helpers/methodes";
 
 const REMB_IMP_RULES = {
   imprimeur_id: 'required|uuid|exists:imprimeurs,id',
+  rep_id: 'nullable|uuid|exists:representants,id',
   date_payment: 'required|date',
   banque_id: 'nullable|uuid|exists:banques,id',
   cheque_number: 'nullable|string|max:50',
   montant: 'required|numeric|min:0',
+  statut_retourne: 'sometimes|boolean',
+  date_retour: 'nullable|date',
+  motif_retour: 'nullable|string|max:500',
   annee: 'nullable|string',
 };
 
 const REMB_IMP_LABELS = {
   imprimeur_id: "Fournisseur",
+  rep_id: "Représentant",
   date_payment: "Date",
   banque_id: "Banque",
   cheque_number: "N° de Chèque",
   montant: "Montant (DH)",
+  statut_retourne: "Retourné",
+  date_retour: "Date de retour",
+  motif_retour: "Motif de retour",
   annee: "Année",
 };
 
@@ -40,17 +50,22 @@ const FournisseurRemboursement = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     imprimeur_id: "",
+    rep_id: "",
     date_payment: "",
     banque_id: "",
     banque_nom: "",
     cheque_image_path: "",
     cheque_number: "",
     montant: "",
+    statut_retourne: false,
+    date_retour: "",
+    motif_retour: "",
     annee: activeSeason?.label || "",
   });
   const [remboursement, setRemboursement] = useState([]);
   const [imprimeurs, setImprimeurs] = useState([]);
   const [banque, setBanque] = useState([]);
+  const [representants, setRepresentants] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const actionsDetaille = {
@@ -80,25 +95,29 @@ const FournisseurRemboursement = () => {
 
   const columns = [
     { header: "Fournisseur", accessor: "imprimeur.raison_sociale" },
+    { header: "Représentant", accessor: "representant.nom" },
     { header: "Date", accessor: "date_payment", type: "date" },
     { header: "Banque", accessor: "banque.nom || banque_nom" },
     { header: "Chèque N°", accessor: "cheque_number" },
     { header: "Montant (DH)", accessor: "montant", type: "money" },
     { header: "Reçu", accessor: "statut_recu", type: "bool", onClick: (row) => handleUpdateStatusRecuRemb(row) },
     { header: "Rejeté", accessor: "statut_rejete", type: "bool", onClick: (row) => handleUpdateStatusRejeteRemb(row) },
+    { header: "Retourné", accessor: "statut_retourne", type: "bool", onClick: (row) => handleUpdateStatusRetourneRemb(row) },
   ];
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [impRemb, imp, bank] = await Promise.all([
+      const [impRemb, imp, bank, reps] = await Promise.all([
         rembImpService.getAll({ annee: activeSeason?.label }),
         imprimeurService.getAll(),
-        banqueService.getAll()
+        banqueService.getAll(),
+        representantService.getAll(),
       ]);
       setRemboursement(impRemb);
       setImprimeurs(imp);
       setBanque(bank);
+      setRepresentants(reps);
     } catch (error) {
       logger("Error fetching Remboursement:", error)();
       toast.error("Erreur lors du chargement des Remboursement");
@@ -114,12 +133,16 @@ const FournisseurRemboursement = () => {
   const handleReset = () => {
     setFormData({
       imprimeur_id: "",
+      rep_id: "",
       date_payment: "",
       banque_id: "",
       banque_nom: "",
       cheque_image_path: "",
       cheque_number: "",
       montant: "",
+      statut_retourne: false,
+      date_retour: "",
+      motif_retour: "",
       annee: activeSeason?.label || "",
     });
   };
@@ -135,11 +158,15 @@ const FournisseurRemboursement = () => {
       setCurrentRembId(row.id);
       setFormData({
         imprimeur_id: row.imprimeur_id,
+        rep_id: row.rep_id || row.representant?.id || "",
         date_payment: row.date_payment?.split('T')[0] || "",
         banque_id: row.banque_id || "",
         banque_nom: row.banque_nom || "",
         cheque_number: row.cheque_number,
         montant: row.montant,
+        statut_retourne: !!row.statut_retourne,
+        date_retour: row.date_retour || "",
+        motif_retour: row.motif_retour || "",
         annee: row.annee || activeSeason?.label || "",
       });
       setDialogOpen(true);
@@ -165,6 +192,20 @@ const FournisseurRemboursement = () => {
       if (!newStatus) return toast.error("Cannot revert statut Rejeté from true to false.")
       await rembImpService.update(row.id, { statut_recu: !newStatus, statut_rejete: newStatus });
       toast.success(newStatus ? "Paiement rejeté" : "Rejet annulé");
+      fetchData();
+    } catch (error) {
+      toast.error("Erreur lors de la modification du statut");
+    }
+  }
+
+  const handleUpdateStatusRetourneRemb = async (row) => {
+    try {
+      const newStatus = !row.statut_retourne;
+      await rembImpService.update(row.id, {
+        statut_retourne: newStatus,
+        date_retour: newStatus ? new Date().toISOString().split('T')[0] : null,
+      });
+      toast.success(newStatus ? "Marqué comme retourné" : "Retour annulé");
       fetchData();
     } catch (error) {
       toast.error("Erreur lors de la modification du statut");
@@ -199,10 +240,14 @@ const FournisseurRemboursement = () => {
     gridSpan: REMB_IMP_GRID,
     selectItems: {
       imprimeur_id: imprimeurs.map(i => ({ label: i.raison_sociale, value: i.id })),
+      rep_id: representants.map(r => ({ label: r.nom, value: r.id })),
       banque_id: banque.map(b => ({ label: b.nom, value: b.id })),
     },
-    exclude: ["id", "created_at", "updated_at", "statut_recu", "statut_rejete", "remarks", "banque_nom", "cheque_image_path"],
-  }), [formData, imprimeurs, banque]);
+    exclude: ["id", "created_at", "updated_at", "statut_recu", "statut_rejete", "statut_retourne", "remarks", "banque_nom", "cheque_image_path"],
+    overrides: {
+      motif_retour: { inputType: "textarea" },
+    },
+  }), [formData, imprimeurs, banque, representants]);
 
   const schema = useMemo(() => baseSchema.map(field => {
     if (field.name === "imprimeur_id") return { ...field, placeholder: "Choisir fournisseur" };
@@ -256,7 +301,13 @@ const FournisseurRemboursement = () => {
               + Ajouter un Remboursement
             </Button>
           }
-        />
+        >
+          <ChequeUpload
+            value={formData.cheque_image_path}
+            onChange={(path) => setFormData(prev => ({ ...prev, cheque_image_path: path }))}
+            isView={dialogMode === "view"}
+          />
+        </UniversalDialog>
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="bg-slate-900 px-6 py-4 flex items-center gap-3">

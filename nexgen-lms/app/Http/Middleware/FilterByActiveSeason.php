@@ -17,10 +17,12 @@ class FilterByActiveSeason
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->has('annee') && !$request->has('season_id')) {
-            $activeSeason = Season::getActiveSeason();
-            if ($activeSeason) {
-                $request->merge(['annee' => $activeSeason->name]);
+        if (!$request->has('annee') && !$request->has('season_id') && !$request->has('annees')) {
+            $activeSeasons = Season::getActiveSeasons();
+            if ($activeSeasons->isNotEmpty()) {
+                $request->merge([
+                    'annees' => $activeSeasons->pluck('name')->toArray(),
+                ]);
             }
         }
 

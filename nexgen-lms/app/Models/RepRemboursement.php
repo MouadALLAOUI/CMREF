@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\ScopedByRepresentant;
@@ -21,6 +22,7 @@ class RepRemboursement extends Model
         'banque_id',
         'cheque_number',
         'cheque_image_path',
+        'a_lordre_de_id',
         'type_versement',
         'compte',
         'montant',
@@ -29,10 +31,21 @@ class RepRemboursement extends Model
         'statut_recu',
         'statut_rejete',
         'statut_accepte',
+        'statut_retourne',
+        'date_retour',
+        'motif_retour',
         'remarks'
     ];
 
     protected $hidden = ['compte', 'created_at', 'updated_at'];
+
+    protected $casts = [
+        'statut_recu' => 'boolean',
+        'statut_rejete' => 'boolean',
+        'statut_accepte' => 'boolean',
+        'statut_retourne' => 'boolean',
+        'date_retour' => 'date',
+    ];
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -58,6 +71,11 @@ class RepRemboursement extends Model
     public function facture()
     {
         return $this->belongsTo(Fact::class, 'fact_id');
+    }
+
+    public function aLordreDe()
+    {
+        return $this->belongsTo(Imprimeur::class, 'a_lordre_de_id');
     }
 
     // Relation: Each repayment belongs to a season

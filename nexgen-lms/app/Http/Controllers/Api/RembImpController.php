@@ -12,7 +12,7 @@ class RembImpController extends Controller
 {
     public function index(Request $request)
     {
-        $rembImps = RembImp::with('imprimeur')->with('banque')->latest()->get();
+        $rembImps = RembImp::with('imprimeur')->with('banque')->with('representant')->latest()->get();
 
         return RembImpResource::collection($rembImps);
     }
@@ -21,6 +21,7 @@ class RembImpController extends Controller
     {
         $validatedData = $request->validate([
             'imprimeur_id' => 'required|uuid|exists:imprimeurs,id',
+            'rep_id' => 'nullable|uuid|exists:representants,id',
             'date_payment' => 'required|date',
             'banque_id' => 'nullable|uuid|exists:banques,id',
             'banque_nom' => 'nullable|string|max:100',
@@ -29,6 +30,9 @@ class RembImpController extends Controller
             'montant' => 'required|numeric|min:0',
             'statut_recu' => 'sometimes|boolean',
             'statut_rejete' => 'sometimes|boolean',
+            'statut_retourne' => 'sometimes|boolean',
+            'date_retour' => 'nullable|date',
+            'motif_retour' => 'nullable|string|max:500',
             'remarks' => 'nullable|string',
         ]);
 
@@ -48,6 +52,7 @@ class RembImpController extends Controller
 
         $validatedData = $request->validate([
             'imprimeur_id' => 'sometimes|uuid|exists:imprimeurs,id',
+            'rep_id' => 'nullable|uuid|exists:representants,id',
             'date_payment' => 'sometimes|date',
             'banque_id' => 'nullable|uuid|exists:banques,id',
             'banque_nom' => 'nullable|string|max:100',
@@ -56,6 +61,9 @@ class RembImpController extends Controller
             'montant' => 'sometimes|numeric|min:0',
             'statut_recu' => 'sometimes|boolean',
             'statut_rejete' => 'sometimes|boolean',
+            'statut_retourne' => 'sometimes|boolean',
+            'date_retour' => 'nullable|date',
+            'motif_retour' => 'nullable|string|max:500',
             'remarks' => 'nullable|string',
         ]);
 

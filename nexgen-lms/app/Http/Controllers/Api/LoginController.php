@@ -45,8 +45,22 @@ class LoginController extends Controller
             ]);
         }
 
-        // 4. Check if account is active
-        if (!$loginRecord->is_active) {
+        // 4. Check account access
+        // Admins: use is_active from logins table
+        // Representants: use season status from representant_season pivot
+        $accessLevel = null;
+        if ($loginRecord->role === 'representant') {
+            $representant = $loginRecord->profile;
+            if ($representant && $season) {
+                $seasonStatus = $representant->seasonStatuses()
+                    ->where('season_id', $season->id)
+                    ->first();
+                if ($seasonStatus && $seasonStatus->status === 'disabled') {
+                    return response()->json(['message' => 'Votre accès à cette saison est désactivé.'], 403);
+                }
+                $accessLevel = $seasonStatus?->status ?? 'unlock';
+            }
+        } elseif (!$loginRecord->is_active) {
             return response()->json(['message' => 'Votre compte est désactivé.'], 403);
         }
 
@@ -65,7 +79,7 @@ class LoginController extends Controller
         $token = $loginRecord->createToken('auth_token')->plainTextToken;
 
         // 7. Structure the response for your React Zustand Store
-        return response()->json([
+        $response = [
             'status' => 'success',
             'token'  => $token,
             'user'   => [
@@ -75,8 +89,14 @@ class LoginController extends Controller
             'annee' => $request->annee,
             // This is the polymorphic data (Admin table or Representant table)
             'profile' => $loginRecord->profile,
-            'reverb_trigger' => config('broadcasting.reverb_trigger')
-        ]);
+            'reverb_trigger' => config('broadcasting.reverb_trigger'),
+        ];
+
+        if ($accessLevel) {
+            $response['access_level'] = $accessLevel;
+        }
+
+        return response()->json($response);
     }
 
     /**
@@ -102,32 +122,6 @@ class LoginController extends Controller
         }
 
         return response()->json(['message' => 'User not found'], 404);
-    }
-
-    /**
-     * Active User Account
-     */
-    public function active_compte(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string',
-            'is_active' => 'required|boolean',
-        ]);
-        $loginRecord = Login::with('profile')
-            ->where('username', $request->username)
-            ->first();
-
-        if (!$loginRecord) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        $loginRecord->update(['is_active' => $request->is_active]);
-
-        if ($loginRecord->role === 'representant' && $loginRecord->profile && config('broadcasting.reverb_trigger')) {
-            event(new RepresentantUpdated($loginRecord->profile));
-        }
-
-        return response()->json(['message' => 'User account updated successfully']);
     }
 
     /**

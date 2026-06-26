@@ -33,10 +33,6 @@ class SeasonController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        if ($validated['is_active'] ?? false) {
-            Season::where('is_active', true)->update(['is_active' => false]);
-        }
-
         $season = Season::create($validated);
         Cache::forget(self::CACHE_KEY);
         return response()->json(new SeasonResource($season), 201);
@@ -61,17 +57,6 @@ class SeasonController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        if (isset($validated['is_active'])) {
-            if ($validated['is_active']) {
-                Season::where('id', '!=', $id)->where('is_active', true)->update(['is_active' => false]);
-            } else {
-                $activeCount = Season::where('is_active', true)->count();
-                if ($season->is_active && $activeCount <= 1) {
-                    return response()->json(['message' => 'Impossible de désactiver la seule saison active. Veuillez d\'abord activer une autre saison.'], 422);
-                }
-            }
-        }
-
         $season->update($validated);
         Cache::forget(self::CACHE_KEY);
         return new SeasonResource($season);
@@ -90,8 +75,8 @@ class SeasonController extends Controller
 
     public function active()
     {
-        $activeSeason = Season::getActiveSeason();
-        return new SeasonResource($activeSeason);
+        $activeSeasons = Season::getActiveSeasons();
+        return SeasonResource::collection($activeSeasons);
     }
 
     public function setActive(Request $request)
@@ -104,17 +89,7 @@ class SeasonController extends Controller
         $seasonId = $validated['season_id'];
         $nextActive = $validated['is_active'];
 
-        if ($nextActive) {
-            Season::where('id', '!=', $seasonId)->update(['is_active' => false]);
-            Season::where('id', $seasonId)->update(['is_active' => true]);
-        } else {
-            $season = Season::findOrFail($seasonId);
-            $activeCount = Season::where('is_active', true)->count();
-            if ($season->is_active && $activeCount <= 1) {
-                return response()->json(['message' => 'Impossible de désactiver la seule saison active. Veuillez d\'abord activer une autre saison.'], 422);
-            }
-            Season::where('id', $seasonId)->update(['is_active' => false]);
-        }
+        Season::where('id', $seasonId)->update(['is_active' => $nextActive]);
 
         $statusMessage = $nextActive ? 'activée' : 'désactivée';
 

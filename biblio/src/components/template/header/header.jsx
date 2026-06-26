@@ -1,17 +1,53 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { ArrowBigDown, ChevronRight, Menu, X } from "lucide-react";
 import useAppStore from "../../../store/useAppStore";
+import SeasonMultiSelect from "../../../components/ui/SeasonMultiSelect";
+import { schoolYearFormat } from "../../../lib/utilities";
+import seasonsService from "../../../api/services/seasonsService";
 import { cn } from "../../../lib/utils";
 
 export const HeaderComponent = () => {
-    const { isAdminMode, activeSeason, isApiLoading } = useAppStore();
+    const { isAdminMode, selectedSeasons, setSelectedSeasons, toggleSeason, isApiLoading } = useAppStore();
     const [openMenu, setOpenMenu] = useState(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [seasonDropdownOpen, setSeasonDropdownOpen] = useState(false);
+    const [allActiveSeasons, setAllActiveSeasons] = useState([]);
     const timeoutRef = useRef(null);
+    const seasonRef = useRef(null);
 
-    const seasonLabel = activeSeason?.label
-        ? `SAISON : ${activeSeason.label.slice(0, 2)} / ${activeSeason.label.slice(2)}`
+    // Compute season label based on selected seasons
+    const displayLabel = selectedSeasons.length > 0
+        ? selectedSeasons.length === 1
+            ? `SAISON : ${(selectedSeasons[0]?.label || "").slice(0, 2)} / ${(selectedSeasons[0]?.label || "").slice(2)}`
+            : `SAISONS (${selectedSeasons.length})`
         : "SAISON : —";
+
+    useEffect(() => {
+        if (seasonDropdownOpen && allActiveSeasons.length === 0) {
+            seasonsService.getAll().then((data) => {
+                const seasons = Array.isArray(data) ? data : [];
+                setAllActiveSeasons(seasons.filter((s) => s.is_active));
+            }).catch(() => {});
+        }
+    }, [seasonDropdownOpen, allActiveSeasons.length]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (seasonRef.current && !seasonRef.current.contains(e.target)) {
+                setSeasonDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleSelectAll = () => {
+        setSelectedSeasons(allActiveSeasons);
+    };
+
+    const handleClear = () => {
+        setSelectedSeasons([]);
+    };
 
     let menuItems =
         isAdminMode
@@ -81,7 +117,6 @@ export const HeaderComponent = () => {
                         { label: "Modèles Cahier de texte", href: "/dash/reglages/modeles_cahier_texte" },
                     ]
                 },
-                { label: seasonLabel, href: "#", isTrigger: false },
                 { label: "Déconnexion", href: "/logout", isTrigger: false, color: "text-slate-900 bg-slate-100 hover:bg-slate-900 hover:text-white" },
             ]
             : [
@@ -131,7 +166,6 @@ export const HeaderComponent = () => {
                 },
                 { label: "ROBOTS", href: "/REP/dash/robots", isTrigger: false },
                 { label: "PROFIL", href: "/REP/dash/profil", isTrigger: false },
-                { label: seasonLabel, href: "#", isTrigger: false },
                 { label: "Déconnexion", href: "/logout", isTrigger: false, color: "text-slate-900 bg-slate-100 hover:bg-slate-900 hover:text-white" },
             ];
 
@@ -201,6 +235,27 @@ export const HeaderComponent = () => {
                             )}
                         </div>
                     ))}
+                    {/* Season Selector */}
+                    <div ref={seasonRef} className="relative">
+                        <button
+                            onClick={() => setSeasonDropdownOpen((prev) => !prev)}
+                            className={`px-3 py-2 rounded-md text-xs font-bold transition-all duration-200 flex items-center gap-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900 ${selectedSeasons.length > 1 ? "bg-blue-50 text-blue-700" : ""}`}
+                        >
+                            {displayLabel}
+                            <ArrowBigDown size={14} className="fill-current" />
+                        </button>
+                        {seasonDropdownOpen && (
+                            <div className="absolute top-full right-0 mt-1 bg-white rounded-md shadow-lg border border-slate-100 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                <SeasonMultiSelect
+                                    seasons={allActiveSeasons}
+                                    selected={selectedSeasons}
+                                    onToggle={toggleSeason}
+                                    onSelectAll={handleSelectAll}
+                                    onClear={handleClear}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </nav>
             </div>
 
@@ -208,6 +263,30 @@ export const HeaderComponent = () => {
             {isMobileMenuOpen && (
                 <nav className="lg:hidden border-t border-slate-100 bg-white rounded-b-lg overflow-hidden">
                     <div className="px-2 pt-2 pb-3 space-y-1">
+                        <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                            <p className="text-xs font-bold text-slate-500 mb-2">Saisons actives</p>
+                            <div className="flex flex-wrap gap-1">
+                                {allActiveSeasons.map((s) => {
+                                    const isSelected = selectedSeasons.some((sel) => sel.id === s.id);
+                                    return (
+                                        <button
+                                            key={s.id}
+                                            onClick={() => toggleSeason(s)}
+                                            className={`text-xs font-semibold px-2 py-1 rounded-full border transition-colors ${
+                                                isSelected
+                                                    ? "bg-blue-600 text-white border-blue-600"
+                                                    : "bg-white text-slate-600 border-slate-200"
+                                            }`}
+                                        >
+                                            {s.label?.length === 4 ? schoolYearFormat(s.label) : s.label || s.name}
+                                        </button>
+                                    );
+                                })}
+                                {allActiveSeasons.length === 0 && (
+                                    <span className="text-xs text-slate-400 italic">Aucune</span>
+                                )}
+                            </div>
+                        </div>
                         <MobileMenu items={menuItems} />
                     </div>
                 </nav>

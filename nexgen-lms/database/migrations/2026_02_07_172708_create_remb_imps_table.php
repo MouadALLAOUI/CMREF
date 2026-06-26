@@ -20,9 +20,14 @@ return new class extends Migration
             $table->foreignUuid('banque_id')->nullable()->constrained('banques')->nullOnDelete(); //
             $table->string('cheque_number', 50)->nullable(); // Renamed from n_cheque
             $table->string('cheque_image_path')->nullable(); // Digital proof of payment
+            $table->foreignUuid('rep_id')->nullable()->index();
+            $table->foreign('rep_id')->references('id')->on('representants')->nullOnDelete();
             $table->decimal('montant', 15, 2); // Precise financial type
             $table->boolean('statut_recu')->default(false); //
             $table->boolean('statut_rejete')->default(false); //
+            $table->boolean('statut_retourne')->default(false);
+            $table->date('date_retour')->nullable();
+            $table->string('motif_retour', 500)->nullable();
             $table->text('remarks')->nullable(); // Standardized from legacy 'ann'
             $table->timestamps();
         });

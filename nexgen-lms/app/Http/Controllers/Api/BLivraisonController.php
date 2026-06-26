@@ -59,7 +59,7 @@ class BLivraisonController extends Controller
 
     public function show($id)
     {
-        $bLivraison = BLivraison::findOrFail($id);
+        $bLivraison = BLivraison::with(['representant', 'items.livre'])->findOrFail($id);
         return new BLivraisonResource($bLivraison);
     }
 

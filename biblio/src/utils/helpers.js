@@ -3,7 +3,7 @@
  * Centralizes repeated logic across components
  */
 
-import { currencyFormat, dateFormat } from '../lib/utilities';
+import { currencyFormat } from '../lib/utilities';
 import { toast } from "react-hot-toast";
 
 export const getApiBaseUrl = () => process.env.REACT_APP_API_URL || "";

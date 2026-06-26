@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
@@ -51,7 +51,7 @@ const SyntheseTracabilitePage = () => {
     const [pdfOpen, setPdfOpen] = useState(false);
     const printRef = useRef(null);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
             const seasonParams = activeSeason?.label ? { annee: activeSeason.label } : {};
@@ -135,11 +135,11 @@ const SyntheseTracabilitePage = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [activeSeason?.label]);
 
     useEffect(() => {
         fetchData();
-    }, [activeSeason?.label]);
+    }, [fetchData]);
 
     const filteredRows = useMemo(() => {
         if (selectedRep === "all") return rows;

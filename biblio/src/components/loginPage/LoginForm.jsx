@@ -39,7 +39,7 @@ function LoginForm({ onLogIn, error }) {
                 setFormData(prev => ({ ...prev, annee: active.name }));
             }
         }
-    }, [seasons]);
+    }, [seasons, formData.annee]);
 
     const seasonFlat = seasons.flatMap(season =>
         season.is_active

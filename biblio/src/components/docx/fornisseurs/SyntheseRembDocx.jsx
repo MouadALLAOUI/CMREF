@@ -1,5 +1,5 @@
+const { currencyFormat, schoolYearFormat } = require("../../../lib/utilities");
 const { Document, Paragraph, Table, TableRow, TableCell, TextRun, WidthType, AlignmentType, BorderStyle } = require("docx");
-import { currencyFormat, schoolYearFormat } from "../../../lib/utilities";
 
 const border = {
   style: BorderStyle.SINGLE, size: 1, color: "999999",

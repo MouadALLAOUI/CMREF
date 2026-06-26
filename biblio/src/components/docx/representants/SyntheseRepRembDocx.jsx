@@ -1,4 +1,4 @@
-import { Document, Paragraph, Table, TableRow, TableCell, TextRun, WidthType, AlignmentType, BorderStyle } from "docx";
+const { Document, Paragraph, Table, TableRow, TableCell, TextRun, WidthType, AlignmentType, BorderStyle } = require("docx");
 import { currencyFormat } from "../../../lib/utilities";
 
 const border = {

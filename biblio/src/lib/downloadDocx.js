@@ -1,4 +1,4 @@
-import { Packer } from "docx";
+const { Packer } = require("docx");
 
 export const downloadDocx = async (doc, filename) => {
   const blob = await Packer.toBlob(doc);

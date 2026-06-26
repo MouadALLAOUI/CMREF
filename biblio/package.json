@@ -35,6 +35,7 @@
 		"zustand": "^5.0.12"
 	},
 	"scripts": {
+		"postinstall": "node scripts/patch-docx.mjs",
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",

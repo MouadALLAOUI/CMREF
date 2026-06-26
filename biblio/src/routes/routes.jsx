@@ -73,7 +73,6 @@ import RepCartesCommanderPage from "../pages/REP/cartes_visite/RepCartesCommande
 import RepCartesSuiviPage from "../pages/REP/cartes_visite/RepCartesSuiviPage";
 import RepProfilPage from "../pages/REP/profil/RepProfilPage";
 import { useEffect, useRef } from "react";
-import seasonsService from "../api/services/seasonsService";
 
 
 export const AppRoutes = () => {

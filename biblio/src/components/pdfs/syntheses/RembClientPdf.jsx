@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Text, View, StyleSheet } from '@react-pdf/renderer';
 import PdfPageLayout from '../../template/pdfs/PdfPageLayout';
-import { currencyFormat, schoolYearFormat } from '../../../lib/utilities';
+import { currencyFormat } from '../../../lib/utilities';
 
 const styles = StyleSheet.create({
   title: { fontSize: 16, marginBottom: 8, textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase' },

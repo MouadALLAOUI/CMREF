@@ -16,6 +16,7 @@ class RembImp extends Model
     protected $fillable = [
         'season_id',
         'imprimeur_id',
+        'rep_id',
         'date_payment',
         'banque_id',
         'banque_nom',
@@ -24,6 +25,9 @@ class RembImp extends Model
         'montant',
         'statut_recu',
         'statut_rejete',
+        'statut_retourne',
+        'date_retour',
+        'motif_retour',
         'remarks',
     ];
 
@@ -32,7 +36,9 @@ class RembImp extends Model
     protected $casts = [
         'statut_recu' => 'boolean',
         'statut_rejete' => 'boolean',
+        'statut_retourne' => 'boolean',
         'date_payment' => 'date',
+        'date_retour' => 'date',
         'montant' => 'float',
     ];
 
@@ -59,5 +65,10 @@ class RembImp extends Model
     public function banque()
     {
         return $this->belongsTo(Banque::class, 'banque_id');
+    }
+
+    public function representant()
+    {
+        return $this->belongsTo(Representant::class, 'rep_id');
     }
 }

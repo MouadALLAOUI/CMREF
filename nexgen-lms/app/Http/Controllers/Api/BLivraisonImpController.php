@@ -52,7 +52,7 @@ class BLivraisonImpController extends Controller
 
     public function show($id)
     {
-        $bLivraisonImp = BLivraisonImp::findOrFail($id);
+        $bLivraisonImp = BLivraisonImp::with(['imprimeur', 'items.livre'])->findOrFail($id);
         return new BLivraisonImpResource($bLivraisonImp);
     }
 

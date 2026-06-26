@@ -4,10 +4,12 @@ import { Button } from "../../../components/ui/button";
 import toast from "react-hot-toast";
 import logger from "../../../lib/logger";
 import { MyTable } from "../../../components/ui/myTable";
-import { Printer, Download, TrendingDown, Users, Wallet, CreditCard } from "lucide-react";
+import { Printer, Download, TrendingDown, Users, Wallet, CreditCard, FileText } from "lucide-react";
 import repRemboursementService from "../../../api/services/repRemboursementService";
 import representantService from "../../../api/services/representantService";
 import { formatMoney, calculateFinancialSummary } from "../../../utils/helpers";
+import { SyntheseRepRembDocx } from "../../../components/docx/representants/SyntheseRepRembDocx";
+import { downloadDocx } from "../../../lib/downloadDocx";
 
 const fetchAllPaginated = async (serviceGetAll, params = {}) => {
     const first = await serviceGetAll({ ...params, page: 1 });
@@ -116,6 +118,16 @@ const SyntheseRemboursementPage = () => {
                     
                 </div>
                 <div className="flex gap-2">
+                    <Button
+                        onClick={() => downloadDocx(
+                            SyntheseRepRembDocx({ data: rows, kpis }),
+                            `synthese_remb_reps_${activeSeason?.label || "all"}.docx`
+                        )}
+                        variant="outline"
+                        className="flex items-center gap-2"
+                    >
+                        <FileText size={16} /> DOCX
+                    </Button>
                     <Button variant="outline" className="flex items-center gap-2">
                         <Download size={16} /> Exporter
                     </Button>

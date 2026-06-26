@@ -14,6 +14,8 @@ const useAppStore = create(
             token: null,
             school_annee: null,
             activeSeason: null,
+            selectedSeasons: [],
+            accessLevel: null,
             lastLoginTime: null,
             isAdminMode: false,
             loading: true,
@@ -23,7 +25,22 @@ const useAppStore = create(
 
             setLoading: (loading) => set({ loading }),
             setAdminMode: (value) => set({ isAdminMode: !!value }),
-            setActiveSeason: (season) => set({ activeSeason: normalizeSeason(season) }),
+            setActiveSeason: (season) => {
+                const normalized = normalizeSeason(season);
+                set({ activeSeason: normalized, selectedSeasons: normalized ? [normalized] : [] });
+            },
+
+            setSelectedSeasons: (seasons) => set({ selectedSeasons: seasons }),
+
+            toggleSeason: (season) => set((state) => {
+                const normalized = normalizeSeason(season);
+                if (!normalized) return state;
+                const exists = state.selectedSeasons.find(s => s.id === normalized.id);
+                if (exists) {
+                    return { selectedSeasons: state.selectedSeasons.filter(s => s.id !== normalized.id) };
+                }
+                return { selectedSeasons: [...state.selectedSeasons, normalized] };
+            }),
 
             login: (userData) => {
                 const activeSeason = normalizeSeason(
@@ -39,6 +56,8 @@ const useAppStore = create(
                     token: userData.token,
                     school_annee: userData.annee || activeSeason?.label || null,
                     activeSeason,
+                    accessLevel: userData.access_level || null,
+                    selectedSeasons: activeSeason ? [activeSeason] : [],
                     isAdminMode: userData.role === 'admin',
                     lastLoginTime: Date.now(),
                     reverbTrigger: userData.reverb_trigger !== undefined ? !!userData.reverb_trigger : false,
@@ -51,15 +70,20 @@ const useAppStore = create(
             loadActiveSeason: async () => {
                 if (get().hasCheckedActiveSeason) return null;
                 try {
-                    // const response = await api.get('/seasons/active');
                     const response = await seasonsService.isActive();
                     logger({ "Active Season Response": response }, "info")();
                     // Handle both wrapped { data: {...} } and direct object responses
-                    const season = response?.data || response;
-                    const normalized = normalizeSeason(season);
-                    if (normalized) {
-                        set({ activeSeason: normalized });
-                        return normalized;
+                    let seasons = response?.data || response;
+                    if (!Array.isArray(seasons)) {
+                        seasons = seasons ? [seasons] : [];
+                    }
+                    const normalized = seasons.map(normalizeSeason).filter(Boolean);
+                    if (normalized.length > 0) {
+                        set({
+                            activeSeason: normalized[0],
+                            selectedSeasons: normalized,
+                        });
+                        return normalized[0];
                     }
                 } catch (error) {
                     // 404 or other error — skip silently, pages show empty-state
@@ -78,6 +102,8 @@ const useAppStore = create(
                     token: null,
                     school_annee: null, // 👈 Clear it out on logout
                     activeSeason: null,
+                    selectedSeasons: [],
+                    accessLevel: null,
                     lastLoginTime: null,
                     isAdminMode: false,
                     loading: false,
@@ -151,6 +177,8 @@ const useAppStore = create(
                 token: state.token,
                 school_annee: state.school_annee,
                 activeSeason: state.activeSeason,
+                selectedSeasons: state.selectedSeasons,
+                accessLevel: state.accessLevel,
                 isAdminMode: state.isAdminMode,
                 services: state.services,
                 lastLoginTime: state.lastLoginTime,

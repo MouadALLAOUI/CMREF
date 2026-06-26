@@ -65,4 +65,16 @@ class Representant extends Authenticatable
     {
         return $this->hasMany(Robot::class, 'rep_id');
     }
+
+    public function seasons()
+    {
+        return $this->belongsToMany(Season::class, 'representant_season')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
+    public function seasonStatuses()
+    {
+        return $this->hasMany(RepresentantSeason::class);
+    }
 }

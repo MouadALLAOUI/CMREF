@@ -30,9 +30,9 @@ class Season extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public static function getActiveSeason()
+    public static function getActiveSeasons()
     {
-        return static::where('is_active', true)->first();
+        return static::where('is_active', true)->get();
     }
 
     public function bLivraisons()
@@ -48,5 +48,12 @@ class Season extends Model
     public function factures()
     {
         return $this->hasMany(Fact::class);
+    }
+
+    public function representants()
+    {
+        return $this->belongsToMany(Representant::class, 'representant_season')
+            ->withPivot('status')
+            ->withTimestamps();
     }
 }

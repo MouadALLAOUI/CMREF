@@ -26,7 +26,12 @@ function FournisseurSaisirBl() {
 
     const [selectedBlItems, setSelectedBlItems] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [dialogMode, setDialogMode] = useState("add");
+    const [editBlId, setEditBlId] = useState(null);
     const [itemQte, setItemQte] = useState(0);
+    const [addItemLivreId, setAddItemLivreId] = useState("");
+    const [addItemQte, setAddItemQte] = useState(1);
+    const [isAddItemOpen, setIsAddItemOpen] = useState(false);
 
     const [formData, setFormData] = useState({
         imprimeur_id: "",
@@ -157,8 +162,23 @@ function FournisseurSaisirBl() {
     };
 
     const handleAction = async (type, row) => {
-        if (type === "view") {
+        if (type === "edit") {
+            setDialogMode("update");
+            setEditBlId(row.id);
+            setFormData({
+                imprimeur_id: row.imprimeur_id || row.imprimeur?.id || "",
+                date_reception: row.date_reception || "",
+                b_livraison_number: row.b_livraison_number || "",
+                quantite: "",
+                livre_id: "",
+                remarks: row.remarks || "",
+                season_id: activeSeason?.id || "",
+                details: [],
+            });
+            setIsDialogOpen(true);
+        } else if (type === "view") {
             setSelectedBlItems({
+                id: row.id,
                 number: row.b_livraison_number,
                 imprimeur: row.imprimeur?.raison_sociale,
                 date: row.date_reception,
@@ -177,12 +197,21 @@ function FournisseurSaisirBl() {
     };
 
     const handleSubmit = async () => {
-        if (formData.details.length === 0) {
+        if (dialogMode === "add" && formData.details.length === 0) {
             return toast.error("Veuillez ajouter au moins un livre");
         }
         try {
-            await bLivraisonImpService.create({ ...formData, type: 'imp' });
-            toast.success("BL enregistré avec succès");
+            if (dialogMode === "add") {
+                await bLivraisonImpService.create({ ...formData, type: 'imp' });
+                toast.success("BL enregistré avec succès");
+            } else if (dialogMode === "update" && editBlId) {
+                await bLivraisonImpService.update(editBlId, {
+                    date_reception: formData.date_reception,
+                    b_livraison_number: formData.b_livraison_number,
+                    remarks: formData.remarks,
+                });
+                toast.success("BL mis à jour avec succès");
+            }
             setIsDialogOpen(false);
             resetForm();
             fetchData();
@@ -202,6 +231,8 @@ function FournisseurSaisirBl() {
             season_id: activeSeason?.id || "",
             details: [],
         });
+        setEditBlId(null);
+        setDialogMode("add");
     }
 
     const booksByLevel = {};
@@ -263,20 +294,89 @@ function FournisseurSaisirBl() {
         }
     ], [formData, imprimeurs, booksByLevel]);
 
+    useEffect(() => {
+        if (!isDialogOpen) resetForm();
+    }, [isDialogOpen]);
+
+    const blEditSchema = useMemo(() => [
+        {
+            name: "date_reception",
+            label: "Date",
+            inputType: "date",
+            type: "date",
+            value: formData.date_reception,
+            onChange: (v) => setFormData({ ...formData, date_reception: v })
+        },
+        {
+            name: "b_livraison_number",
+            label: "N° BL",
+            placeholder: "Ex: BL-2024-001",
+            value: formData.b_livraison_number,
+            onChange: (v) => setFormData({ ...formData, b_livraison_number: v })
+        },
+        {
+            name: "remarks",
+            label: "Remarques",
+            placeholder: "Remarques éventuelles",
+            inputType: "textarea",
+            value: formData.remarks,
+            onChange: (v) => setFormData({ ...formData, remarks: v })
+        },
+    ], [formData]);
+
+    const handleAddItem = async () => {
+        if (!addItemLivreId || !addItemQte) {
+            toast.error("Veuillez sélectionner un livre et saisir une quantité");
+            return;
+        }
+        if (!selectedBlItems?.id) {
+            toast.error("BL introuvable");
+            return;
+        }
+        try {
+            await bLivraisonItemService.create({
+                bl_id: selectedBlItems.id,
+                type: "imp",
+                livre_id: addItemLivreId,
+                quantite: addItemQte,
+            });
+            toast.success("Livre ajouté au BL");
+            setIsAddItemOpen(false);
+            setAddItemLivreId("");
+            setAddItemQte(1);
+            const updatedBl = await bLivraisonImpService.getById(selectedBlItems.id);
+            const bl = updatedBl?.data || updatedBl;
+            setSelectedBlItems(prev => ({
+                ...prev,
+                items: bl?.items || prev.items
+            }));
+            fetchData();
+        } catch (error) {
+            toast.error("Erreur lors de l'ajout du livre");
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Liste des BL (Fournisseur &rarr; MSM-MEDIAS)</h1>
                 <UniversalDialog
-                    schema={schema}
-                    config={{ title: "Saisie de Bon de Livraison" }}
+                    schema={dialogMode === "update" ? blEditSchema : schema}
+                    config={{
+                        title: dialogMode === "add" ? "Saisie de Bon de Livraison" : "Modifier le BL",
+                        subtitle: dialogMode === "update" ? "Mettre à jour les informations du BL." : undefined,
+                        submitLabel: dialogMode === "add" ? "Créer" : "Enregistrer",
+                    }}
                     trigger={
-                        <Button className="bg-slate-900 hover:bg-black text-white px-6 h-11 rounded-xl font-bold shadow-lg shadow-slate-100 transition-all hover:scale-[1.02]">
+                        <Button
+                            onClick={() => { setDialogMode("add"); resetForm(); }}
+                            className="bg-slate-900 hover:bg-black text-white px-6 h-11 rounded-xl font-bold shadow-lg shadow-slate-100 transition-all hover:scale-[1.02]"
+                        >
                             + Saisir un nouveau BL
                         </Button>
                     }
                     onSubmit={handleSubmit}
-                    grid={3}
+                    grid={dialogMode === "add" ? 3 : 2}
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                 />
@@ -293,7 +393,7 @@ function FournisseurSaisirBl() {
                     data={blData}
                     variant="slate"
                     pageSize={10}
-                    actions={["view", "delete"]}
+                    actions={["view", "edit", "delete"]}
                     onAction={handleAction}
                     isLoading={isLoading}
                     columns={columns}
@@ -312,17 +412,40 @@ function FournisseurSaisirBl() {
                                     {selectedBlItems.imprimeur} — {selectedBlItems.date}
                                 </p>
                             </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSelectedBlItems(null)}
-                                className="text-slate-400 hover:text-slate-900"
-                            >
-                                Fermer les détails
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        const bl = blData.find(b => b.b_livraison_number === selectedBlItems.number);
+                                        if (bl) handleAction("edit", bl);
+                                    }}
+                                    className="text-slate-600 hover:text-slate-900"
+                                >
+                                    Modifier le BL
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSelectedBlItems(null)}
+                                    className="text-slate-400 hover:text-slate-900"
+                                >
+                                    Fermer les détails
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                            <div className="flex items-center justify-between px-4 pt-4">
+                                <h3 className="text-sm font-bold text-slate-700 uppercase">Articles</h3>
+                                <Button
+                                    size="sm"
+                                    onClick={() => setIsAddItemOpen(true)}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold"
+                                >
+                                    + Ajouter un livre
+                                </Button>
+                            </div>
                             <MyTable
                                 data={selectedBlItems.items}
                                 variant="blue"
@@ -338,6 +461,54 @@ function FournisseurSaisirBl() {
                                 ]}
                                 actionsDetaille={actionsSubDetaille}
                             />
+                        </div>
+                    </div>
+                )}
+
+                {isAddItemOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setIsAddItemOpen(false)}>
+                        <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+                            <h3 className="text-lg font-bold text-slate-900 mb-4">Ajouter un livre au BL</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-1">Livre</label>
+                                    <select
+                                        value={addItemLivreId}
+                                        onChange={(e) => setAddItemLivreId(e.target.value)}
+                                        className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option value="">Sélectionner un livre</option>
+                                        {livres.map((liv) => (
+                                            <option key={liv.id} value={liv.id}>{liv.titre}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-1">Quantité</label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={addItemQte}
+                                        onChange={(e) => setAddItemQte(parseInt(e.target.value) || 1)}
+                                        className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+                                <div className="flex gap-3 justify-end pt-2">
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => setIsAddItemOpen(false)}
+                                        className="text-slate-600"
+                                    >
+                                        Annuler
+                                    </Button>
+                                    <Button
+                                        onClick={handleAddItem}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                                    >
+                                        Ajouter
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}

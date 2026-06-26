@@ -15,7 +15,7 @@ class RepresentantController extends Controller
 {
     public function index(Request $request)
     {
-        $representants = Representant::with(["loginRecord"])->latest()->get();
+        $representants = Representant::with(["loginRecord", "seasonStatuses.season"])->latest()->get();
         return RepresentantResource::collection($representants);
     }
 

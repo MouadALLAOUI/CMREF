@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
 import { MyTable } from "../../../components/ui/myTable";
@@ -39,7 +38,12 @@ function ReprésentantSaisirBl() {
     });
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [dialogMode, setDialogMode] = useState("add");
+    const [editBlId, setEditBlId] = useState(null);
     const [itemQte, setItemQte] = useState(0);
+    const [addItemLivreId, setAddItemLivreId] = useState("");
+    const [addItemQte, setAddItemQte] = useState(1);
+    const [isAddItemOpen, setIsAddItemOpen] = useState(false);
 
     const actionsDetaille = {
         delete: {
@@ -138,8 +142,25 @@ function ReprésentantSaisirBl() {
     };
 
     const handleAction = async (type, row) => {
-        if (type === "view") {
+        if (type === "edit") {
+            setDialogMode("update");
+            setEditBlId(row.id);
+            setFormData({
+                rep_id: row.rep_id || row.representant?.id || "",
+                bl_number: row.bl_number || "",
+                date_emission: row.date_emission || "",
+                mode_envoi: row.mode_envoi || "",
+                type: row.type || "",
+                statut_recu: !!row.statut_recu,
+                statut_vu: !!row.statut_vu,
+                status: row.status || "",
+                annee: row.annee || activeSeason?.label || "",
+                details: []
+            });
+            setIsDialogOpen(true);
+        } else if (type === "view") {
             setSelectedBlItems({
+                id: row.id,
                 representant: row.representant?.nom,
                 number: row.bl_number,
                 date: row.date_emission,
@@ -172,8 +193,18 @@ function ReprésentantSaisirBl() {
 
     const handleSubmit = async () => {
         try {
-            await bLivraisonService.create(formData);
-            toast.success("BL enregistré avec succès");
+            if (dialogMode === "add") {
+                await bLivraisonService.create(formData);
+                toast.success("BL enregistré avec succès");
+            } else if (dialogMode === "update" && editBlId) {
+                await bLivraisonService.update(editBlId, {
+                    date_emission: formData.date_emission,
+                    type: formData.type,
+                    bl_number: formData.bl_number,
+                    mode_envoi: formData.mode_envoi,
+                });
+                toast.success("BL mis à jour avec succès");
+            }
             setIsDialogOpen(false);
             resetForm();
             fetchData();
@@ -194,6 +225,8 @@ function ReprésentantSaisirBl() {
             annee: activeSeason?.label || "",
             details: []
         });
+        setEditBlId(null);
+        setDialogMode("add");
     }
 
     const BOOKS_BY_LEVEL = {};
@@ -314,20 +347,103 @@ function ReprésentantSaisirBl() {
         }
     ], [formData, representants, BOOKS_BY_LEVEL]);
 
+    useEffect(() => {
+        if (!isDialogOpen) resetForm();
+    }, [isDialogOpen]);
+
+    const blEditSchema = useMemo(() => [
+        {
+            name: "date_emission",
+            label: "Date d'émission",
+            type: "date",
+            required: true,
+            value: formData.date_emission,
+            onChange: (v) => setFormData(prev => ({ ...prev, date_emission: v }))
+        },
+        {
+            name: "type",
+            label: "Type",
+            placeholder: "Type de BL",
+            inputType: "select",
+            items: [
+                { label: "Livre", value: "Livre" },
+                { label: "Spécimen", value: "Specimen" },
+                { label: "Retour", value: "Retour" },
+                { label: "Pédagogie", value: "Pedagogie" },
+            ],
+            value: formData.type,
+            onChange: (v) => setFormData(prev => ({ ...prev, type: v }))
+        },
+        {
+            name: "bl_number",
+            label: "N° BL",
+            placeholder: "Ex: BL-123456",
+            required: true,
+            value: formData.bl_number,
+            onChange: (v) => setFormData(prev => ({ ...prev, bl_number: v }))
+        },
+        {
+            name: "mode_envoi",
+            label: "Mode d'envoi",
+            placeholder: "Ex: Transporteur, Main propre",
+            value: formData.mode_envoi,
+            onChange: (v) => setFormData(prev => ({ ...prev, mode_envoi: v }))
+        },
+    ], [formData]);
+
+    const handleAddItem = async () => {
+        if (!addItemLivreId || !addItemQte) {
+            toast.error("Veuillez sélectionner un livre et saisir une quantité");
+            return;
+        }
+        if (!selectedBlItems?.id) {
+            toast.error("BL introuvable");
+            return;
+        }
+        try {
+            await bLivraisonItemService.create({
+                bl_id: selectedBlItems.id,
+                type: "rep",
+                livre_id: addItemLivreId,
+                quantite: addItemQte,
+            });
+            toast.success("Livre ajouté au BL");
+            setIsAddItemOpen(false);
+            setAddItemLivreId("");
+            setAddItemQte(1);
+            const updatedBl = await bLivraisonService.getById(selectedBlItems.id);
+            const bl = updatedBl?.data || updatedBl;
+            setSelectedBlItems(prev => ({
+                ...prev,
+                items: bl?.items || prev.items
+            }));
+            fetchData();
+        } catch (error) {
+            toast.error("Erreur lors de l'ajout du livre");
+        }
+    };
+
     return (
         <div className="p-4">
             <div className="flex items-center justify-between mb-4">
                 <h1 className="text-xl font-bold">Liste des BLs (Représentant)</h1>
                 <UniversalDialog
-                    schema={schema}
-                    config={{ title: "Ajouter un BL (MSM-MEDIAS -- Représentant)" }}
+                    schema={dialogMode === "update" ? blEditSchema : schema}
+                    config={{
+                        title: dialogMode === "add" ? "Ajouter un BL (MSM-MEDIAS -- Représentant)" : "Modifier le BL",
+                        subtitle: dialogMode === "update" ? "Mettre à jour les informations du BL." : undefined,
+                        submitLabel: dialogMode === "add" ? "Créer" : "Enregistrer",
+                    }}
                     trigger={
-                        <Button className="bg-slate-900 hover:bg-black text-white px-6 h-11 rounded-xl font-bold shadow-lg shadow-slate-100 transition-all hover:scale-[1.02]">
+                        <Button
+                            onClick={() => { setDialogMode("add"); resetForm(); }}
+                            className="bg-slate-900 hover:bg-black text-white px-6 h-11 rounded-xl font-bold shadow-lg shadow-slate-100 transition-all hover:scale-[1.02]"
+                        >
                             + Saisir un nouveau BL
                         </Button>
                     }
                     onSubmit={handleSubmit}
-                    grid={3}
+                    grid={dialogMode === "add" ? 3 : 2}
                     open={isDialogOpen}
                     onOpenChange={setIsDialogOpen}
                 />
@@ -352,7 +468,7 @@ function ReprésentantSaisirBl() {
                 data={filteredBlData}
                 variant="blue"
                 pageSize={4}
-                actions={["view", "imp"]}
+                actions={["view", "edit", "imp"]}
                 onAction={handleAction}
                 columns={columns}
                 isLoading={isLoading}
@@ -378,17 +494,40 @@ function ReprésentantSaisirBl() {
                                 {selectedBlItems.representant} — {selectedBlItems.date}
                             </p>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedBlItems(null)}
-                            className="text-slate-400 hover:text-slate-900"
-                        >
-                            Fermer les détails
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    const bl = blData.find(b => b.bl_number === selectedBlItems.number);
+                                    if (bl) handleAction("edit", bl);
+                                }}
+                                className="text-slate-600 hover:text-slate-900"
+                            >
+                                Modifier le BL
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSelectedBlItems(null)}
+                                className="text-slate-400 hover:text-slate-900"
+                            >
+                                Fermer les détails
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                        <div className="flex items-center justify-between px-4 pt-4">
+                            <h3 className="text-sm font-bold text-slate-700 uppercase">Articles</h3>
+                            <Button
+                                size="sm"
+                                onClick={() => setIsAddItemOpen(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold"
+                            >
+                                + Ajouter un livre
+                            </Button>
+                        </div>
                         <MyTable
                             data={selectedBlItems.items}
                             variant="slate"
@@ -404,6 +543,54 @@ function ReprésentantSaisirBl() {
                             isLoading={isLoading}
                             enableSearch enableSorting
                         />
+                    </div>
+                </div>
+            )}
+
+            {isAddItemOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setIsAddItemOpen(false)}>
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-lg font-bold text-slate-900 mb-4">Ajouter un livre au BL</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1">Livre</label>
+                                <select
+                                    value={addItemLivreId}
+                                    onChange={(e) => setAddItemLivreId(e.target.value)}
+                                    className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="">Sélectionner un livre</option>
+                                    {livres.map((liv) => (
+                                        <option key={liv.id} value={liv.id}>{liv.titre}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-1">Quantité</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={addItemQte}
+                                    onChange={(e) => setAddItemQte(parseInt(e.target.value) || 1)}
+                                    className="w-full h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+                            <div className="flex gap-3 justify-end pt-2">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => setIsAddItemOpen(false)}
+                                    className="text-slate-600"
+                                >
+                                    Annuler
+                                </Button>
+                                <Button
+                                    onClick={handleAddItem}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                                >
+                                    Ajouter
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

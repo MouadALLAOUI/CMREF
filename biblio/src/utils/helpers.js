@@ -21,7 +21,7 @@ export const normalizeSeason = (season) => {
     return { id: season.season_id, ...season };
   }
   if (season.id !== undefined) {
-    return season;
+    return season.label ? season : { ...season, label: season.name || season.id };
   }
   return null;
 };

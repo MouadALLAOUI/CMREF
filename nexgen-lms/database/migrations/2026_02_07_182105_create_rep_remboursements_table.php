@@ -22,6 +22,8 @@ return new class extends Migration
             $table->foreignUuid('banque_id')->nullable()->constrained('banques')->nullOnDelete();
             $table->string('cheque_number', 50)->nullable();
             $table->string('cheque_image_path')->nullable(); // New column for the image path
+            $table->foreignUuid('a_lordre_de_id')->nullable()->index();
+            $table->foreign('a_lordre_de_id')->references('id')->on('imprimeurs')->nullOnDelete();
             $table->string('type_versement')->default('Versement');
             $table->string('compte')->nullable();
             $table->decimal('montant', 15, 2);
@@ -30,6 +32,9 @@ return new class extends Migration
             $table->boolean('statut_recu')->default(false);
             $table->boolean('statut_rejete')->default(false);
             $table->boolean('statut_accepte')->default(false);
+            $table->boolean('statut_retourne')->default(false);
+            $table->date('date_retour')->nullable();
+            $table->string('motif_retour', 500)->nullable();
 
             $table->text('remarks')->nullable();
             $table->timestamps();

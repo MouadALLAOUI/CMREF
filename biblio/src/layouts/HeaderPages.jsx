@@ -12,7 +12,7 @@ import {
 
 const HeaderPages = ({ role }) => {
     const location = useLocation();
-    const { activeSeason, loading } = useAppStore();
+    const { selectedSeasons, loading } = useAppStore();
 
     // Split the pathname and filter out empty strings
     const pathnames = location.pathname.split("/").filter((x) => x);
@@ -21,7 +21,7 @@ const HeaderPages = ({ role }) => {
         <div className="min-h-screen flex flex-col bg-slate-50/50">
             <HeaderComponent />
             <div className="relative flex-1 m-5 mx-auto bg-white rounded-xl shadow-sm border border-slate-100 p-8 max-w-[97%] min-w-[95%]">
-                {!loading && !activeSeason && (
+                {!loading && selectedSeasons?.length === 0 && (
                     <div className="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl flex items-center justify-between shadow-sm animate-pulse">
                         <div className="flex items-center gap-3">
                             <span className="text-xl">⚠️</span>

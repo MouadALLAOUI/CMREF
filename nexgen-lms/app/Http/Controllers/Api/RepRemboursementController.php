@@ -12,7 +12,7 @@ class RepRemboursementController extends Controller
 {
     public function index(Request $request)
     {
-        $repRemboursements = RepRemboursement::with(['representant', 'banque', 'facture'])->latest()->get();
+        $repRemboursements = RepRemboursement::with(['representant', 'banque', 'facture', 'aLordreDe'])->latest()->get();
         return RepRemboursementResource::collection($repRemboursements);
     }
 
@@ -25,6 +25,7 @@ class RepRemboursementController extends Controller
             'banque_id' => 'nullable|uuid|exists:banques,id',
             'cheque_number' => 'nullable|string|max:50',
             'cheque_image_path' => 'nullable|string',
+            'a_lordre_de_id' => 'nullable|uuid|exists:imprimeurs,id',
             'type_versement' => 'required|in:En main propre,Virement,Versement',
             'compte' => 'nullable|string',
             'montant' => 'required|numeric|min:0',
@@ -33,6 +34,9 @@ class RepRemboursementController extends Controller
             'statut_recu' => 'sometimes|boolean',
             'statut_rejete' => 'sometimes|boolean',
             'statut_accepte' => 'sometimes|boolean',
+            'statut_retourne' => 'sometimes|boolean',
+            'date_retour' => 'nullable|date',
+            'motif_retour' => 'nullable|string|max:500',
             'remarks' => 'nullable|string',
         ]);
 
@@ -57,6 +61,7 @@ class RepRemboursementController extends Controller
             'banque_id' => 'nullable|uuid|exists:banques,id',
             'cheque_number' => 'nullable|string|max:50',
             'cheque_image_path' => 'nullable|string',
+            'a_lordre_de_id' => 'nullable|uuid|exists:imprimeurs,id',
             'type_versement' => 'sometimes|in:En main propre,Virement,Versement',
             'compte' => 'nullable|string',
             'montant' => 'sometimes|numeric|min:0',
@@ -65,6 +70,9 @@ class RepRemboursementController extends Controller
             'statut_recu' => 'sometimes|boolean',
             'statut_rejete' => 'sometimes|boolean',
             'statut_accepte' => 'sometimes|boolean',
+            'statut_retourne' => 'sometimes|boolean',
+            'date_retour' => 'nullable|date',
+            'motif_retour' => 'nullable|string|max:500',
             'remarks' => 'nullable|string',
         ]);
 

@@ -122,7 +122,16 @@ function RepRembBLPage() {
                     : <AlertCircle size={18} className="text-slate-400" />
                 }
             </button>
-        )}
+        )},
+        { header: "Retourné", accessor: "statut_retourne", cell: ({ row }) => (
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                row.original.statut_retourne
+                    ? "bg-orange-100 text-orange-700"
+                    : "bg-slate-100 text-slate-400"
+            }`}>
+                {row.original.statut_retourne ? "Retourné" : "—"}
+            </span>
+        )},
     ];
 
     const totalMontant = useMemo(() =>

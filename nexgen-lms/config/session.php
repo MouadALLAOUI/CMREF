@@ -199,7 +199,7 @@ return [
     |
     */
 
-    'same_site' => env('SESSION_SAMESITE_COOKIE', 'lax'),
+    'same_site' => env('SESSION_SAMESITE_COOKIE', 'none'),
 
     /*
     |--------------------------------------------------------------------------

@@ -51,77 +51,70 @@ class DatabaseSeeder extends Seeder
             LivreSeeder::class,
         ]);
 
-        // 2. Parent Factories
-        $livres = Livre::get(); // Create books first to assign to depots later
-        Imprimeur::factory(7)->create();
-        Banque::factory(7)->create();
-        FactSequence::factory(7)->create();
-        User::factory(7)->create();
-        Content::factory(7)->create();
+        // 2. Parent Factories (skip in production — requires dev dependency fakerphp/faker)
+        if (! app()->isProduction()) {
+            $livres = Livre::get();
 
-        // 3. Create Representants AND their Login/Depots immediately
-        // This ensures NO representant is left behind
-        Representant::factory(7)->create()->each(function ($rep) use ($livres) {
-            // Create the polymorphic Login
-            Login::factory()->create([
-                'username' => $rep->login,
-                'authenticatable_id' => $rep->id,
-                'authenticatable_type' => Representant::class,
-                'role' => 'representant'
-            ]);
+            Imprimeur::factory(7)->create();
+            Banque::factory(7)->create();
+            FactSequence::factory(7)->create();
+            User::factory(7)->create();
+            Content::factory(7)->create();
 
-            // Create random inventory for this representative
-            $randomLivres = $livres->random(min(5, $livres->count()));
-            foreach ($randomLivres as $livre) {
-                Depot::factory()->create([
-                    'rep_id' => $rep->id,
-                    'livre_id' => $livre->id,
+            // 3. Create Representants AND their Login/Depots immediately
+            Representant::factory(7)->create()->each(function ($rep) use ($livres) {
+                Login::factory()->create([
+                    'username' => $rep->login,
+                    'authenticatable_id' => $rep->id,
+                    'authenticatable_type' => Representant::class,
+                    'role' => 'representant'
+                ]);
+
+                $randomLivres = $livres->random(min(5, $livres->count()));
+                foreach ($randomLivres as $livre) {
+                    Depot::factory()->create([
+                        'rep_id' => $rep->id,
+                        'livre_id' => $livre->id,
+                    ]);
+                }
+            });
+
+            // 4. Secondary Entities
+            Client::factory(7)->create();
+            Catalogue::factory(7)->create();
+            Robot::factory(7)->create();
+
+            // 5. Items & Transactions
+            $bls = BLivraison::factory(10)->create();
+            $blis = BLivraisonImp::factory(14)->create();
+
+            foreach ($bls as $bl) {
+                $randomCount = fake()->numberBetween(1, 8);
+                BLivraisonItem::factory($randomCount)->create([
+                    'deliverable_id' => $bl->id,
+                    'deliverable_type' => BLivraison::class
                 ]);
             }
-        });
 
-        // 4. Secondary Entities (Clients depend on Reps)
-        Client::factory(7)->create();
-        Catalogue::factory(7)->create();
-        Robot::factory(7)->create();
+            foreach ($blis as $bli) {
+                $randomCount = fake()->numberBetween(2, 10);
+                BLivraisonItem::factory($randomCount)->create([
+                    'deliverable_id' => $bli->id,
+                    'deliverable_type' => BLivraisonImp::class
+                ]);
+            }
 
-        // 5. Items & Transactions
-        // Create the delivery notes
-        $bls = BLivraison::factory(10)->create();
-        $blis = BLivraisonImp::factory(14)->create();
-
-        // Seed random number of items for standard BLs
-        foreach ($bls as $bl) {
-            // Generates between 1 and 8 items per BL
-            $randomCount = fake()->numberBetween(1, 8);
-
-            BLivraisonItem::factory($randomCount)->create([
-                'deliverable_id' => $bl->id,
-                'deliverable_type' => BLivraison::class // Better than hardcoded strings
-            ]);
+            // 6. Final Transactions
+            BVentesClient::factory(7)->create();
+            ClientRemboursement::factory(7)->create();
+            RembImp::factory(7)->create();
+            DemandeF::factory(7)->create();
+            Fact::factory(7)->create();
+            RepRemboursement::factory(7)->create();
+            DetFact::factory(7)->create();
+            CarteVisite::factory(7)->create();
+            CahierCommunication::factory(7)->create();
         }
-
-        // Seed random number of items for Imprimeur BLs
-        foreach ($blis as $bli) {
-            // Generates between 2 and 10 items per BLI
-            $randomCount = fake()->numberBetween(2, 10);
-
-            BLivraisonItem::factory($randomCount)->create([
-                'deliverable_id' => $bli->id,
-                'deliverable_type' => BLivraisonImp::class
-            ]);
-        }
-
-        // 6. Final Transactions
-        BVentesClient::factory(7)->create();
-        ClientRemboursement::factory(7)->create();
-        RembImp::factory(7)->create();
-        DemandeF::factory(7)->create();
-        Fact::factory(7)->create();
-        RepRemboursement::factory(7)->create();
-        DetFact::factory(7)->create();
-        CarteVisite::factory(7)->create();
-        CahierCommunication::factory(7)->create();
     }
 
     private function faker()
